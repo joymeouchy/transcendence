@@ -5,6 +5,8 @@ import { Server } from "socket.io";
 
 const app = express();
 const PORT = 3001;
+let waitingPlayer: any = null;
+let matchId = 0;
 
 const server = http.createServer(app);
 
@@ -14,20 +16,44 @@ const io = new Server(server, {
   },
 });
 
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
 
-  socket.on("ping", () => {
-    console.log("Received ping");
+  socket.on("join_queue", () => {
+    console.log(socket.id, "wants to play");
 
-    socket.emit("pong", { msg: "Hello from backend" });
+    if (waitingPlayer === null) {
+      waitingPlayer = socket;
+      socket.emit("waiting");
+    } else {
+      const room = `match-${matchId++}`;
+
+      // join both players
+      socket.join(room);
+      waitingPlayer.join(room);
+
+      console.log("Match created:", room);
+
+      // notify both players
+      io.to(room).emit("match_found", {
+        room,
+        players: [waitingPlayer.id, socket.id],
+      });
+
+      // reset queue
+      waitingPlayer = null;
+    }
   });
 
   socket.on("disconnect", () => {
-    console.log("Client disconnected:", socket.id);
-  });
-});
+    console.log("Disconnected:", socket.id);
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    if (waitingPlayer?.id === socket.id) {
+      waitingPlayer = null;
+    }
+  });
 });
