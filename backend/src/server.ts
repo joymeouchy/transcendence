@@ -2,12 +2,15 @@
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
+// import authRoutes from "../routes/auth";
 
-const app = express();
 const PORT = 3001;
 let waitingPlayer: any = null;
 let matchId = 0;
 
+const app = express();
+// app.use(express.json());
+// app.use("/auth", authRoutes);
 const server = http.createServer(app);
 
 const io = new Server(server, {
