@@ -10,4 +10,45 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+//this replaces create table
+//format: <field name> <type>  (optional attribut or modifier. written @<modifier> ex: @id, @unique)
+// if question mark after <type> it means optional
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  avatarUrl String?
+  
+  matchesAsPlayer1 Match[] @relation("Player1")
+  matchesAsPlayer2 Match[] @relation("Player2")
+
+  friendshipsSent     Friendship[] @relation("FriendshipSender")
+  friendshipsReceived  Friendship[] @relation("FriendshipReceiver")
+}
+
+model Match {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  player1Id Int
+  player2Id Int
+
+  player1 User @relation("Player1", fields: [player1Id], references: [id])
+  player2 User @relation("Player2", fields: [player2Id], references: [id])
+}
+
+model Friendship {
+  id        Int      @id @default(autoincrement())
+  status    String   // "pending", "accepted"
+
+  senderId   Int
+  receiverId Int
+
+  sender   User @relation("FriendshipSender", fields: [senderId], references: [id])
+  receiver User @relation("FriendshipReceiver", fields: [receiverId], references: [id])
 }
