@@ -14,6 +14,7 @@ export default function Navbar () {
 		<Link href="/"> Home</Link>
 		<Link href="/login"> LogIn</Link>
 		<Link href="/game"> Game</Link>
+		<Link href="/profile"> profile</Link>
     </div>
 	</nav>
   );
@@ -32,7 +33,7 @@ const styles: Record<string, React.CSSProperties> = {
 
   navButtons: {
     display: "flex",
-    gap: "400px",
+    gap: "100px",
   },
 
   main: {
