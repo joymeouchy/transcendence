@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums.js"
-import type * as Prisma from "../internal/prismaNamespace.js"
+import type * as $Enums from "../enums"
+import type * as Prisma from "../internal/prismaNamespace"
 
 /**
  * Model User
@@ -37,6 +37,7 @@ export type UserSumAggregateOutputType = {
 export type UserMinAggregateOutputType = {
   id: number | null
   username: string | null
+  email: string | null
   password: string | null
   avatarUrl: string | null
 }
@@ -44,6 +45,7 @@ export type UserMinAggregateOutputType = {
 export type UserMaxAggregateOutputType = {
   id: number | null
   username: string | null
+  email: string | null
   password: string | null
   avatarUrl: string | null
 }
@@ -51,6 +53,7 @@ export type UserMaxAggregateOutputType = {
 export type UserCountAggregateOutputType = {
   id: number
   username: number
+  email: number
   password: number
   avatarUrl: number
   _all: number
@@ -68,6 +71,7 @@ export type UserSumAggregateInputType = {
 export type UserMinAggregateInputType = {
   id?: true
   username?: true
+  email?: true
   password?: true
   avatarUrl?: true
 }
@@ -75,6 +79,7 @@ export type UserMinAggregateInputType = {
 export type UserMaxAggregateInputType = {
   id?: true
   username?: true
+  email?: true
   password?: true
   avatarUrl?: true
 }
@@ -82,6 +87,7 @@ export type UserMaxAggregateInputType = {
 export type UserCountAggregateInputType = {
   id?: true
   username?: true
+  email?: true
   password?: true
   avatarUrl?: true
   _all?: true
@@ -176,6 +182,7 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type UserGroupByOutputType = {
   id: number
   username: string
+  email: string
   password: string
   avatarUrl: string | null
   _count: UserCountAggregateOutputType | null
@@ -206,6 +213,7 @@ export type UserWhereInput = {
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.IntFilter<"User"> | number
   username?: Prisma.StringFilter<"User"> | string
+  email?: Prisma.StringFilter<"User"> | string
   password?: Prisma.StringFilter<"User"> | string
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
   matchesAsPlayer1?: Prisma.MatchListRelationFilter
@@ -217,6 +225,7 @@ export type UserWhereInput = {
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   matchesAsPlayer1?: Prisma.MatchOrderByRelationAggregateInput
@@ -228,6 +237,7 @@ export type UserOrderByWithRelationInput = {
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: number
   username?: string
+  email?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
@@ -237,11 +247,12 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   matchesAsPlayer2?: Prisma.MatchListRelationFilter
   friendshipsSent?: Prisma.FriendshipListRelationFilter
   friendshipsReceived?: Prisma.FriendshipListRelationFilter
-}, "id" | "username">
+}, "id" | "username" | "email">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -257,12 +268,14 @@ export type UserScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"User"> | number
   username?: Prisma.StringWithAggregatesFilter<"User"> | string
+  email?: Prisma.StringWithAggregatesFilter<"User"> | string
   password?: Prisma.StringWithAggregatesFilter<"User"> | string
   avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
   username: string
+  email: string
   password: string
   avatarUrl?: string | null
   matchesAsPlayer1?: Prisma.MatchCreateNestedManyWithoutPlayer1Input
@@ -274,6 +287,7 @@ export type UserCreateInput = {
 export type UserUncheckedCreateInput = {
   id?: number
   username: string
+  email: string
   password: string
   avatarUrl?: string | null
   matchesAsPlayer1?: Prisma.MatchUncheckedCreateNestedManyWithoutPlayer1Input
@@ -284,6 +298,7 @@ export type UserUncheckedCreateInput = {
 
 export type UserUpdateInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchesAsPlayer1?: Prisma.MatchUpdateManyWithoutPlayer1NestedInput
@@ -295,6 +310,7 @@ export type UserUpdateInput = {
 export type UserUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchesAsPlayer1?: Prisma.MatchUncheckedUpdateManyWithoutPlayer1NestedInput
@@ -306,12 +322,14 @@ export type UserUncheckedUpdateInput = {
 export type UserCreateManyInput = {
   id?: number
   username: string
+  email: string
   password: string
   avatarUrl?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -319,6 +337,7 @@ export type UserUpdateManyMutationInput = {
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -326,6 +345,7 @@ export type UserUncheckedUpdateManyInput = {
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
 }
@@ -337,6 +357,7 @@ export type UserAvgOrderByAggregateInput = {
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
 }
@@ -344,6 +365,7 @@ export type UserMaxOrderByAggregateInput = {
 export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
 }
@@ -431,6 +453,7 @@ export type UserUpdateOneRequiredWithoutFriendshipsReceivedNestedInput = {
 
 export type UserCreateWithoutMatchesAsPlayer1Input = {
   username: string
+  email: string
   password: string
   avatarUrl?: string | null
   matchesAsPlayer2?: Prisma.MatchCreateNestedManyWithoutPlayer2Input
@@ -441,6 +464,7 @@ export type UserCreateWithoutMatchesAsPlayer1Input = {
 export type UserUncheckedCreateWithoutMatchesAsPlayer1Input = {
   id?: number
   username: string
+  email: string
   password: string
   avatarUrl?: string | null
   matchesAsPlayer2?: Prisma.MatchUncheckedCreateNestedManyWithoutPlayer2Input
@@ -455,6 +479,7 @@ export type UserCreateOrConnectWithoutMatchesAsPlayer1Input = {
 
 export type UserCreateWithoutMatchesAsPlayer2Input = {
   username: string
+  email: string
   password: string
   avatarUrl?: string | null
   matchesAsPlayer1?: Prisma.MatchCreateNestedManyWithoutPlayer1Input
@@ -465,6 +490,7 @@ export type UserCreateWithoutMatchesAsPlayer2Input = {
 export type UserUncheckedCreateWithoutMatchesAsPlayer2Input = {
   id?: number
   username: string
+  email: string
   password: string
   avatarUrl?: string | null
   matchesAsPlayer1?: Prisma.MatchUncheckedCreateNestedManyWithoutPlayer1Input
@@ -490,6 +516,7 @@ export type UserUpdateToOneWithWhereWithoutMatchesAsPlayer1Input = {
 
 export type UserUpdateWithoutMatchesAsPlayer1Input = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchesAsPlayer2?: Prisma.MatchUpdateManyWithoutPlayer2NestedInput
@@ -500,6 +527,7 @@ export type UserUpdateWithoutMatchesAsPlayer1Input = {
 export type UserUncheckedUpdateWithoutMatchesAsPlayer1Input = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchesAsPlayer2?: Prisma.MatchUncheckedUpdateManyWithoutPlayer2NestedInput
@@ -520,6 +548,7 @@ export type UserUpdateToOneWithWhereWithoutMatchesAsPlayer2Input = {
 
 export type UserUpdateWithoutMatchesAsPlayer2Input = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchesAsPlayer1?: Prisma.MatchUpdateManyWithoutPlayer1NestedInput
@@ -530,6 +559,7 @@ export type UserUpdateWithoutMatchesAsPlayer2Input = {
 export type UserUncheckedUpdateWithoutMatchesAsPlayer2Input = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchesAsPlayer1?: Prisma.MatchUncheckedUpdateManyWithoutPlayer1NestedInput
@@ -539,6 +569,7 @@ export type UserUncheckedUpdateWithoutMatchesAsPlayer2Input = {
 
 export type UserCreateWithoutFriendshipsSentInput = {
   username: string
+  email: string
   password: string
   avatarUrl?: string | null
   matchesAsPlayer1?: Prisma.MatchCreateNestedManyWithoutPlayer1Input
@@ -549,6 +580,7 @@ export type UserCreateWithoutFriendshipsSentInput = {
 export type UserUncheckedCreateWithoutFriendshipsSentInput = {
   id?: number
   username: string
+  email: string
   password: string
   avatarUrl?: string | null
   matchesAsPlayer1?: Prisma.MatchUncheckedCreateNestedManyWithoutPlayer1Input
@@ -563,6 +595,7 @@ export type UserCreateOrConnectWithoutFriendshipsSentInput = {
 
 export type UserCreateWithoutFriendshipsReceivedInput = {
   username: string
+  email: string
   password: string
   avatarUrl?: string | null
   matchesAsPlayer1?: Prisma.MatchCreateNestedManyWithoutPlayer1Input
@@ -573,6 +606,7 @@ export type UserCreateWithoutFriendshipsReceivedInput = {
 export type UserUncheckedCreateWithoutFriendshipsReceivedInput = {
   id?: number
   username: string
+  email: string
   password: string
   avatarUrl?: string | null
   matchesAsPlayer1?: Prisma.MatchUncheckedCreateNestedManyWithoutPlayer1Input
@@ -598,6 +632,7 @@ export type UserUpdateToOneWithWhereWithoutFriendshipsSentInput = {
 
 export type UserUpdateWithoutFriendshipsSentInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchesAsPlayer1?: Prisma.MatchUpdateManyWithoutPlayer1NestedInput
@@ -608,6 +643,7 @@ export type UserUpdateWithoutFriendshipsSentInput = {
 export type UserUncheckedUpdateWithoutFriendshipsSentInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchesAsPlayer1?: Prisma.MatchUncheckedUpdateManyWithoutPlayer1NestedInput
@@ -628,6 +664,7 @@ export type UserUpdateToOneWithWhereWithoutFriendshipsReceivedInput = {
 
 export type UserUpdateWithoutFriendshipsReceivedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchesAsPlayer1?: Prisma.MatchUpdateManyWithoutPlayer1NestedInput
@@ -638,6 +675,7 @@ export type UserUpdateWithoutFriendshipsReceivedInput = {
 export type UserUncheckedUpdateWithoutFriendshipsReceivedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchesAsPlayer1?: Prisma.MatchUncheckedUpdateManyWithoutPlayer1NestedInput
@@ -706,6 +744,7 @@ export type UserCountOutputTypeCountFriendshipsReceivedArgs<ExtArgs extends runt
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   username?: boolean
+  email?: boolean
   password?: boolean
   avatarUrl?: boolean
   matchesAsPlayer1?: boolean | Prisma.User$matchesAsPlayer1Args<ExtArgs>
@@ -718,6 +757,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   username?: boolean
+  email?: boolean
   password?: boolean
   avatarUrl?: boolean
 }, ExtArgs["result"]["user"]>
@@ -725,6 +765,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   username?: boolean
+  email?: boolean
   password?: boolean
   avatarUrl?: boolean
 }, ExtArgs["result"]["user"]>
@@ -732,11 +773,12 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type UserSelectScalar = {
   id?: boolean
   username?: boolean
+  email?: boolean
   password?: boolean
   avatarUrl?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username" | "password" | "avatarUrl", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username" | "email" | "password" | "avatarUrl", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   matchesAsPlayer1?: boolean | Prisma.User$matchesAsPlayer1Args<ExtArgs>
   matchesAsPlayer2?: boolean | Prisma.User$matchesAsPlayer2Args<ExtArgs>
@@ -758,6 +800,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     username: string
+    email: string
     password: string
     avatarUrl: string | null
   }, ExtArgs["result"]["user"]>
@@ -1189,6 +1232,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'Int'>
   readonly username: Prisma.FieldRef<"User", 'String'>
+  readonly email: Prisma.FieldRef<"User", 'String'>
   readonly password: Prisma.FieldRef<"User", 'String'>
   readonly avatarUrl: Prisma.FieldRef<"User", 'String'>
 }
