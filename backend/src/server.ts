@@ -1,16 +1,22 @@
 //to run -> npx ts-node-dev src/server.ts
+import dotenv from "dotenv";
+dotenv.config(); // loads .env from current directory
 import express from "express";
+import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
-// import authRoutes from "../routes/auth";
+import authRoutes from "../routes/auth";
 
 const PORT = 3001;
 let waitingPlayer: any = null;
 let matchId = 0;
 
 const app = express();
-// app.use(express.json());
-// app.use("/auth", authRoutes);
+app.use(cors({
+  origin: "http://localhost:3000",
+}));
+app.use(express.json());
+app.use("/auth", authRoutes);
 const server = http.createServer(app);
 
 const io = new Server(server, {
