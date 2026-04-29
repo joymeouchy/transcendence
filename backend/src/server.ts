@@ -1,6 +1,7 @@
 //to run -> npx ts-node-dev src/server.ts
 import dotenv from "dotenv";
-dotenv.config(); // loads .env from current directory
+dotenv.config({ path: "../.env" });
+dotenv.config();
 import express from "express";
 import cors from "cors";
 import http from "http";
