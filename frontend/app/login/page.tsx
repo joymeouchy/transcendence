@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from "react";
@@ -7,13 +6,31 @@ import Link from "next/link";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const handleSubmit = (e : any) => {
-    e.preventDefault();
+  const handleSubmit = async (e: any) => {
+  e.preventDefault();
 
-    //placeholders for testing
-    console.log("Email:", email); 
-    console.log("Password:", password);
-  };
+  try {
+    const response = await fetch("http://localhost:3001/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.error);
+      return;
+    }
+
+    console.log("Login successful:", data);
+    // router.push("/home");  // go to home or profile when login successful
+
+  } catch (err) {
+    console.error("Login error:", err);
+    alert("Something went wrong");
+  }
+};
 
   return (
     <div className="flex items-center justify-center min-h-screen">
