@@ -16,6 +16,7 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: "postgresql://postgres:1234@postgres:5432/transcendence_db"
+      JWT_SECRET: "some_secret_key"
 
   postgres:
     image: postgres:15
