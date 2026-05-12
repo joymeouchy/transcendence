@@ -1,34 +1,44 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { socket } from "../../lib/socket";
 
+import GameCanvas from "../components/game/GameCanvas";
+import GameModal from "../components/game/GameModal";
+
+import "./page.scss";
+
 export default function GamePage() {
+  const [showModal, setShowModal] = useState(true);
+
   useEffect(() => {
     socket.connect();
 
-    socket.on("waiting", () => {
-      console.log("Waiting for another player...");
-    });
-
-    socket.on("match_found", (data) => {
-      console.log("Match found!", data);
+    socket.on("match_found", () => {
+      setShowModal(false);
     });
 
     return () => {
-      socket.off("waiting");
-      socket.off("match_found");
       socket.disconnect();
     };
   }, []);
 
-  return (
-    <div>
-      <h1>Game Page</h1>
+  const joinQueue = () => {
+    socket.emit("join_queue");
+  };
 
-      <button onClick={() => socket.emit("join_queue")}>
-        Play
-      </button>
+  return (
+    <div className="game-page">
+      <div className="game-container">
+        <div className="scoreboard">
+          <div>0</div>
+          <div>0</div>
+        </div>
+
+        <GameCanvas />
+      </div>
+
+      {showModal && <GameModal onPlay={joinQueue} />}
     </div>
   );
 }
