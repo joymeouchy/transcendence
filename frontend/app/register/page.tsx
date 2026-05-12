@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import "./page.scss";
 
 export default function RegisterPage() {
-
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const handleSubmit = async (e: any) => {
+
+  const handleSubmit = (e: any) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -17,74 +18,65 @@ export default function RegisterPage() {
       return;
     }
 
-    try {
-      const response = await fetch("http://localhost:3001/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.error);
-        return;
-      }
-
-      console.log("Registered successfully:", data);
-      // router.push("/login");
-
-    } catch (err) {
-      console.error("Register error:", err);
-      alert("Something went wrong");
-    }
+    // placeholders for testing
+    console.log("Username:", username);
+    console.log("Email:", email);
+    console.log("Password:", password);
+    console.log("Confirmed Password:", confirmPassword);
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-72 p-6 border rounded"
-      >
-        <h1 className="text-xl font-bold">Register</h1>
-        <label>Username</label>
+    <div className="register-page">
+      <form onSubmit={handleSubmit} className="register-form">
+        <h1 className="register-title">Register</h1>
+
+        <label className="register-label">Username</label>
         <input
-          type="username"
+          type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="border p-2 rounded w-64"
+          className="register-input"
           required
         />
-        <label>Email</label>
+
+        <label className="register-label">Email</label>
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border p-2 rounded w-64"
+          className="register-input"
           required
         />
-        <label>Password</label>
+
+        <label className="register-label">Password</label>
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="border p-2 rounded w-64"
+          className="register-input"
           required
         />
-        <label>Confirm Password</label>
+
+        <label className="register-label">Confirm Password</label>
         <input
           type="password"
           placeholder="Confirm Password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="border p-2 rounded w-64"
+          className="register-input"
           required
         />
-        <button type="submit"
-          className="bg-black text-white p-2 rounded hover:opacity-80"
-        >
-          Register </button>
+
+        <Link href="../login" className="login-link">
+          Already a User? Login
+        </Link>
+
+        <button type="submit" className="register-button">
+          Register
+        </button>
       </form>
     </div>
   );
