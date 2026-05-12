@@ -58,8 +58,13 @@ router.post("/login", async (req, res) => {
     const user = await prisma.user.findUnique({
       where: { email },
     });
+    
     if (!user) {
       return res.status(400).json({ error: "Invalid credentials" });
+    }
+
+    if (!user.password) {
+      return res.status(400).json({ error: "This account uses social login. Please sign in with Google, GitHub, or 42." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);

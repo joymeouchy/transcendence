@@ -1,0 +1,29 @@
+@use "../../../styles/variables" as v;
+
+.card {
+  background: #111827; /* gray-900 */
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.label {
+  color: #9ca3af; /* gray-400 */
+  font-size: 14px;
+}
+
+.value {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.valueGreen {
+  color: v.$green;
+}
+
+.valueRed {
+  color: v.$red;
+}
+
+.valueBlue {
+  color: v.$blue;
+}
