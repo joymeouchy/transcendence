@@ -1,0 +1,102 @@
+/* GamePage.scss */
+
+.game-page {
+  height: 100vh;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  overflow: hidden;
+}
+
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 16px;
+
+  width: min(90vw, 900px);
+  max-height: 100vh;
+}
+
+.scoreboard {
+  width: min(90vw, 900px);
+  display: flex;
+  justify-content: space-between;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.controls {
+  display: flex;
+  gap: 16px;
+}
+
+.play-button {
+  padding: 12px 24px;
+  background: #2563eb;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.play-button:hover {
+  background: #1d4ed8;
+}
+
+.instructions {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.game-modal {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.6);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 9999;
+}
+
+.modal-box {
+  background: #111827;
+  border: 2px solid #475569;
+  border-radius: 12px;
+
+  padding: 24px;
+  min-width: 240px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  text-align: center;
+  color: white;
+}
+
+.modal-box button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: white;
+
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.modal-box button:hover {
+  background: #1d4ed8;
+}
