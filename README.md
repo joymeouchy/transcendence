@@ -2,7 +2,7 @@
 -------------
 Frontend: Next.js + React (UI)
 Backend: Node.js + Typescript
-Frontend Framework: Tailwind CSS
+Frontend Framework: SCSS
 Backend Framework: Express
 Database: PostgreSQL
 ORM: Prisma

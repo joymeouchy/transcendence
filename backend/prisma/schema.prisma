@@ -18,13 +18,15 @@ datasource db {
 //format: <field name> <type>  (optional attribut or modifier. written @<modifier> ex: @id, @unique)
 // if question mark after <type> it means optional
 
-model User {
+  model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
   email     String   @unique
-  password  String
+  password  String?  // optional since OAuth users won't have a password
   avatarUrl String?
-  
+
+  oauthId   String?  @unique // the ID returned by the OAuth provider
+  provider  String?  // "google", "42", etc.
   matchesAsPlayer1 Match[] @relation("Player1")
   matchesAsPlayer2 Match[] @relation("Player2")
 

@@ -4,7 +4,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { socket } from "../lib/socket";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/Navbar/Navbar";
 
 export default function Home() {
   useEffect(() => {
