@@ -12,20 +12,30 @@ export default function GamePage() {
   const [showModal, setShowModal] = useState(true);
 
   useEffect(() => {
-    socket.connect();
+  socket.connect();
 
-    socket.on("match_found", () => {
-      setShowModal(false);
-    });
+  const handleMatchFound = () => {
+    setShowModal(false);
+  };
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  socket.on("match_found", handleMatchFound);
+
+  return () => {
+    socket.off("match_found", handleMatchFound);
+    socket.disconnect();
+  };
+}, []);
 
   const joinQueue = () => {
-    socket.emit("join_queue");
-  };
+  console.log("connected?", socket.connected);
+
+  if (!socket.connected) {
+    console.warn("Socket not connected yet");
+    return;
+  }
+
+  socket.emit("join_queue");
+};
 
   return (
     <div className="game-page">
