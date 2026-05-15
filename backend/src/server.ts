@@ -7,6 +7,7 @@ import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import authRoutes from "../routes/auth";
+import { startGame, handlePaddleMove } from "./game";
 
 const PORT = 3001;
 let waitingPlayer: any = null;
@@ -54,9 +55,18 @@ io.on("connection", (socket) => {
         players: [waitingPlayer.id, socket.id],
       });
 
+      // start game loop
+      startGame(io, room, waitingPlayer.id, socket.id);
+      console.log("Game started in room:", room);
+
       // reset queue
       waitingPlayer = null;
     }
+  });
+
+  // handle paddle movement
+  socket.on("paddle_move", ({ room, direction }: { room: string; direction: "up" | "down" }) => {
+    handlePaddleMove(socket.id, room, direction);
   });
 
   socket.on("disconnect", () => {
