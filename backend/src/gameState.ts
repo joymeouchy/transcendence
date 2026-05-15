@@ -1,3 +1,10 @@
+export interface GameState {
+  ball: { x: number; y: number; vx: number; vy: number };
+  paddles: { left: number; right: number };
+  scores: { left: number; right: number };
+  players: { left: string; right: string };
+}
+
 export interface GameConfig {
   canvasWidth: number;
   canvasHeight: number;
@@ -7,7 +14,7 @@ export interface GameConfig {
   paddleSpeed: number;
   ballSpeed: number;
   winningScore: number;
-  gameName: "pong"; // we can add hockey here later
+  gameName: "pong"; // we can add here airHockey later
 }
 
 export const pongConfig: GameConfig = {
@@ -16,7 +23,7 @@ export const pongConfig: GameConfig = {
   paddleHeight: 100,
   paddleWidth: 10,
   ballSize: 10,
-  paddleSpeed: 5,
+  paddleSpeed: 10,
   ballSpeed: 4,
   winningScore: 5,
   gameName: "pong",
