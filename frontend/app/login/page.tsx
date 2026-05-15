@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import "./page.scss";
+import "./page.module.scss";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
