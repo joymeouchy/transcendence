@@ -1,0 +1,16 @@
+export type RegisterDto = {
+  username: string;
+  email: string;
+  password: string;
+};
+
+export type LoginDto = {
+  email: string;
+  password: string;
+};
+
+export type AuthResponse = {
+  message: string;
+  token?: string;
+  userId: string;
+};
