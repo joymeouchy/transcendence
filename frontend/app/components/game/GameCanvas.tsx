@@ -2,113 +2,78 @@
 
 import { useEffect, useRef } from "react";
 import { socket } from "../../../lib/socket";
-
 import "./GameCanvas.scss";
 
+// this is compatible with backend struct
 type GameState = {
-  ballX: number;
-  ballY: number;
-  leftPaddleY: number;
-  rightPaddleY: number;
+  ball: { x: number; y: number; vx: number; vy: number };
+  paddles: { left: number; right: number };
+  scores: { left: number; right: number };
+  players: { left: string; right: string };
 };
 
 export default function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  /*
-   * These refs are updated from backend socket events.
-   * The frontend only renders them.
-   */
-  const gameState = useRef<GameState>({
-    ballX: 450,
-    ballY: 250,
-    leftPaddleY: 200,
-    rightPaddleY: 200,
-  });
+  const gameState = useRef<GameState | null>(null); // null until first game_state arrives
+  const roomRef = useRef<string | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-
-    if (!canvas)
-      return;
+    if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    if (!ctx)
-      return;
+    // change in backend/gameState if u want
+    const width = canvas.width;   // 800
+    const height = canvas.height; // 600
 
-    const width = canvas.width;
-    const height = canvas.height;
+    socket.on("match_found", ({ room }: { room: string }) => {
+      roomRef.current = room;
+    });
 
-    /*
-     * Receive authoritative game state from backend
-     */
     socket.on("game_state", (state: GameState) => {
       gameState.current = state;
     });
 
-    /*
-     * Rendering only
-     */
     const draw = () => {
+      const state = gameState.current;
+      if (!state) return; // wait for first game_state from backend
+
       ctx.clearRect(0, 0, width, height);
 
+      // Background
       ctx.fillStyle = "#111827";
       ctx.fillRect(0, 0, width, height);
 
-      /*
-       * Center line
-       */
+      // Center line
       ctx.fillStyle = "#475569";
-
       for (let i = 0; i < height; i += 30) {
         ctx.fillRect(width / 2 - 2, i, 4, 20);
       }
 
-      const state = gameState.current;
-
-      /*
-       * Paddles
-       */
+      // Paddles
       ctx.fillStyle = "white";
+      ctx.fillRect(20, state.paddles.left, 16, 100);
+      ctx.fillRect(width - 36, state.paddles.right, 16, 100);
 
-      ctx.fillRect(
-        20,
-        state.leftPaddleY,
-        16,
-        100
-      );
-
-      ctx.fillRect(
-        width - 36,
-        state.rightPaddleY,
-        16,
-        100
-      );
-
-      /*
-       * Ball
-       */
+      // Ball
       ctx.beginPath();
-
-      ctx.arc(
-        state.ballX,
-        state.ballY,
-        10,
-        0,
-        Math.PI * 2
-      );
-
+      ctx.fillStyle = "white";
+      ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
       ctx.fill();
       ctx.closePath();
+
+      // Scores
+      ctx.fillStyle = "white";
+      ctx.font = "48px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(`${state.scores.left}`, width / 4, 60);
+      ctx.fillText(`${state.scores.right}`, (width * 3) / 4, 60);
     };
 
-    /*
-     * Frontend render loop only
-     */
     const renderLoop = () => {
       draw();
-
       requestAnimationFrame(renderLoop);
     };
 
@@ -116,38 +81,27 @@ export default function GameCanvas() {
 
     return () => {
       socket.off("game_state");
+      socket.off("match_found");
     };
   }, []);
 
-  /*
-   * Send player input to backend
-   */
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "w") {
-        socket.emit("move_up");
-      }
+      if (!roomRef.current) return;
 
-      if (event.key === "s") {
-        socket.emit("move_down");
-      }
+      if (event.key === "w" || event.key === "ArrowUp")
+        socket.emit("paddle_move", { room: roomRef.current, direction: "up" });
+      if (event.key === "s" || event.key === "ArrowDown")
+        socket.emit("paddle_move", { room: roomRef.current, direction: "down" });
     };
 
     window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   return (
     <div className="canvas-wrapper">
-      <canvas
-        ref={canvasRef}
-        className="game-canvas"
-        width={900}
-        height={500}
-      />
+      <canvas ref={canvasRef} width={800} height={600} />
     </div>
   );
 }
