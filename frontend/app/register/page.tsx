@@ -2,38 +2,50 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import "./page.scss";
+
 import { authService } from "@/services/auth.services";
 
+import AuthLayout from "../components/auth/AuthLayout";
+import AuthPanel from "../components/auth/AuthPanel";
+
+import { registerFields } from "../data/auth/registerFields";
 
 export default function RegisterPage() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-  const handleSubmit = async (e:React.FormEvent<HTMLFormElement>)=>{
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
+    if (
+      formData.password !==
+      formData.confirmPassword
+    ) {
       alert("Passwords do not match");
       return;
     }
 
-     try {
-    const response = await authService.register({
-      username,
-      email,
-      password,
-    });
+    try {
+      const response =
+        await authService.register({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        });
 
-      console.log("Register success:", response);
-
-      // optional redirect later
+      console.log(
+        "Register success:",
+        response
+      );
 
     } catch (err: any) {
       console.error(err);
-      // catch (err: any) {
       console.error(err.response?.data);
 
       alert(
@@ -41,78 +53,92 @@ export default function RegisterPage() {
         "Registration failed"
       );
     }
-    // placeholders for testing
-    console.log("Username:", username);
-    console.log("Email:", email);
-    console.log("Password:", password);
-    console.log("Confirmed Password:", confirmPassword);
+
+    console.log(
+      "Username:",
+      formData.username
+    );
+
+    console.log(
+      "Email:",
+      formData.email
+    );
+
+    console.log(
+      "Password:",
+      formData.password
+    );
+
+    console.log(
+      "Confirmed Password:",
+      formData.confirmPassword
+    );
   };
 
-const labels = [
-    {
-      name: "Username",
-      placeholder: "Username",
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setUsername(e.target.value),
-      value: username,
-      required: true,
-      type: "text",
-    },
-    {
-      name: "Email",
-      placeholder: "example@example.com",
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setEmail(e.target.value),
-      value: email,
-      required: true,
-      type: "email",
-    },
-    {
-      name: "Password",
-      placeholder: "Password",
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setPassword(e.target.value),
-      value: password,
-      required: true,
-      type: "password",
-    },
-    {
-      name: "Confirm Password",
-      placeholder: "Password",
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setConfirmPassword(e.target.value),
-      value: confirmPassword,
-      required: true,
-      type: "password",
-    },
-  ];
-
-
   return (
-    <div className="register-page">
-      <form onSubmit={handleSubmit} className="register-form">
-        <h1 className="register-title">Register</h1>
-          {labels.map((label) => (
-              <div key={label.name}>
-                <label className="register-label">{label.name}</label>
-                <input
-                  type={label.type}
-                  placeholder={label.placeholder}
-                  value={label.value}
-                  onChange={label.onChange}
-                  className="register-input"
-                  required={label.required}
-                />
-              </div>
-            ))}
-        <Link href="../login" className="login-link">
-          Already a User? Login
+    <AuthLayout>
+
+      <AuthPanel>
+
+        <form
+          onSubmit={handleSubmit}
+          className="xp-form"
+        >
+
+          <h3 className="xp-title">
+            Register for PONG
+          </h3>
+
+          {registerFields.map((field) => (
+            <div
+              key={field.key}
+              className="xp-field"
+            >
+
+              <label className="xp-label">
+                {field.label}
+              </label>
+
+              <input
+                type={field.type}
+                placeholder={field.placeholder}
+                value={
+                  formData[
+                  field.key as keyof typeof formData
+                  ]
+                }
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    [
+                      field.key as keyof typeof formData
+                    ]: e.target.value,
+                  }))
+                }
+                className="xp-input"
+                required={field.required}
+              />
+
+            </div>
+          ))}
+
+          <button
+            type="submit"
+            className="xp-submit"
+          >
+            Register
+          </button>
+
+        </form>
+
+        <Link
+          href="/login"
+          className="xp-link"
+        >
+          Already a user? Login
         </Link>
 
-        <button type="submit" className="register-button">
-          Register
-        </button>
-      </form>
-    </div>
+      </AuthPanel>
+    </AuthLayout>
   );
 }
