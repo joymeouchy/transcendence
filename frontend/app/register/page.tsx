@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import "./page.scss";
+import { authService } from "@/services/auth.services";
 
-// import "./page"
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -12,7 +12,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e:React.FormEvent<HTMLFormElement>)=>{
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -20,6 +20,27 @@ export default function RegisterPage() {
       return;
     }
 
+     try {
+    const response = await authService.register({
+      username,
+      email,
+      password,
+    });
+
+      console.log("Register success:", response);
+
+      // optional redirect later
+
+    } catch (err: any) {
+      console.error(err);
+      // catch (err: any) {
+      console.error(err.response?.data);
+
+      alert(
+        err.response?.data?.message ||
+        "Registration failed"
+      );
+    }
     // placeholders for testing
     console.log("Username:", username);
     console.log("Email:", email);
