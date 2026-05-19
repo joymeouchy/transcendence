@@ -23,3 +23,11 @@ export const usernameField: AuthField = {
   type: "text",
   required: true,
 };
+
+export const confirmPasswordField = {
+  key: "confirmPassword",
+  label: "Confirm Password",
+  placeholder: "Password",
+  type: "password",
+  required: true,
+};
