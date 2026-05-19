@@ -6,7 +6,7 @@ import { socket } from "../../lib/socket";
 import GameCanvas from "../components/game/GameCanvas";
 import GameModal from "../components/game/GameModal";
 
-import "./page.module.scss";
+import "./page.scss";
 
 export default function GamePage() {
   const [showModal, setShowModal] = useState(true);
