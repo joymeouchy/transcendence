@@ -1,0 +1,2 @@
+- only login returns token ,register does NOT auto-login: create auto log in token for register
+- thoroughly test both register and login pages for invalid cases
