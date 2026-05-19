@@ -1,6 +1,6 @@
 "use client";
 
-import "./../../game/page.module.scss";
+import "./../../game/page.scss";
 
 type Props = {
   onPlay: () => void;
