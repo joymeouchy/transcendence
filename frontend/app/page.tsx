@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { socket } from "../lib/socket";
 import Navbar from "./components/Navbar/Navbar";
+import { isAuthenticated } from "@/lib/auth";
 
 export default function Home() {
   useEffect(() => {
@@ -27,6 +28,11 @@ export default function Home() {
     };
   }, []);
   const router = useRouter();
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      router.replace("/login");
+    }
+  }, []);
 
   return( 
     //added simple nav bar that should be moved later to be able to be reused across all pages 

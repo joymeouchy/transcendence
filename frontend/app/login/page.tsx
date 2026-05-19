@@ -8,6 +8,9 @@ import { useRouter } from "next/navigation";
 import { loginFields } from "../data/auth/loginFields";
 import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
+import { useEffect } from "react";
+import { isAuthenticated } from "@/lib/auth";
+
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -15,6 +18,12 @@ export default function LoginPage() {
     password: "",
   });
   const router = useRouter();
+
+  useEffect(() => {
+  if (isAuthenticated()) {
+    router.replace("/");
+  }
+}, []);
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
@@ -41,7 +50,7 @@ export default function LoginPage() {
     console.log("Email:", formData.email);
     console.log("Password:", formData.password);
   };
-  
+
   return (
     <AuthLayout>
       <AuthPanel>
