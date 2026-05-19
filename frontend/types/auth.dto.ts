@@ -14,3 +14,17 @@ export type AuthResponse = {
   token?: string;
   userId: string;
 };
+
+type FormData = {
+  email: string;
+  password: string;
+  username: string;
+};
+
+export type AuthField = {
+  key: keyof FormData;
+  label: string;
+  placeholder: string;
+  type: string;
+  required?: boolean;
+};
