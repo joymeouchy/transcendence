@@ -2,82 +2,143 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import "./page.scss";
+
+import { authService } from "@/services/auth.services";
+
+import AuthLayout from "../components/auth/AuthLayout";
+import AuthPanel from "../components/auth/AuthPanel";
+
+import { registerFields } from "../data/auth/registerFields";
 
 export default function RegisterPage() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
+    if (
+      formData.password !==
+      formData.confirmPassword
+    ) {
       alert("Passwords do not match");
       return;
     }
 
-    // placeholders for testing
-    console.log("Username:", username);
-    console.log("Email:", email);
-    console.log("Password:", password);
-    console.log("Confirmed Password:", confirmPassword);
+    try {
+      const response =
+        await authService.register({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        });
+
+      console.log(
+        "Register success:",
+        response
+      );
+
+    } catch (err: any) {
+      console.error(err);
+      console.error(err.response?.data);
+
+      alert(
+        err.response?.data?.message ||
+        "Registration failed"
+      );
+    }
+
+    console.log(
+      "Username:",
+      formData.username
+    );
+
+    console.log(
+      "Email:",
+      formData.email
+    );
+
+    console.log(
+      "Password:",
+      formData.password
+    );
+
+    console.log(
+      "Confirmed Password:",
+      formData.confirmPassword
+    );
   };
 
   return (
-    <div className="register-page">
-      <form onSubmit={handleSubmit} className="register-form">
-        <h1 className="register-title">Register</h1>
+    <AuthLayout>
 
-        <label className="register-label">Username</label>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="register-input"
-          required
-        />
+      <AuthPanel>
 
-        <label className="register-label">Email</label>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="register-input"
-          required
-        />
+        <form
+          onSubmit={handleSubmit}
+          className="xp-form"
+        >
 
-        <label className="register-label">Password</label>
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="register-input"
-          required
-        />
+          <h3 className="xp-title">
+            Register for PONG
+          </h3>
 
-        <label className="register-label">Confirm Password</label>
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          className="register-input"
-          required
-        />
+          {registerFields.map((field) => (
+            <div
+              key={field.key}
+              className="xp-field"
+            >
 
-        <Link href="../login" className="login-link">
-          Already a User? Login
+              <label className="xp-label">
+                {field.label}
+              </label>
+
+              <input
+                type={field.type}
+                placeholder={field.placeholder}
+                value={
+                  formData[
+                  field.key as keyof typeof formData
+                  ]
+                }
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    [
+                      field.key as keyof typeof formData
+                    ]: e.target.value,
+                  }))
+                }
+                className="xp-input"
+                required={field.required}
+              />
+
+            </div>
+          ))}
+
+          <button
+            type="submit"
+            className="xp-submit"
+          >
+            Register
+          </button>
+
+        </form>
+
+        <Link
+          href="/login"
+          className="xp-link"
+        >
+          Already a user? Login
         </Link>
 
-        <button type="submit" className="register-button">
-          Register
-        </button>
-      </form>
-    </div>
+      </AuthPanel>
+    </AuthLayout>
   );
 }
