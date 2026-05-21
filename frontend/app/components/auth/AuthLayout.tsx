@@ -20,9 +20,11 @@ export default function AuthLayout({
             <span>Pong XP</span>
           </div>
         </div>
-
+        
         {/* Page Content */}
+
         {children}
+        {/* <div className="xp-divider" /> */}
 
       </div>
 

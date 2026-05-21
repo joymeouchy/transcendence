@@ -21,7 +21,7 @@ export default function LoginPage() {
 
   useEffect(() => {
   if (isAuthenticated()) {
-    router.replace("/");
+    router.replace("/home");
   }
 }, []);
 
@@ -36,7 +36,7 @@ export default function LoginPage() {
         password: formData.password,
       });
       console.log("Login success:", response);
-      router.push("/");
+      router.push("/home");
 
     } catch (err: any) {
       console.error(err);
@@ -60,7 +60,7 @@ export default function LoginPage() {
         >
 
           <h3 className="xp-title">
-            Log In to PONG
+            Log In to Pong XP
           </h3>
 
           {loginFields.map((field) => (
