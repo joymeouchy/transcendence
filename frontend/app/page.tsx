@@ -1,43 +1,53 @@
-//to run -> npm run dev
 "use client";
 
-import { useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import AuthLayout from "./components/auth/AuthLayout";
+import AuthIcon from "./components/auth/AuthIcon";
 import { useRouter } from "next/navigation";
-import { socket } from "../lib/socket";
-import Navbar from "./components/Navbar/Navbar";
+import { useEffect } from "react";
 import { isAuthenticated } from "@/lib/auth";
 
-export default function Home() {
-  useEffect(() => {
-    socket.connect();
+import "./page.scss";
 
-    socket.on("connect", () => {
-      console.log("Connected:", socket.id);
-
-      socket.emit("ping");
-    });
-
-    socket.on("pong", (data) => {
-      console.log("Server says:", data);
-    });
-
-    return () => {
-      socket.off("connect");
-      socket.off("pong");
-      socket.disconnect();
-    };
-  }, []);
+export default function LandingPage() {
   const router = useRouter();
+
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.replace("/login");
+    if (isAuthenticated()) {
+      router.replace("/home");
     }
   }, []);
 
-  return( 
-    //added simple nav bar that should be moved later to be able to be reused across all pages 
-    <div> 
-      <Navbar ></Navbar>
-    </div>
+  return (
+    <AuthLayout>
+      <div className="xp-divider" />
+      <div className="xp-auth-stack">
+        <div className="xp-auth-card">
+          <div className="xp-system-text"> To begin, select an option </div>
+          <Link href="/login" className="xp-user-tile">
+            <AuthIcon
+              className="xp-auth-icon"
+              src="/chess.jpg"
+            />
+            <div>
+              <h3>Log In</h3>
+              <p>Access existing account</p>
+            </div> </Link>
+        </div>
+
+        <div className="xp-auth-card">
+          <Link href="/register" className="xp-user-tile">
+            <AuthIcon
+              className="xp-auth-icon"
+              src="/beach.jpg"
+            /> <div>
+              <h3>Register</h3> <p>Create new account</p>
+            </div>
+          </Link>
+        </div>
+      </div>
+
+    </AuthLayout >
   );
 }
