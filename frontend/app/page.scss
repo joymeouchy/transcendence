@@ -1,0 +1,152 @@
+.xp-login-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+
+  gap: 40px;
+}
+
+.xp-divider {
+  width: 1px;
+  height: 60vh;
+
+  background: rgba(255, 255, 255, 0.4);
+  opacity: 0.8;
+}
+
+/* RIGHT SIDE WRAPPER */
+.xp-right-container {
+  width: 380px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.xp-auth-panel {
+  width: 100%;
+
+  padding: 18px;
+
+  display: flex;
+  flex-direction: row;
+  gap: 18px;
+
+  border-radius: 10px;
+
+  /* glass effect */
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.06)
+  );
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.xp-login-panel-temp {
+  width: 360px;
+  padding: 20px;
+  border-radius: 8px;
+
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+
+  border: 1px solid rgba(255,255,255,0.3);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.xp-auth-stack {
+  width: 360px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.xp-user-tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px 14px;
+  border-radius: 8px;
+
+  text-decoration: none;
+  color: white;
+
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  transition: all 0.15s ease;
+
+  cursor: pointer;
+}
+
+.xp-user-tile:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.xp-icon-box {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.25),
+    rgba(255, 255, 255, 0.08)
+  );
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15);
+}
+
+.xp-avatar {
+  width: 24px;
+  height: 24px;
+
+  border-radius: 10%;
+
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.xp-avatar-new {
+  background: rgba(120, 200, 255, 0.7);
+}
+
+.xp-user-text h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.xp-user-text p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.xp-auth-icon {
+  width: 70px;
+  height: 70px;
+}
+
+.xp-system-text {
+  margin-bottom: 16px;
+  color: white;
+  font-size: 14px;
+}
