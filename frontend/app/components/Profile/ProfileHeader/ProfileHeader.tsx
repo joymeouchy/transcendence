@@ -1,5 +1,6 @@
 import Image from "next/image";
 import styles from "./ProfileHeader.module.scss";
+import { images } from "@/lib/images";
 
 type Props = {
   username: string;
@@ -10,7 +11,7 @@ export default function ProfileHeader({ username, tagline }: Props) {
   return (
     <div className={styles.header}>
       <Image
-        src="/defaultIcon.png"
+        src={images.defaultUserIcon}
         alt="Avatar"
         width={64}
         height={64}

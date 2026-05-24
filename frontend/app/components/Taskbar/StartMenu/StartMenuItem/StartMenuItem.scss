@@ -1,0 +1,46 @@
+.xp-start-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 6px 8px;
+
+  border-radius: 3px;
+
+  cursor: pointer;
+
+  color: #000;
+  text-decoration: none;
+
+  background: transparent;
+  border: none;
+  outline: none;
+
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.xp-start-menu-item img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* normal hover */
+.xp-start-menu-item:hover {
+  background: #2b579a;
+  color: white;
+}
+
+/* danger variant */
+.xp-start-menu-item--danger {
+  gap: 1px;
+  padding: 0px 0px;
+  color: #ffffff;
+}
+
+/* override hover completely */
+.xp-start-menu-item--danger:hover {
+  background: transparent;
+  outline: 1px dotted rgba(255, 255, 255, 0.8);
+  outline-offset: -2px;
+}

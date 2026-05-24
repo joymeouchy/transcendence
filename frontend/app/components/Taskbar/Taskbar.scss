@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: space-between;
 
-  padding: 0 10px;
+  // padding: 0 10px;
 
   background: linear-gradient(
     to bottom,
@@ -27,6 +27,7 @@
 }
 
 .xp-clock {
+  padding: 0 10px;
   text-align: right;
   line-height: 1.1;
   font-size: 12px;
@@ -35,4 +36,29 @@
 .xp-date {
   font-size: 10px;
   opacity: 0.9;
+}
+
+.xp-start-menu {
+  position: fixed;
+
+  bottom: 40px; /* sits above taskbar */
+  left: 10px;
+
+  width: 200px;
+  height: 250px;
+
+  background: white;
+
+  border: 1px solid #999;
+
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.4);
+
+  padding: 10px;
+
+  font-family: Tahoma, sans-serif;
+}
+
+.xp-start.active {
+  filter: brightness(1.2);
+  transform: translateY(1px);
 }

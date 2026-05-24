@@ -1,27 +1,20 @@
 import "./Sidebar.scss";
 import DesktopIcon from "../DesktopIcon/DesktopIcon";
+import { sidebarItems } from "@/app/data/navigationItems/sidebarItemsFields";
+
 
 export default function Sidebar() {
   return (
     <aside className="xp-sidebar">
 
-      <DesktopIcon
-        image="/home.ico"
-        label="Home"
-        href="/home"
-      />
-
-      <DesktopIcon
-        image="/user.ico"
-        label="My Profile"
-        href="/profile"
-      />
-
-      <DesktopIcon
-        image="/game.ico"
-        label="Play"
-        href="/game"
-      />
+      {sidebarItems.map((item) => (
+        <DesktopIcon
+          key={item.href}
+          image={item.image}
+          label={item.label}
+          href={item.href}
+        />
+      ))}
 
     </aside>
   );
