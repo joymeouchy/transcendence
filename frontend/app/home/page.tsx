@@ -4,7 +4,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { socket } from "../../lib/socket";
-import Navbar from "./../components/Navbar/Navbar";
 import { isAuthenticated } from "@/lib/auth";
 import Sidebar from "../components/Sidebar/Sidebar";
 import "./page.scss"
@@ -42,8 +41,5 @@ export default function Home() {
        <Sidebar />
        <Taskbar />
       </div>
-    //     <div> 
-    //   <Navbar ></Navbar>
-    // </div>
   );
 }
