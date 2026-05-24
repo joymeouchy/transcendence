@@ -1,0 +1,38 @@
+.xp-taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 10px;
+
+  background: linear-gradient(
+    to bottom,
+    #245edb,
+    #1941a5
+  );
+
+  border-top: 1px solid rgba(255,255,255,0.3);
+
+  color: white;
+
+  font-family: Tahoma, sans-serif;
+  font-size: 13px;
+}
+
+.xp-clock {
+  text-align: right;
+  line-height: 1.1;
+  font-size: 12px;
+}
+
+.xp-date {
+  font-size: 10px;
+  opacity: 0.9;
+}
