@@ -54,6 +54,7 @@ export default function RegisterPage() {
         "Register success:",
         response
       );
+       alert("Registration Successful");
       // router.replace("/home");
 
     } catch (err: any) {
@@ -66,25 +67,25 @@ export default function RegisterPage() {
       );
     }
 
-    console.log(
-      "Username:",
-      formData.username
-    );
+    // console.log(
+    //   "Username:",
+    //   formData.username
+    // );
 
-    console.log(
-      "Email:",
-      formData.email
-    );
+    // console.log(
+    //   "Email:",
+    //   formData.email
+    // );
 
-    console.log(
-      "Password:",
-      formData.password
-    );
+    // console.log(
+    //   "Password:",
+    //   formData.password
+    // );
 
-    console.log(
-      "Confirmed Password:",
-      formData.confirmPassword
-    );
+    // console.log(
+    //   "Confirmed Password:",
+    //   formData.confirmPassword
+    // );
   };
 
   return (
