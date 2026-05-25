@@ -4,8 +4,10 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { socket } from "../../lib/socket";
-import Navbar from "./../components/Navbar/Navbar";
 import { isAuthenticated } from "@/lib/auth";
+import Sidebar from "../components/Sidebar/Sidebar";
+import "./page.scss"
+import Taskbar from "../components/Taskbar/Taskbar";
 
 export default function Home() {
   useEffect(() => {
@@ -34,10 +36,10 @@ export default function Home() {
     }
   }, []);
 
-  return( 
-    //added simple nav bar that should be moved later to be able to be reused across all pages 
-    <div> 
-      <Navbar ></Navbar>
-    </div>
+  return ( 
+      <div className="xp-desktop">
+       <Sidebar />
+       <Taskbar />
+      </div>
   );
 }
