@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { api, API_URL } from "@/lib/api";
 import { tokenStorage } from "@/lib/token";
 import type { RegisterDto, LoginDto, AuthResponse } from "../types/auth.dto";
 
@@ -27,6 +27,11 @@ export const authService = {
     }
 
     return res.data;
+  },
+  
+  loginWithGoogle: () => {
+    window.location.href =
+      `${API_URL}/auth/google`;
   },
 
   logout: () => {
