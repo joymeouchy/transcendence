@@ -14,9 +14,11 @@ let waitingPlayer: any = null;
 let matchId = 0;
 
 const app = express();
-app.use(cors({
-  origin: "http://localhost:3000",
-}));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  }),
+);
 app.use(express.json());
 app.use("/auth", authRoutes);
 const server = http.createServer(app);
@@ -40,6 +42,8 @@ io.on("connection", (socket) => {
     if (waitingPlayer === null) {
       waitingPlayer = socket;
       socket.emit("waiting");
+    } else if (waitingPlayer.id === socket.id) {
+      socket.emit("already_waiting");
     } else {
       const room = `match-${matchId++}`;
 
@@ -65,9 +69,12 @@ io.on("connection", (socket) => {
   });
 
   // handle paddle movement
-  socket.on("paddle_move", ({ room, direction }: { room: string; direction: "up" | "down" }) => {
-    handlePaddleMove(socket.id, room, direction);
-  });
+  socket.on(
+    "paddle_move",
+    ({ room, direction }: { room: string; direction: "up" | "down" }) => {
+      handlePaddleMove(socket.id, room, direction);
+    },
+  );
 
   socket.on("disconnect", () => {
     console.log("Disconnected:", socket.id);
