@@ -1,0 +1,41 @@
+/* XPModal.scss */
+
+.xp-modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: var(--xp-space-lg);
+
+  background: rgba(0, 0, 0, 0.45);
+
+  z-index: 9999;
+
+  backdrop-filter: blur(1px);
+}
+
+.xp-modal-container {
+  animation: xp-modal-in 0.15s ease-out;
+}
+
+@keyframes xp-modal-in {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(8px)
+      scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}

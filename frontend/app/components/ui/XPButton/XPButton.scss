@@ -1,0 +1,65 @@
+/* XPButton.scss */
+
+.xp-button {
+  min-width: 75px;
+
+  padding:
+    4px
+    12px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(
+    to bottom,
+    #ffffff,
+    #dfe8f7
+  );
+
+  border-top: 1px solid var(--xp-border-light);
+  border-left: 1px solid var(--xp-border-light);
+
+  border-right: 1px solid var(--xp-border-dark);
+  border-bottom: 1px solid var(--xp-border-dark);
+
+  border-radius: var(--xp-radius-sm);
+
+  color: var(--xp-text);
+
+  font-family: var(--xp-font-main);
+  font-size: 12px;
+
+  cursor: pointer;
+
+  user-select: none;
+
+  box-shadow:
+    inset 1px 1px rgba(255,255,255,0.75);
+
+  transition:
+    filter 0.1s ease,
+    transform 0.05s ease;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.02);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+
+    box-shadow:
+      inset 1px 1px rgba(0,0,0,0.15);
+  }
+
+  &:focus {
+    outline: 1px dotted #000;
+    outline-offset: -4px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+  }
+}
