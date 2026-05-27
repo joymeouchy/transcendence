@@ -1,21 +1,24 @@
-//to run -> npm run dev
 "use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { socket } from "../../lib/socket";
 import { isAuthenticated } from "@/lib/auth";
+
 import Sidebar from "../components/Sidebar/Sidebar";
-import "./page.scss"
 import Taskbar from "../components/Taskbar/Taskbar";
 
+import { images } from "@/lib/images";
+import "./page.scss";
+
 export default function Home() {
+  const router = useRouter();
+
   useEffect(() => {
     socket.connect();
 
     socket.on("connect", () => {
       console.log("Connected:", socket.id);
-
       socket.emit("ping");
     });
 
@@ -29,17 +32,22 @@ export default function Home() {
       socket.disconnect();
     };
   }, []);
-  const router = useRouter();
+
   useEffect(() => {
     if (!isAuthenticated()) {
       router.replace("/login");
     }
-  }, []);
+  }, [router]);
 
-  return ( 
-      <div className="xp-desktop">
-       <Sidebar />
-       <Taskbar />
-      </div>
+  return (
+    <div
+      className="xp-desktop"
+      style={{
+        backgroundImage: `url(${images.windowsDefaultWallpaper})`,
+      }}
+    >
+      <Sidebar />
+      <Taskbar />
+    </div>
   );
 }
