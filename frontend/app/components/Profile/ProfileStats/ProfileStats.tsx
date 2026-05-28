@@ -10,10 +10,21 @@ type Props = {
 
 export default function ProfileStats({ wins, losses, winRate }: Props) {
   return (
-    <div className={styles.grid}>
-    <StatsCard label="Wins" value={wins} colorClass={styles.valueGreen} />
-    <StatsCard label="Losses" value={losses} colorClass={styles.valueRed} />
-    <StatsCard label="Win Rate" value={`${winRate}%`} colorClass={styles.valueBlue} />
-    </div>
+    <div className={styles.stats}>
+  <div className={styles.row}>
+    <span>Wins</span>
+    <span>{wins}</span>
+  </div>
+
+  <div className={styles.row}>
+    <span>Losses</span>
+    <span>{losses}</span>
+  </div>
+
+  <div className={styles.row}>
+    <span>Win Rate</span>
+    <span>{winRate}%</span>
+  </div>
+</div>
   );
 }

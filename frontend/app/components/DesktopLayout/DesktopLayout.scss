@@ -1,0 +1,31 @@
+/* DesktopLayout.scss */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.xp-desktop {
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+
+  overflow: hidden;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.xp-desktop-content {
+  flex: 1;
+
+  padding: 40px;
+
+  overflow: auto;
+
+  display: flex;
+  align-items: flex-start;
+}
