@@ -1,4 +1,4 @@
-import "./XPPanle.scss";
+import "./XPPanel.scss";
 
 type XPPanelProps = {
   children: React.ReactNode;
