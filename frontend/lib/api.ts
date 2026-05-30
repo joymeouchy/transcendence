@@ -1,8 +1,12 @@
 import axios from "axios";
 import { tokenStorage } from "./token";
 
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:3001";
+
 export const api = axios.create({
-  baseURL: "http://localhost:3001",
+  baseURL: API_URL,
 });
 
 api.interceptors.request.use((config) => {

@@ -103,6 +103,14 @@ export default function LoginPage() {
             Log In
           </button>
 
+          <button
+            type="submit"
+            className="xp-submit"
+            onClick={authService.loginWithGoogle}
+          >
+            Log In with Google instead
+          </button>
+
         </form>
         <Link
           href="/register"
