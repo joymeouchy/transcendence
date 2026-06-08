@@ -8,17 +8,21 @@ import http from "http";
 import { Server } from "socket.io";
 import authRoutes from "../routes/auth";
 import { startGame, handlePaddleMove } from "./game";
+import passport from "./OAuth";
 
 const PORT = 3001;
 let waitingPlayer: any = null;
 let matchId = 0;
 
 const app = express();
-app.use(cors({
-  origin: "http://localhost:3000",
-}));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  }),
+);
 app.use(express.json());
 app.use("/auth", authRoutes);
+app.use(passport.initialize());
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -26,7 +30,6 @@ const io = new Server(server, {
     origin: "http://localhost:3000",
   },
 });
-
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
@@ -65,9 +68,12 @@ io.on("connection", (socket) => {
   });
 
   // handle paddle movement
-  socket.on("paddle_move", ({ room, direction }: { room: string; direction: "up" | "down" }) => {
-    handlePaddleMove(socket.id, room, direction);
-  });
+  socket.on(
+    "paddle_move",
+    ({ room, direction }: { room: string; direction: "up" | "down" }) => {
+      handlePaddleMove(socket.id, room, direction);
+    },
+  );
 
   socket.on("disconnect", () => {
     console.log("Disconnected:", socket.id);
