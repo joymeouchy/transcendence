@@ -1,29 +1,42 @@
 .xp-screen {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(to bottom, #3a6ea5, #1e4f8a);
+
+  background: linear-gradient(
+    to bottom,
+    var(--xp-light-blue),
+    var(--xp-dark-blue)
+  );
+
   position: relative;
-  font-family: Tahoma, sans-serif;
+
+  font-family: var(--xp-font-main);
+
   overflow: hidden;
 }
 
-/* subtle XP scanline effect */
+/* scanline effect (keep it subtle XP CRT feel) */
 .xp-screen::before {
   content: "";
+
   position: absolute;
   inset: 0;
+
   background: repeating-linear-gradient(
     to bottom,
-    rgba(255,255,255,0.05),
-    rgba(255,255,255,0.05) 1px,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.04) 1px,
     transparent 2px,
     transparent 4px
   );
+
   pointer-events: none;
 }
+
 /* TOP BAR */
 .xp-screen::after {
   content: "";
+
   position: absolute;
   top: 0;
   left: 0;
@@ -33,11 +46,11 @@
 
   background: linear-gradient(
     to bottom,
-    #224b8f,
-    #16396d
+    var(--xp-dark-blue),
+    #0b2f66
   );
 
-  border-bottom: 1px solid rgba(255,255,255,0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
 
   z-index: 2;
 }
@@ -53,11 +66,11 @@
 
   background: linear-gradient(
     to top,
-    #224b8f,
-    #16396d
+    var(--xp-dark-blue),
+    #0b2f66
   );
 
-  border-top: 1px solid rgba(255,255,255,0.7);
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
 
   z-index: 2;
 }
@@ -65,9 +78,12 @@
 /* CENTER AREA */
 .xp-login-center {
   position: absolute;
-  top: 45%;
+
+  top: 50%;
   left: 50%;
+
   transform: translate(-50%, -50%);
+
   display: flex;
   align-items: center;
   gap: 40px;
@@ -76,7 +92,9 @@
 /* LEFT BRANDING */
 .xp-branding {
   color: white;
+
   text-align: right;
+
   font-size: 14px;
   line-height: 1.2;
 }
@@ -89,71 +107,105 @@
 /* LOGIN PANEL */
 .xp-login-panel {
   width: 360px;
-  padding: 20px;
-  border-radius: 8px;
 
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(8px);
+  padding: var(--xp-space-lg);
 
-  border: 1px solid rgba(255,255,255,0.3);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  border-radius: var(--xp-radius-md);
+
+  background: var(--xp-window-bg);
+
+  border-top: 1px solid var(--xp-border-light);
+  border-left: 1px solid var(--xp-border-light);
+
+  border-right: 1px solid var(--xp-border-dark);
+  border-bottom: 1px solid var(--xp-border-dark);
+
+  box-shadow: var(--xp-window-shadow);
+
+  font-family: var(--xp-font-main);
 }
 
-/* FORM FIXED (THIS WAS THE ISSUE) */
+/* FORM */
 .xp-form {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
+
+  gap: var(--xp-space-sm);
 }
 
-/* INPUT FIX */
+/* INPUT */
 .xp-form input {
   width: 100%;
-  padding: 6px;
-  border-radius: 4px;
-  border: 1px solid #7aa3d6;
+
+  padding: 6px 8px;
+
+  border-radius: var(--xp-radius-sm);
+
+  border-top: 1px solid var(--xp-border-dark);
+  border-left: 1px solid var(--xp-border-dark);
+
+  border-right: 1px solid var(--xp-border-light);
+  border-bottom: 1px solid var(--xp-border-light);
+
   outline: none;
+
+  font-family: var(--xp-font-main);
+}
+
+.xp-form input:focus {
+  outline: 1px dotted #000;
+  outline-offset: -3px;
 }
 
 /* BUTTON */
 .xp-submit {
   width: fit-content;
+
   padding: 6px 14px;
 
-  border-radius: 4px;
-  border: 1px solid #1f7a1f;
+  border-radius: var(--xp-radius-sm);
 
-  background: #429c43;
+  border-top: 1px solid var(--xp-border-light);
+  border-left: 1px solid var(--xp-border-light);
 
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
+  border-right: 1px solid var(--xp-border-dark);
+  border-bottom: 1px solid var(--xp-border-dark);
+
+  background: linear-gradient(
+    to bottom,
+    #ffffff,
+    #dfe8f7
+  );
+
+  color: var(--xp-text);
+
+  font-size: 13px;
 
   cursor: pointer;
+
+  box-shadow:
+    inset 1px 1px rgba(255, 255, 255, 0.7);
 }
 
 .xp-submit:active {
-  background: linear-gradient(#cfe3ff, #ffffff);
+  transform: translateY(1px);
 }
 
 /* LINK */
 .xp-link {
   display: block;
-  margin-top: 10px;
-  font-size: 14px;
+
+  margin-top: var(--xp-space-sm);
+
+  font-size: 12px;
+
   color: white;
-  opacity: 0.8;
+
+  opacity: 0.85;
+
+  text-decoration: none;
 }
 
-/* TOOLTIP */
-.xp-tooltip {
-  position: absolute;
-  top: 30%;
-  right: 10%;
-  background: white;
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+.xp-link:hover {
+  text-decoration: underline;
 }

@@ -1,5 +1,5 @@
 import "./Sidebar.scss";
-import DesktopIcon from "../DesktopIcon/DesktopIcon";
+import DesktopIcon from "./DesktopIcon/DesktopIcon";
 import { sidebarItems } from "@/app/data/navigationItems/sidebarItemsFields";
 
 

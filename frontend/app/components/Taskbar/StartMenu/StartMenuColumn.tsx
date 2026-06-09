@@ -1,18 +1,23 @@
+import "./StartMenu.scss";
 import StartMenuItem from "./StartMenuItem/StartMenuItem";
 
-type Item = {
+type StartMenuItemType = {
   image: string;
   label: string;
   href: string;
 };
 
 type Props = {
-  items: Item[];
+  items: StartMenuItemType[];
+  className?: string;
 };
 
-export default function StartMenuColumn({ items }: Props) {
+export default function StartMenuColumn({
+  items,
+  className = "",
+}: Props) {
   return (
-    <div className="xp-start-menu-column">
+    <div className={`xp-start-menu-column ${className}`}>
       {items.map((item) => (
         <StartMenuItem
           key={item.href}
