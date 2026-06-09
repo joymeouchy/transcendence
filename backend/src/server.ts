@@ -8,6 +8,7 @@ import http from "http";
 import { Server } from "socket.io";
 import authRoutes from "../routes/auth";
 import { startGame, handlePaddleMove } from "./game";
+import passport from "./OAuth";
 
 const PORT = 3001;
 let waitingPlayer: any = null;
@@ -21,6 +22,7 @@ app.use(
 );
 app.use(express.json());
 app.use("/auth", authRoutes);
+app.use(passport.initialize());
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -28,7 +30,6 @@ const io = new Server(server, {
     origin: "http://localhost:3000",
   },
 });
-
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

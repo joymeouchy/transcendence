@@ -1,29 +1,36 @@
 .xp-screen {
   width: 100vw;
   height: 100vh;
+
   background: linear-gradient(to bottom, #3a6ea5, #1e4f8a);
+
   position: relative;
-  font-family: Tahoma, sans-serif;
+
+  font-family: var(--xp-font-main);
+
   overflow: hidden;
 }
 
-/* subtle XP scanline effect */
 .xp-screen::before {
   content: "";
+
   position: absolute;
   inset: 0;
+
   background: repeating-linear-gradient(
     to bottom,
-    rgba(255,255,255,0.05),
-    rgba(255,255,255,0.05) 1px,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.05) 1px,
     transparent 2px,
     transparent 4px
   );
+
   pointer-events: none;
 }
-/* TOP BAR */
+
 .xp-screen::after {
   content: "";
+
   position: absolute;
   top: 0;
   left: 0;
@@ -31,18 +38,13 @@
   width: 100%;
   height: 60px;
 
-  background: linear-gradient(
-    to bottom,
-    #224b8f,
-    #16396d
-  );
+  background: linear-gradient(to bottom, #224b8f, #16396d);
 
-  border-bottom: 1px solid rgba(255,255,255,0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
 
   z-index: 2;
 }
 
-/* BOTTOM BAR */
 .xp-bottom-bar {
   position: absolute;
   bottom: 0;
@@ -51,32 +53,32 @@
   width: 100%;
   height: 60px;
 
-  background: linear-gradient(
-    to top,
-    #224b8f,
-    #16396d
-  );
+  background: linear-gradient(to top, #224b8f, #16396d);
 
-  border-top: 1px solid rgba(255,255,255,0.7);
+  border-top: 1px solid rgba(255, 255, 255, 0.7);
 
   z-index: 2;
 }
 
-/* CENTER AREA */
 .xp-login-center {
   position: absolute;
+
   top: 45%;
   left: 50%;
+
   transform: translate(-50%, -50%);
+
   display: flex;
   align-items: center;
+
   gap: 40px;
 }
 
-/* LEFT BRANDING */
 .xp-branding {
   color: white;
+
   text-align: right;
+
   font-size: 14px;
   line-height: 1.2;
 }
@@ -86,47 +88,56 @@
   font-weight: bold;
 }
 
-/* LOGIN PANEL */
 .xp-login-panel {
   width: 360px;
-  padding: 20px;
-  border-radius: 8px;
 
-  background: rgba(255,255,255,0.15);
+  padding: 20px;
+
+  border-radius: var(--xp-radius-md);
+
+  background: rgba(255, 255, 255, 0.15);
+
   backdrop-filter: blur(8px);
 
-  border: 1px solid rgba(255,255,255,0.3);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  box-shadow: var(--xp-window-shadow);
 }
 
-/* FORM FIXED (THIS WAS THE ISSUE) */
 .xp-form {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+
   gap: 10px;
+
+  align-items: stretch;
 }
 
-/* INPUT FIX */
 .xp-form input {
   width: 100%;
+
   padding: 6px;
-  border-radius: 4px;
+
+  border-radius: var(--xp-radius-sm);
+
   border: 1px solid #7aa3d6;
+
   outline: none;
 }
 
-/* BUTTON */
 .xp-submit {
   width: fit-content;
+
   padding: 6px 14px;
 
-  border-radius: 4px;
+  border-radius: var(--xp-radius-sm);
+
   border: 1px solid #1f7a1f;
 
   background: #429c43;
 
   color: white;
+
   font-size: 14px;
   font-weight: bold;
 
@@ -134,44 +145,53 @@
 }
 
 .xp-submit:active {
-  background: linear-gradient(#cfe3ff, #ffffff);
+  background: linear-gradient(to bottom, #cfe3ff, #ffffff);
 }
 
-/* LINK */
 .xp-link {
   display: block;
+
   margin-top: 10px;
+
   font-size: 14px;
+
   color: white;
+
   opacity: 0.8;
 }
 
-/* TOOLTIP */
 .xp-tooltip {
   position: absolute;
+
   top: 30%;
   right: 10%;
+
   background: white;
+
   padding: 6px 10px;
-  border-radius: 4px;
+
+  border-radius: var(--xp-radius-sm);
+
   font-size: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .xp-divider {
   width: 1px;
   height: 60%;
 
-  background: rgba(255,255,255,0.4);
+  background: rgba(255, 255, 255, 0.4);
 }
-
-/* components/XpAvatar.scss */
 
 .xp-avatar {
   border: 2px solid #fff;
+
   box-shadow:
     inset -1px -1px 0 #000,
     inset 1px 1px 0 #dfdfdf;
+
   image-rendering: pixelated;
+
   object-fit: cover;
 }
