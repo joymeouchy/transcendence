@@ -48,7 +48,6 @@
   "compilerOptions": {
     "module": "commonjs",
     "moduleResolution": "node",
-    "ignoreDeprecations": "6.0",
     "target": "esnext",
     "types": ["node"],
     "sourceMap": true,
