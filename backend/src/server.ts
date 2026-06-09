@@ -108,8 +108,8 @@ io.on("connection", (socket) => {
       if (game.players.left === socket.id || game.players.right === socket.id) {
         io.to(room).emit("player_disconnected");
         clearInterval(gameIntervals[room]);
-        delete games[room];
         delete gameIntervals[room];
+        delete games[room];
         break;
       }
     }
