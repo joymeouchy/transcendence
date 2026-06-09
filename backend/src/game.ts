@@ -5,8 +5,8 @@ interface FullGameState extends GameState {
   config: GameConfig;
 }
 
-const games: Record<string, FullGameState> = {};
-const gameIntervals: Record<string, NodeJS.Timeout> = {};
+export const games: Record<string, FullGameState> = {};
+export const gameIntervals: Record<string, NodeJS.Timeout> = {};
 
 export function startGame(
   io: Server,
@@ -32,8 +32,11 @@ export function startGame(
   };
 
   gameIntervals[room] = setInterval(() => {
+    if (!games[room]) {
+      clearInterval(gameIntervals[room]);
+      return;
+    }
     updateGame(io, room);
-    // only send GameState to frontend, not config
     const { config: _, ...stateToSend } = games[room]!;
     io.to(room).emit("game_state", stateToSend);
   }, 1000 / 60);
