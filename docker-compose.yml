@@ -29,7 +29,7 @@ services:
       GOOGLE_CLIENT_SECRET: "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"
       SESSION_SECRET: "some_random_string"
 
-    command: sh -c "npx prisma generate && npx ts-node-dev src/server.ts"
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && npx ts-node-dev src/server.ts"
 
   postgres:
     image: postgres:15
