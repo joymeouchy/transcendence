@@ -121,8 +121,8 @@ function updateGame(io: Server, room: string) {
         : game.players.right;
     io.to(room).emit("game_over", { winner, scores: game.scores });
     clearInterval(gameIntervals[room]);
-    delete games[room];
     delete gameIntervals[room];
+    delete games[room];
   }
 }
 

@@ -9,6 +9,22 @@ import { Server } from "socket.io";
 import authRoutes from "../routes/auth";
 import { startGame, handlePaddleMove, games, gameIntervals } from "./game";
 import passport from "./OAuth";
+import userRoutes from "../routes/users";
+
+import swaggerUi from "swagger-ui-express";
+import swaggerJsdoc from "swagger-jsdoc";
+
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Transcendence API",
+      version: "1.0.0",
+      description: "Pong game backend API",
+    },
+  },
+  apis: ["/app/routes/*.ts"],
+};
 
 const PORT = 3001;
 let waitingPlayer: any = null;
@@ -18,10 +34,11 @@ const app = express();
 app.use(
   cors({
     origin: "http://localhost:3000",
-  }),
+  })
 );
 app.use(express.json());
 app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
 app.use(passport.initialize());
 const server = http.createServer(app);
 
@@ -30,6 +47,10 @@ const io = new Server(server, {
     origin: "http://localhost:3000",
   },
 });
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
@@ -43,11 +64,9 @@ io.on("connection", (socket) => {
     if (waitingPlayer === null) {
       waitingPlayer = socket;
       socket.emit("waiting");
-    } 
-    else if (waitingPlayer.id === socket.id) {
+    } else if (waitingPlayer.id === socket.id) {
       socket.emit("already_waiting");
-    }
-    else {
+    } else {
       const room = `match-${matchId++}`;
 
       // join both players
@@ -76,7 +95,7 @@ io.on("connection", (socket) => {
     "paddle_move",
     ({ room, direction }: { room: string; direction: "up" | "down" }) => {
       handlePaddleMove(socket.id, room, direction);
-    },
+    }
   );
 
   socket.on("disconnect", () => {
@@ -91,8 +110,8 @@ io.on("connection", (socket) => {
       if (game.players.left === socket.id || game.players.right === socket.id) {
         io.to(room).emit("player_disconnected");
         clearInterval(gameIntervals[room]);
-        delete games[room];
         delete gameIntervals[room];
+        delete games[room];
         break;
       }
     }
