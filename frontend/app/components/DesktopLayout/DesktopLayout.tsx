@@ -1,0 +1,35 @@
+"use client";
+
+import { ReactNode } from "react";
+
+import Sidebar from "@/app/components/Sidebar/Sidebar";
+import Taskbar from "@/app/components/Taskbar/Taskbar";
+
+import { images } from "@/lib/images";
+
+import "./DesktopLayout.scss";
+
+type DesktopLayoutProps = {
+  children: ReactNode;
+};
+
+export default function DesktopLayout({
+  children,
+}: DesktopLayoutProps) {
+  return (
+    <div
+      className="xp-desktop"
+      style={{
+        backgroundImage: `url(${images.windowsDefaultWallpaper})`,
+      }}
+    >
+      <Sidebar />
+
+      <main className="xp-desktop-content">
+        {children}
+      </main>
+
+      <Taskbar />
+    </div>
+  );
+}

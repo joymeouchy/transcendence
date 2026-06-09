@@ -14,29 +14,21 @@
 
   background: linear-gradient(
     to bottom,
-    #0b5a2a,
-    #06421f
+    #2f8f4e,
+    #1f6f39
   );
 
-  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  border-right: 1px solid rgba(0, 0, 0, 0.25);
 
-  transition: background 0.15s ease;
+  transition: filter 0.15s ease, transform 0.1s ease;
 }
 
-/* hover = lighter green */
 .xp-start:hover {
-  background: linear-gradient(
-    to bottom,
-    #117a3a,
-    #0a5a2a
-  );
+  filter: brightness(1.1);
 }
 
-/* active/open state */
+.xp-start:active,
 .xp-start.active {
-  background: linear-gradient(
-    to bottom,
-    #0a3f1d,
-    #062d14
-  );
+  filter: brightness(0.9);
+  transform: translateY(1px);
 }

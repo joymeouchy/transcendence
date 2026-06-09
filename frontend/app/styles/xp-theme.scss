@@ -1,13 +1,46 @@
 :root {
+  /* COLORS */
+
   --xp-blue: #245edb;
   --xp-dark-blue: #0c2d83;
   --xp-light-blue: #3a6ff7;
 
-  --xp-window-bg: #ece9d8;
+  --xp-window-bg: #e9eefc;
+
   --xp-border-light: #ffffff;
   --xp-border-dark: #7f9db9;
 
   --xp-sidebar: #1d4fa3;
 
-  --xp-text: #000;
+  --xp-text: #000000;
+
+  /* FONTS */
+
+  --xp-font-main:
+    "Tahoma",
+    "Segoe UI",
+    sans-serif;
+
+  --xp-font-mono:
+    "Consolas",
+    monospace;
+
+  /* SPACING */
+
+  --xp-space-xs: 4px;
+  --xp-space-sm: 8px;
+  --xp-space-md: 12px;
+  --xp-space-lg: 16px;
+  --xp-space-xl: 24px;
+
+  /* RADIUS */
+
+  --xp-radius-sm: 4px;
+  --xp-radius-md: 6px;
+  --xp-radius-lg: 10px;
+
+  /* SHADOWS */
+
+  --xp-window-shadow:
+    2px 2px 10px rgba(0, 0, 0, 0.35);
 }

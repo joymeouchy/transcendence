@@ -1,0 +1,20 @@
+.xp-panel {
+  background: #f5f7ff;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.9);
+  border-left: 1px solid rgba(255, 255, 255, 0.9);
+
+  border-right: 1px solid var(--xp-border-dark);
+  border-bottom: 1px solid var(--xp-border-dark);
+
+  border-radius: var(--xp-radius-sm);
+
+  padding: var(--xp-space-md);
+
+  font-family: var(--xp-font-main);
+  font-size: 13px;
+  color: var(--xp-text);
+
+  box-shadow:
+    inset 1px 1px rgba(0, 0, 0, 0.05);
+}

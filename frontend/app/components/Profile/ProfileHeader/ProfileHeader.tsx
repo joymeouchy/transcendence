@@ -13,8 +13,8 @@ export default function ProfileHeader({ username, tagline }: Props) {
       <Image
         src={images.defaultUserIcon}
         alt="Avatar"
-        width={64}
-        height={64}
+        width={72}
+        height={72}
         className={styles.avatar}
       />
 

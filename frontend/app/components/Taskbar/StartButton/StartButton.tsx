@@ -1,4 +1,4 @@
-import "./StartButton.scss"
+import "./StartButton.scss";
 
 type StartButtonProps = {
   open: boolean;
@@ -10,11 +10,13 @@ export default function StartButton({
   onClick,
 }: StartButtonProps) {
   return (
-    <div
+    <button
       className={`xp-start ${open ? "active" : ""}`}
       onClick={onClick}
+      aria-pressed={open}
+      type="button"
     >
       Start
-    </div>
+    </button>
   );
 }
