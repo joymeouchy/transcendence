@@ -9,6 +9,7 @@ import { Server } from "socket.io";
 import authRoutes from "../routes/auth";
 import { startGame, handlePaddleMove, games, gameIntervals } from "./game";
 import passport from "./OAuth";
+import userRoutes from "../routes/users";
 
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
@@ -37,6 +38,7 @@ app.use(
 );
 app.use(express.json());
 app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
 app.use(passport.initialize());
 const server = http.createServer(app);
 
