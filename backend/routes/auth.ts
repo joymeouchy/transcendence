@@ -9,7 +9,37 @@ const prisma = new PrismaClient();
 const SALT_ROUNDS = 12;
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
-// REGISTER
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - email
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *       400:
+ *         description: User already exists or missing fields
+ *       500:
+ *         description: Server error
+ */
+
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -57,7 +87,33 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// LOGIN
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Login with email and password
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful, returns JWT token
+ *       400:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Server error
+ */
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -94,7 +150,15 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Google OAuth
+/**
+ * @swagger
+ * /auth/google:
+ *   get:
+ *     summary: Login with Google OAuth
+ *     responses:
+ *       302:
+ *         description: Redirects to Google login
+ */
 router.get(
   "/google",
   passport.authenticate("google", {
@@ -103,6 +167,15 @@ router.get(
   }),
 );
 
+/**
+ * @swagger
+ * /auth/google/callback:
+ *   get:
+ *     summary: Google OAuth callback
+ *     responses:
+ *       302:
+ *         description: Redirects to frontend with token
+ */
 router.get(
   "/google/callback",
   passport.authenticate("google", {
