@@ -7,7 +7,7 @@ import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import authRoutes from "../routes/auth";
-import { startGame, handlePaddleMove } from "./game";
+import { startGame, handlePaddleMove, games, gameIntervals } from "./game";
 import passport from "./OAuth";
 
 const PORT = 3001;
@@ -43,7 +43,11 @@ io.on("connection", (socket) => {
     if (waitingPlayer === null) {
       waitingPlayer = socket;
       socket.emit("waiting");
-    } else {
+    } 
+    else if (waitingPlayer.id === socket.id) {
+      socket.emit("already_waiting");
+    }
+    else {
       const room = `match-${matchId++}`;
 
       // join both players
@@ -80,6 +84,17 @@ io.on("connection", (socket) => {
 
     if (waitingPlayer?.id === socket.id) {
       waitingPlayer = null;
+    }
+
+    // notify other player and clean up game
+    for (const [room, game] of Object.entries(games)) {
+      if (game.players.left === socket.id || game.players.right === socket.id) {
+        io.to(room).emit("player_disconnected");
+        clearInterval(gameIntervals[room]);
+        delete games[room];
+        delete gameIntervals[room];
+        break;
+      }
     }
   });
 });
