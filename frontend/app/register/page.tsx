@@ -9,9 +9,9 @@ import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
 
 import { registerFields } from "../data/auth/registerFields";
-// import { useRouter } from "next/navigation";
-// import { useEffect } from "react";
-// import { isAuthenticated } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { isAuthenticated } from "@/lib/auth";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -21,13 +21,13 @@ export default function RegisterPage() {
     confirmPassword: "",
   });
 
-  // const router = useRouter();
+  const router = useRouter();
 
-  //   useEffect(() => {
-  //   if (isAuthenticated()) {
-  //     router.replace("/home");
-  //   }
-  // }, []);
+    useEffect(() => {
+    if (isAuthenticated()) {
+      router.replace("/home");
+    }
+  }, []);
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
@@ -55,7 +55,7 @@ export default function RegisterPage() {
         response
       );
        alert("Registration Successful");
-      // router.replace("/home");
+      router.replace("/home");
 
     } catch (err: any) {
       console.error(err);
