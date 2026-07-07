@@ -1,0 +1,109 @@
+.page {
+  display: flex;
+  gap: 16px;
+
+  min-width: 900px;
+
+  height: 70vh;
+}
+
+/* LEFT SIDEBAR */
+.leftPanel {
+  width: 260px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* RIGHT CONTENT */
+.rightPanel {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* XP GROUP BOX (core XP pattern) */
+.groupBox {
+  border: 1px solid #7f9db9;
+
+  background: #ece9d8;
+
+  box-shadow:
+    inset 1px 1px 0 #ffffff,
+    inset -1px -1px 0 #c0c0c0;
+
+  padding: 10px;
+}
+
+/* XP SECTION TITLE BAR */
+.groupTitle {
+  font-weight: bold;
+  font-size: 12px;
+
+  padding: 4px 8px;
+
+  margin: -10px -10px 10px -10px;
+
+  color: white;
+
+  background: linear-gradient(
+    to bottom,
+    #3d95ff,
+    #1e6fd9
+  );
+
+  border-bottom: 1px solid #7f9db9;
+}
+
+/* LINKS (XP control panel style) */
+.links {
+  list-style: none;
+
+  padding: 0;
+  margin: 0;
+
+  font-size: 12px;
+}
+
+.links li {
+  padding: 3px 0;
+
+  color: #0000ee;
+
+  cursor: pointer;
+}
+
+.links li:hover {
+  text-decoration: underline;
+}
+
+/* INFO GRID */
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  font-size: 12px;
+}
+
+/* STATUS */
+.status {
+  font-size: 12px;
+}
+
+.rightPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.topRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+

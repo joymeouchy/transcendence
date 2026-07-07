@@ -11,6 +11,9 @@ export const authService = {
       "/auth/register",
       data
     );
+    if (res.data.token) {
+      tokenStorage.set(res.data.token);
+    }
     return res.data;
   },
 
