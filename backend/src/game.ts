@@ -13,7 +13,7 @@ export function startGame(
   room: string,
   player1Id: string,
   player2Id: string,
-  config: GameConfig = pongConfig
+  config: GameConfig = pongConfig,
 ) {
   games[room] = {
     ball: {
@@ -34,9 +34,11 @@ export function startGame(
   gameIntervals[room] = setInterval(() => {
     if (!games[room]) {
       clearInterval(gameIntervals[room]);
+      delete gameIntervals[room];
       return;
     }
     updateGame(io, room);
+    if (!games[room]) return; // check again after updateGame deletes it
     const { config: _, ...stateToSend } = games[room]!;
     io.to(room).emit("game_state", stateToSend);
   }, 1000 / 60);
@@ -45,7 +47,7 @@ export function startGame(
 export function handlePaddleMove(
   socketId: string,
   room: string,
-  direction: "up" | "down"
+  direction: "up" | "down",
 ) {
   const game = games[room];
   if (!game) return;
@@ -58,7 +60,7 @@ export function handlePaddleMove(
   } else {
     game.paddles[side] = Math.min(
       config.canvasHeight - config.paddleHeight,
-      game.paddles[side] + config.paddleSpeed
+      game.paddles[side] + config.paddleSpeed,
     );
   }
 }
