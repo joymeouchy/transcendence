@@ -7,6 +7,23 @@ interface FullGameState extends GameState {
 
 export const games: Record<string, FullGameState> = {};
 export const gameIntervals: Record<string, NodeJS.Timeout> = {};
+export const disconnectTimers: Record<string, NodeJS.Timeout> = {};
+
+const DISCONNECT_GRACE_MS = 15000;
+
+function runGameLoop(io: Server, room: string) {
+  gameIntervals[room] = setInterval(() => {
+    if (!games[room]) {
+      clearInterval(gameIntervals[room]);
+      delete gameIntervals[room];
+      return;
+    }
+    updateGame(io, room);
+    if (!games[room]) return; // check again after updateGame deletes it
+    const { config: _, ...stateToSend } = games[room]!;
+    io.to(room).emit("game_state", stateToSend);
+  }, 1000 / 60);
+}
 
 export function startGame(
   io: Server,
@@ -31,17 +48,60 @@ export function startGame(
     config,
   };
 
-  gameIntervals[room] = setInterval(() => {
-    if (!games[room]) {
-      clearInterval(gameIntervals[room]);
-      delete gameIntervals[room];
-      return;
+  runGameLoop(io, room);
+}
+
+export function findRoomBySocket(socketId: string): string | null {
+  for (const [room, game] of Object.entries(games)) {
+    if (game.players.left === socketId || game.players.right === socketId) {
+      return room;
     }
-    updateGame(io, room);
-    if (!games[room]) return; // check again after updateGame deletes it
-    const { config: _, ...stateToSend } = games[room]!;
-    io.to(room).emit("game_state", stateToSend);
-  }, 1000 / 60);
+  }
+  return null;
+}
+
+// Pauses the loop (without deleting game state) so a briefly dropped
+// connection doesn't instantly end the match.
+export function pauseGame(room: string) {
+  clearInterval(gameIntervals[room]);
+  delete gameIntervals[room];
+}
+
+export function resumeGame(io: Server, room: string) {
+  if (games[room] && !gameIntervals[room]) {
+    runGameLoop(io, room);
+  }
+}
+
+export function scheduleGameCleanup(
+  io: Server,
+  room: string,
+  disconnectedSocketId: string,
+) {
+  disconnectTimers[room] = setTimeout(() => {
+    delete disconnectTimers[room];
+    const game = games[room];
+    if (game) {
+      const winner =
+        game.players.left === disconnectedSocketId
+          ? game.players.right
+          : game.players.left;
+      io.to(room).emit("game_over", {
+        winner,
+        scores: game.scores,
+        reason: "disconnect",
+      });
+    }
+    delete games[room];
+    delete gameIntervals[room];
+  }, DISCONNECT_GRACE_MS);
+}
+
+export function cancelGameCleanup(room: string) {
+  if (disconnectTimers[room]) {
+    clearTimeout(disconnectTimers[room]);
+    delete disconnectTimers[room];
+  }
 }
 
 export function handlePaddleMove(
