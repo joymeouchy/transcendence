@@ -7,7 +7,15 @@ import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import authRoutes from "../routes/auth";
-import { startGame, handlePaddleMove, games, gameIntervals } from "./game";
+import {
+  startGame,
+  handlePaddleMove,
+  findRoomBySocket,
+  pauseGame,
+  resumeGame,
+  scheduleGameCleanup,
+  cancelGameCleanup,
+} from "./game";
 import passport from "./OAuth";
 import userRoutes from "../routes/users";
 
@@ -27,14 +35,15 @@ const swaggerOptions = {
 };
 
 const PORT = 3001;
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 let waitingPlayer: any = null;
 let matchId = 0;
 
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:3000",
-  })
+    origin: FRONTEND_URL,
+  }),
 );
 app.use(express.json());
 app.use("/auth", authRoutes);
@@ -44,8 +53,9 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: FRONTEND_URL,
   },
+  connectionStateRecovery: {},
 });
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
@@ -57,6 +67,16 @@ server.listen(PORT, () => {
 
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
+
+  if (socket.recovered) {
+    const room = findRoomBySocket(socket.id);
+    if (room) {
+      cancelGameCleanup(room);
+      resumeGame(io, room);
+      io.to(room).emit("player_reconnected");
+      console.log("Recovered session, resumed game in room:", room);
+    }
+  }
 
   socket.on("join_queue", () => {
     console.log(socket.id, "wants to play");
@@ -95,7 +115,7 @@ io.on("connection", (socket) => {
     "paddle_move",
     ({ room, direction }: { room: string; direction: "up" | "down" }) => {
       handlePaddleMove(socket.id, room, direction);
-    }
+    },
   );
 
   socket.on("disconnect", () => {
@@ -105,15 +125,13 @@ io.on("connection", (socket) => {
       waitingPlayer = null;
     }
 
-    // notify other player and clean up game
-    for (const [room, game] of Object.entries(games)) {
-      if (game.players.left === socket.id || game.players.right === socket.id) {
-        io.to(room).emit("player_disconnected");
-        clearInterval(gameIntervals[room]);
-        delete gameIntervals[room];
-        delete games[room];
-        break;
-      }
+    // pause the game and give the player a chance to reconnect before
+    // ending the match, instead of killing it on the first dropped packet
+    const room = findRoomBySocket(socket.id);
+    if (room) {
+      pauseGame(room);
+      io.to(room).emit("player_disconnected");
+      scheduleGameCleanup(io, room, socket.id);
     }
   });
 });
