@@ -19,20 +19,20 @@ import {
 import passport from "./OAuth";
 import userRoutes from "../routes/users";
 
-import swaggerUi from "swagger-ui-express";
-import swaggerJsdoc from "swagger-jsdoc";
+// import swaggerUi from "swagger-ui-express";
+// import swaggerJsdoc from "swagger-jsdoc";
 
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Transcendence API",
-      version: "1.0.0",
-      description: "Pong game backend API",
-    },
-  },
-  apis: ["/app/routes/*.ts"],
-};
+// const swaggerOptions = {
+//   definition: {
+//     openapi: "3.0.0",
+//     info: {
+//       title: "Transcendence API",
+//       version: "1.0.0",
+//       description: "Pong game backend API",
+//     },
+//   },
+//   apis: ["/app/routes/*.ts"],
+// };
 
 const PORT = 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
@@ -58,8 +58,8 @@ const io = new Server(server, {
   connectionStateRecovery: {},
 });
 
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// const swaggerSpec = swaggerJsdoc(swaggerOptions);
+// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
