@@ -1,15 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { socket } from "../../lib/socket";
 
 import GameCanvas from "../components/game/GameCanvas";
-import GameModal from "../components/game/GameModal";
+import MatchSelectModal from "../components/game/MatchSelectModal/MatchSelectModal";
+import MatchmakingModal, {
+  MatchmakingStatus,
+} from "../components/game/MatchMakingModal/MatchmakingModal";
 
 import "./page.scss";
 
+type ModalState =
+  | "select"
+  | "matchmaking"
+  | "playing";
+
 export default function GamePage() {
-  const [showModal, setShowModal] = useState(true);
+  const [modalState, setModalState] =
+    useState<ModalState>("select");
+
+  const [matchmakingStatus, setMatchmakingStatus] =
+    useState<MatchmakingStatus>("searching");
+
+  const [opponentName, setOpponentName] =
+    useState("");
 
   useEffect(() => {
     socket.connect();
@@ -18,8 +34,19 @@ export default function GamePage() {
       console.log("Socket connected:", socket.id);
     };
 
-    const handleMatchFound = () => {
-      setShowModal(false);
+    const handleMatchFound = (data: {
+      opponentName: string;
+    }) => {
+      console.log("Match found!", data);
+
+      setOpponentName(data.opponentName);
+
+      setMatchmakingStatus("found");
+
+      // Briefly show the "Match Found" dialog before starting the game
+      setTimeout(() => {
+        setModalState("playing");
+      }, 1000);
     };
 
     socket.on("connect", handleConnect);
@@ -33,30 +60,53 @@ export default function GamePage() {
   }, []);
 
   const joinQueue = () => {
-    console.log("connected?", socket.connected);
-
     if (!socket.connected) {
       console.warn("Socket not connected yet");
       return;
     }
 
     socket.emit("join_queue");
+
+    setMatchmakingStatus("searching");
+    setModalState("matchmaking");
+  };
+
+  const playFriend = () => {
+    // Friend matchmaking can be implemented later.
+    // For now we reuse the matchmaking modal.
+
+    setMatchmakingStatus("waitingFriend");
+    setModalState("matchmaking");
+  };
+
+  const cancelMatchmaking = () => {
+    if (socket.connected) {
+      socket.emit("leave_queue");
+    }
+
+    setOpponentName("");
+    setModalState("select");
   };
 
   return (
     <div className="game-page">
       <div className="game-container">
-        <div className="scoreboard">
-          
-          {/* i commented this because the scores are rendered in GameCanvas
-           <div>0</div>
-          <div>0</div> */}
-        </div>
-
         <GameCanvas />
       </div>
 
-      {showModal && <GameModal onPlay={joinQueue} />}
+      <MatchSelectModal
+        isOpen={modalState === "select"}
+        onClose={() => {}}
+        onStartOnline={joinQueue}
+        onPlayFriend={playFriend}
+      />
+
+      <MatchmakingModal
+        isOpen={modalState === "matchmaking"}
+        status={matchmakingStatus}
+        opponentName={opponentName}
+        onCancel={cancelMatchmaking}
+      />
     </div>
   );
 }
