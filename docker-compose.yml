@@ -48,11 +48,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+    command: sh -c "rm -rf /app/generated && npx prisma generate && npx prisma migrate deploy && npx ts-node-dev src/server.ts"
 
   frontend:
     build: ./frontend
@@ -68,6 +64,5 @@ services:
       - backend
 
 volumes:
-  postgres_data:
   backend_node_modules:
   frontend_node_modules:
