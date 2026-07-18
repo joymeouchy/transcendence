@@ -8,6 +8,9 @@
 # later:
 # docker compose up
 
+# if it says permision denied, run:
+# sudo chown -R $USER:$USER backend/generated/
+
 services:
   backend:
     build: ./backend
@@ -26,10 +29,10 @@ services:
       DATABASE_URL: "postgresql://postgres:1234@postgres:5432/transcendence_db"
       JWT_SECRET: "some_secret_key"
       GOOGLE_CLIENT_ID: "236757838064-s1s9mekv8kl6msdocgbdcgoi1t2hbbqk.apps.googleusercontent.com"
-      GOOGLE_CLIENT_SECRET: "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"
+      GOOGLE_CLIENT_SECRET: "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"
       SESSION_SECRET: "some_random_string"
 
-    command: sh -c "npx prisma generate && npx prisma migrate deploy && npx ts-node-dev src/server.ts"
+    command: sh -c "rm -rf /app/generated && npx prisma generate && npx prisma migrate deploy && npx ts-node-dev src/server.ts"
 
   postgres:
     image: postgres:15
