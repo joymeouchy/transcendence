@@ -18,6 +18,9 @@ import {
 } from "./game";
 import passport from "./OAuth";
 import userRoutes from "../routes/users";
+import { PrismaClient } from "../generated/prisma/client";
+
+const prisma = new PrismaClient();
 
 // import swaggerUi from "swagger-ui-express";
 // import swaggerJsdoc from "swagger-jsdoc";
@@ -38,6 +41,8 @@ const PORT = 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 let waitingPlayer: any = null;
 let matchId = 0;
+const socketToUser = new Map<string, number>(); // socketId → userId
+const onlineUsers = new Map<number, string>(); // userId → socketId
 
 const app = express();
 app.use(
@@ -102,7 +107,7 @@ io.on("connection", (socket) => {
       });
 
       // start game loop
-      startGame(io, room, waitingPlayer.id, socket.id);
+      startGame(io, room, waitingPlayer.id, socket.id, socketToUser);
       console.log("Game started in room:", room);
 
       // reset queue
@@ -118,7 +123,29 @@ io.on("connection", (socket) => {
     },
   );
 
+  socket.on("user_online", ({ userId }: { userId: number }) => {
+    socketToUser.set(socket.id, userId);
+    onlineUsers.set(userId, socket.id);
+
+    // update isOnline in DB
+    prisma.user.update({
+      where: { id: userId },
+      data: { isOnline: true },
+    });
+  });
+
   socket.on("disconnect", () => {
+    const userId = socketToUser.get(socket.id);
+    if (userId) {
+      onlineUsers.delete(userId);
+      socketToUser.delete(socket.id);
+
+      // set offline in DB
+      prisma.user.update({
+        where: { id: userId },
+        data: { isOnline: false },
+      });
+    }
     console.log("Disconnected:", socket.id);
 
     if (waitingPlayer?.id === socket.id) {
