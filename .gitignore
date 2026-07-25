@@ -4,3 +4,5 @@
 .env
 
 /backend/generated/prisma/
+
+.env
