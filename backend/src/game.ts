@@ -1,8 +1,12 @@
 import { Server } from "socket.io";
 import { GameConfig, GameState, pongConfig } from "./gameState";
+import { PrismaClient } from "../generated/prisma/client";
+
+const prisma = new PrismaClient();
 
 interface FullGameState extends GameState {
   config: GameConfig;
+  socketToUser: Map<string, number>;
 }
 
 export const games: Record<string, FullGameState> = {};
@@ -30,6 +34,7 @@ export function startGame(
   room: string,
   player1Id: string,
   player2Id: string,
+  socketToUser: Map<string, number>,
   config: GameConfig = pongConfig,
 ) {
   games[room] = {
@@ -46,6 +51,7 @@ export function startGame(
     scores: { left: 0, right: 0 },
     players: { left: player1Id, right: player2Id },
     config,
+    socketToUser,
   };
 
   runGameLoop(io, room);
@@ -125,11 +131,11 @@ export function handlePaddleMove(
   }
 }
 
-function updateGame(io: Server, room: string) {
+async function updateGame(io: Server, room: string) {
   const game = games[room];
   if (!game) return;
 
-  const { config } = game;
+  const { config, socketToUser } = game;
   const ball = game.ball;
 
   ball.x += ball.vx;
@@ -177,11 +183,32 @@ function updateGame(io: Server, room: string) {
     game.scores.left >= config.winningScore ||
     game.scores.right >= config.winningScore
   ) {
-    const winner =
+    const winnerSocketId =
       game.scores.left >= config.winningScore
         ? game.players.left
         : game.players.right;
-    io.to(room).emit("game_over", { winner, scores: game.scores });
+
+    const p1UserId = socketToUser.get(game.players.left);
+    const p2UserId = socketToUser.get(game.players.right);
+    const winnerUserId = socketToUser.get(winnerSocketId);
+
+    if (p1UserId && p2UserId) {
+      await prisma.match.create({
+        data: {
+          player1Id: p1UserId,
+          player2Id: p2UserId,
+          winnerId: winnerUserId ?? null,
+          player1Score: game.scores.left,
+          player2Score: game.scores.right,
+        },
+      });
+    }
+
+    io.to(room).emit("game_over", {
+      winner: winnerSocketId,
+      scores: game.scores,
+    });
+
     clearInterval(gameIntervals[room]);
     delete gameIntervals[room];
     delete games[room];
