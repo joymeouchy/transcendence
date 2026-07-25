@@ -4,7 +4,7 @@ dotenv.config();
 
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { PrismaClient } from "../generated/prisma/client";
+import { AuthProvider, PrismaClient } from "../generated/prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -35,10 +35,10 @@ passport.use(
               email,
               avatarUrl: avatarUrl ?? null,
               oauthId: profile.id,
-              provider: "google",
+              provider: AuthProvider.google,
             },
           });
-        } else if (user.provider !== "google") {
+        } else if (user.provider !== AuthProvider.google) {
           // user exists but registered with email/password
           return done(
             new Error(

@@ -1,57 +1,88 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
+enum AuthProvider {
+  email
+  google
+  fortytwo
+}
 
-//this replaces create table
-//format: <field name> <type>  (optional attribut or modifier. written @<modifier> ex: @id, @unique)
-// if question mark after <type> it means optional
+enum FriendshipStatus {
+  pending
+  accepted
+}
 
-  model User {
+enum MatchStatus {
+  ongoing
+  finished
+  abandoned
+}
+
+model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
   email     String   @unique
-  password  String?  // optional since OAuth users won't have a password
+  password  String?
   avatarUrl String?
+  isOnline  Boolean  @default(false)
 
-  oauthId   String?  @unique // the ID returned by the OAuth provider
-  provider  String?  // "google", "42", etc.
+  oauthId  String?      @unique
+  provider AuthProvider?
+
   matchesAsPlayer1 Match[] @relation("Player1")
   matchesAsPlayer2 Match[] @relation("Player2")
+  matchesWon       Match[] @relation("MatchWinner")
 
   friendshipsSent     Friendship[] @relation("FriendshipSender")
-  friendshipsReceived  Friendship[] @relation("FriendshipReceiver")
+  friendshipsReceived Friendship[] @relation("FriendshipReceiver")
+
+  messagesSent     Message[] @relation("MessageSender")
+  messagesReceived Message[] @relation("MessageReceiver")
 }
 
 model Match {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
+  id        Int         @id @default(autoincrement())
+  createdAt DateTime    @default(now())
+  status    MatchStatus @default(ongoing)
 
-  player1Id Int
-  player2Id Int
+  player1Id    Int
+  player2Id    Int
+  winnerId     Int?
+  player1Score Int  @default(0)
+  player2Score Int  @default(0)
 
-  player1 User @relation("Player1", fields: [player1Id], references: [id])
-  player2 User @relation("Player2", fields: [player2Id], references: [id])
+  player1 User  @relation("Player1", fields: [player1Id], references: [id])
+  player2 User  @relation("Player2", fields: [player2Id], references: [id])
+  winner  User? @relation("MatchWinner", fields: [winnerId], references: [id])
 }
 
 model Friendship {
-  id        Int      @id @default(autoincrement())
-  status    String   // "pending", "accepted"
+  id     Int              @id @default(autoincrement())
+  status FriendshipStatus @default(pending)
 
   senderId   Int
   receiverId Int
 
   sender   User @relation("FriendshipSender", fields: [senderId], references: [id])
   receiver User @relation("FriendshipReceiver", fields: [receiverId], references: [id])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  content   String
+
+  senderId   Int
+  receiverId Int
+
+  sender   User @relation("MessageSender", fields: [senderId], references: [id])
+  receiver User @relation("MessageReceiver", fields: [receiverId], references: [id])
 }

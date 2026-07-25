@@ -152,6 +152,19 @@ router.post("/login", async (req, res) => {
 
 /**
  * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Logout (client should delete JWT token)
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ */
+router.post("/logout", (req, res) => {
+  res.json({ message: "Logged out successfully" });
+});
+
+/**
+ * @swagger
  * /auth/google:
  *   get:
  *     summary: Login with Google OAuth
