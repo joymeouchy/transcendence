@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -12,9 +9,22 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-//this replaces create table
-//format: <field name> <type>  (optional attribut or modifier. written @<modifier> ex: @id, @unique)
-// if question mark after <type> it means optional
+enum AuthProvider {
+  email
+  google
+  fortytwo
+}
+
+enum FriendshipStatus {
+  pending
+  accepted
+}
+
+enum MatchStatus {
+  ongoing
+  finished
+  abandoned
+}
 
 model User {
   id        Int      @id @default(autoincrement())
@@ -24,11 +34,12 @@ model User {
   avatarUrl String?
   isOnline  Boolean  @default(false)
 
-  oauthId  String? @unique
-  provider String?
+  oauthId  String?      @unique
+  provider AuthProvider?
 
   matchesAsPlayer1 Match[] @relation("Player1")
   matchesAsPlayer2 Match[] @relation("Player2")
+  matchesWon       Match[] @relation("MatchWinner")
 
   friendshipsSent     Friendship[] @relation("FriendshipSender")
   friendshipsReceived Friendship[] @relation("FriendshipReceiver")
@@ -38,22 +49,24 @@ model User {
 }
 
 model Match {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
+  id        Int         @id @default(autoincrement())
+  createdAt DateTime    @default(now())
+  status    MatchStatus @default(ongoing)
 
   player1Id    Int
   player2Id    Int
   winnerId     Int?
-  player1Score Int @default(0)
-  player2Score Int @default(0)
+  player1Score Int  @default(0)
+  player2Score Int  @default(0)
 
-  player1 User @relation("Player1", fields: [player1Id], references: [id])
-  player2 User @relation("Player2", fields: [player2Id], references: [id])
+  player1 User  @relation("Player1", fields: [player1Id], references: [id])
+  player2 User  @relation("Player2", fields: [player2Id], references: [id])
+  winner  User? @relation("MatchWinner", fields: [winnerId], references: [id])
 }
 
 model Friendship {
-  id     Int    @id @default(autoincrement())
-  status String // "pending", "accepted"
+  id     Int              @id @default(autoincrement())
+  status FriendshipStatus @default(pending)
 
   senderId   Int
   receiverId Int
