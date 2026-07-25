@@ -23,6 +23,7 @@ export const images = {
 
 	shutdown: "/shutdown.png",
 
+	messaging: "/msn.png",
 	// profile: "/profile.png",
 	// settings: "/settings.png",
 

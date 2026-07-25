@@ -18,6 +18,12 @@ export const gameItem = {
   href: "/game",
 };
 
+export const messagingItem = {
+  image: images.messaging,
+  label: "Chats",
+  href: "/chats",
+};
+
 export const customizationItem = {
   image: images.customization,
   label: "Customize",
