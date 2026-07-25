@@ -18,26 +18,32 @@ import {
 } from "./game";
 import passport from "./OAuth";
 import userRoutes from "../routes/users";
+import { PrismaClient } from "../generated/prisma/client";
+import friendshipRoutes from "../routes/friendships";
 
-// import swaggerUi from "swagger-ui-express";
-// import swaggerJsdoc from "swagger-jsdoc";
+const prisma = new PrismaClient();
 
-// const swaggerOptions = {
-//   definition: {
-//     openapi: "3.0.0",
-//     info: {
-//       title: "Transcendence API",
-//       version: "1.0.0",
-//       description: "Pong game backend API",
-//     },
-//   },
-//   apis: ["/app/routes/*.ts"],
-// };
+import swaggerUi from "swagger-ui-express";
+import swaggerJsdoc from "swagger-jsdoc";
+
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Transcendence API",
+      version: "1.0.0",
+      description: "Pong game backend API",
+    },
+  },
+  apis: ["/app/routes/*.ts"],
+};
 
 const PORT = 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 let waitingPlayer: any = null;
 let matchId = 0;
+const socketToUser = new Map<string, number>(); // socketId → userId
+const onlineUsers = new Map<number, string>(); // userId → socketId
 
 const app = express();
 app.use(
@@ -49,6 +55,8 @@ app.use(express.json());
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use(passport.initialize());
+app.use("/friendships", friendshipRoutes);
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -58,8 +66,8 @@ const io = new Server(server, {
   connectionStateRecovery: {},
 });
 
-// const swaggerSpec = swaggerJsdoc(swaggerOptions);
-// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
@@ -102,7 +110,7 @@ io.on("connection", (socket) => {
       });
 
       // start game loop
-      startGame(io, room, waitingPlayer.id, socket.id);
+      startGame(io, room, waitingPlayer.id, socket.id, socketToUser);
       console.log("Game started in room:", room);
 
       // reset queue
@@ -118,7 +126,29 @@ io.on("connection", (socket) => {
     },
   );
 
+  socket.on("user_online", ({ userId }: { userId: number }) => {
+    socketToUser.set(socket.id, userId);
+    onlineUsers.set(userId, socket.id);
+
+    // update isOnline in DB
+    prisma.user.update({
+      where: { id: userId },
+      data: { isOnline: true },
+    });
+  });
+
   socket.on("disconnect", () => {
+    const userId = socketToUser.get(socket.id);
+    if (userId) {
+      onlineUsers.delete(userId);
+      socketToUser.delete(socket.id);
+
+      // set offline in DB
+      prisma.user.update({
+        where: { id: userId },
+        data: { isOnline: false },
+      });
+    }
     console.log("Disconnected:", socket.id);
 
     if (waitingPlayer?.id === socket.id) {
