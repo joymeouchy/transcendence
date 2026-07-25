@@ -3,6 +3,7 @@ import {
   profileItem,
   gameItem,
   messagingItem,
+  friendshipsItem,
 } from "./navigationItemsFields";
 
 export const sidebarItems = [
@@ -10,5 +11,5 @@ export const sidebarItems = [
   profileItem,
   gameItem,
   messagingItem,
-  
+  friendshipsItem,  
 ];

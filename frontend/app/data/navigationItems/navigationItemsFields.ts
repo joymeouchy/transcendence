@@ -24,6 +24,12 @@ export const messagingItem = {
   href: "/chats",
 };
 
+export const friendshipsItem = {
+  image: images.friendships,
+  label: "Friends",
+  href: "/friends",
+};
+
 export const customizationItem = {
   image: images.customization,
   label: "Customize",

@@ -2,7 +2,7 @@ import { achievementsItem, privacyPolicyItem, termsOfServicesItem } from "@/app/
 
 export const images = {
 
-	user: "/user.ico",
+	user: "/user.png",
 	home: "/home.ico",
 	game: "/game.ico",
 
@@ -24,6 +24,8 @@ export const images = {
 	shutdown: "/shutdown.png",
 
 	messaging: "/msn.png",
+
+	friendships: "/friendships.ico",
 	// profile: "/profile.png",
 	// settings: "/settings.png",
 
