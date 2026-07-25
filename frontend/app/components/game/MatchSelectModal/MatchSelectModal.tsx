@@ -1,7 +1,6 @@
 "use client";
 
 import XPModal from "../../ui/XPModal/XPModal";
-import XPButton from "../../ui/XPButton/XPButton";
 
 import "./MatchSelectModal.scss";
 
@@ -38,13 +37,13 @@ export default function MatchSelectModal({
 
 
         <div className="mode-buttons">
-          <XPButton onClick={onStartOnline}>
+          <button onClick={onStartOnline}>
             🎮 Play Online
-          </XPButton>
+          </button>
 
-          <XPButton onClick={onPlayFriend}>
+          <button onClick={onPlayFriend}>
             👥 Play Friend
-          </XPButton>
+          </button>
         </div>
 
       </div>

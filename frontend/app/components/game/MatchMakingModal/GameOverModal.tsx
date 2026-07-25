@@ -36,10 +36,6 @@ export default function GameOverModal({
       isOpen={isOpen}
     >
       <div className="game-over">
-        <div className="icon">
-          {won ? "🏆" : "🎮"}
-        </div>
-
         <h2>
           {won
             ? "You Won!"
