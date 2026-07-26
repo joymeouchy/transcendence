@@ -112,6 +112,56 @@ router.get("/me", async (req, res) => {
 
 /**
  * @swagger
+ * /users/search:
+ *   get:
+ *     summary: Search users by username
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Username to search for
+ *     responses:
+ *       200:
+ *         description: List of matching users
+ *       400:
+ *         description: Missing search query
+ *       500:
+ *         description: Server error
+ */
+router.get("/search", async (req, res) => {
+  try {
+    const query = req.query.q as string;
+
+    if (!query) {
+      return res.status(400).json({ error: "Missing search query" });
+    }
+
+    const users = await prisma.user.findMany({
+      where: {
+        username: {
+          contains: query,
+          mode: "insensitive", // doesn't care if it's upper or lower case
+        },
+      },
+      select: {
+        id: true,
+        username: true,
+        avatarUrl: true,
+        isOnline: true,
+      },
+      take: 10, // limit to 10 results
+    });
+
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+/**
+ * @swagger
  * /users/{id}:
  *   get:
  *     summary: Get user profile by ID
