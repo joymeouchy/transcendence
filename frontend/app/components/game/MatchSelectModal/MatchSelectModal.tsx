@@ -6,22 +6,24 @@ import "./MatchSelectModal.scss";
 
 type Props = {
   isOpen: boolean;
-  onClose: () => void;
+  onBack: () => void;
   onStartOnline: () => void;
   onPlayFriend: () => void;
+  onReturnHome: () => void;
 };
 
 export default function MatchSelectModal({
   isOpen,
-  onClose,
+  onBack,
   onStartOnline,
   onPlayFriend,
+  onReturnHome,
 }: Props) {
   return (
     <XPModal
       title="Play Pong"
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={onBack}
     >
       <div className="match-select">
 
@@ -35,7 +37,6 @@ export default function MatchSelectModal({
           </span>
         </div>
 
-
         <div className="mode-buttons">
           <button onClick={onStartOnline}>
             🎮 Play Online
@@ -43,6 +44,12 @@ export default function MatchSelectModal({
 
           <button onClick={onPlayFriend}>
             👥 Play Friend
+          </button>
+        </div>
+
+        <div className="return-button">
+          <button onClick={onReturnHome}>
+            🏠 Return to Homepage
           </button>
         </div>
 
