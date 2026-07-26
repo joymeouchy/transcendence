@@ -10,9 +10,6 @@ export interface Friend {
 
 export interface PendingRequest {
   id: number;
-  senderId: number;
-  receiverId: number;
-  status: string;
   sender: {
     id: number;
     username: string;
@@ -20,77 +17,42 @@ export interface PendingRequest {
   };
 }
 
-export interface Friendship {
-  id: number;
-  senderId: number;
-  receiverId: number;
-  status: string;
-}
+export const FriendshipService = {
+  async getFriends(userId: number): Promise<Friend[]> {
+    const { data } = await api.get<Friend[]>(`/friendships/${userId}`);
+    return data;
+  },
 
-export async function sendFriendRequest(
-  senderId: number,
-  receiverId: number
-): Promise<Friendship> {
-  const response = await api.post("/friendships/send", {
-    senderId,
-    receiverId,
-  });
+  async getPendingRequests(userId: number): Promise<PendingRequest[]> {
+    const { data } = await api.get<PendingRequest[]>(
+      `/friendships/pending/${userId}`
+    );
 
-  return response.data;
-}
+    return data;
+  },
 
+  async sendRequest(senderId: number, receiverId: number) {
+    const { data } = await api.post("/friendships/send", {
+      senderId,
+      receiverId,
+    });
 
-/**
- * Accept a friend request
- */
-export async function acceptFriendRequest(
-  friendshipId: number
-): Promise<Friendship> {
-  const response = await api.patch(
-    `/friendships/accept/${friendshipId}`
-  );
+    return data;
+  },
 
-  return response.data;
-}
+  async acceptRequest(friendshipId: number) {
+    const { data } = await api.patch(
+      `/friendships/accept/${friendshipId}`
+    );
 
+    return data;
+  },
 
-/**
- * Reject / remove a friendship
- */
-export async function removeFriendship(
-  friendshipId: number
-): Promise<{ message: string }> {
-  const response = await api.delete(
-    `/friendships/reject/${friendshipId}`
-  );
+  async rejectRequest(friendshipId: number) {
+    const { data } = await api.delete(
+      `/friendships/reject/${friendshipId}`
+    );
 
-  return response.data;
-}
-
-
-/**
- * Get user's friends
- */
-export async function getFriends(
-  userId: number
-): Promise<Friend[]> {
-  const response = await api.get(
-    `/friendships/${userId}`
-  );
-
-  return response.data;
-}
-
-
-/**
- * Get pending friend requests
- */
-export async function getPendingRequests(
-  userId: number
-): Promise<PendingRequest[]> {
-  const response = await api.get(
-    `/friendships/pending/${userId}`
-  );
-
-  return response.data;
-}
+    return data;
+  },
+};

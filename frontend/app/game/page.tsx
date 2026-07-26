@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { socket } from "../../lib/socket";
 
@@ -21,7 +22,8 @@ type ModalState =
   | "result";
 
 export default function GamePage() {
-  console.log("GAME PAGE RENDERED");
+  const router = useRouter();
+
   const [modalState, setModalState] =
     useState<ModalState>("select");
 
@@ -30,128 +32,71 @@ export default function GamePage() {
 
   const [opponentName, setOpponentName] =
     useState("");
-  
+
   const [winner, setWinner] = useState("");
   const [scoreLeft, setScoreLeft] = useState(0);
   const [scoreRight, setScoreRight] = useState(0);
   const [currentUser, setCurrentUser] = useState("");
 
-//  useEffect(() => {
-//   console.log("GAME PAGE USE EFFECT STARTED");
-//   socket.connect();
 
-//   const handleConnect = () => {
-//     console.log("Socket connected:", socket.id);
-//     setCurrentUser(socket.id ?? "");
-//   };
 
-//   const handleMatchFound = (data: {
-//   room: string;
-//   players: string[];
-// }) => {
-//   console.log("Match found!", data);
+  useEffect(() => {
 
-//   const opponent = data.players.find(
-//     (player) => player !== socket.id
-//   );
+    socket.connect();
 
-//   setOpponentName(opponent ?? "Opponent");
-//   setMatchmakingStatus("found");
-
-//   setTimeout(() => {
-//     setModalState("playing");
-//   }, 1000);
-// };
-
-//   const handleGameOver = (data: {
-//   winner: string;
-//   scores: {
-//     left: number;
-//     right: number;
-//   };
-// }) => {
-//   console.log("this is the data:", data);
-
-//   setWinner(data.winner);
-//   setScoreLeft(data.scores.left);
-//   setScoreRight(data.scores.right);
-
-//   setModalState("result");
-// };
-
-//   socket.on("connect", handleConnect);
-//   socket.on("match_found", handleMatchFound);
-//   socket.on("game_over", handleGameOver);
-
-//   return () => {
-//     return () => {
-//   socket.off("connect", handleConnect);
-//   socket.off("match_found", handleMatchFound);
-//   socket.off("game_over", handleGameOver);
-//   // socket.offAny(handleAnyEvent);
-//   socket.disconnect();
-// };
-//   };
-// }, []);
-
-useEffect(() => {
-  console.log("GAME PAGE USE EFFECT STARTED");
-
-  socket.connect();
-
-  const handleConnect = () => {
-    console.log("Socket connected:", socket.id);
-    setCurrentUser(socket.id ?? "");
-  };
-
-  const handleMatchFound = (data: {
-    room: string;
-    players: string[];
-  }) => {
-    console.log("Match found!", data);
-
-    const opponent = data.players.find(
-      (player) => player !== socket.id
-    );
-
-    setOpponentName(opponent ?? "Opponent");
-    setMatchmakingStatus("found");
-
-    setTimeout(() => {
-      setModalState("playing");
-    }, 1000);
-  };
-
-  const handleGameOver = (data: {
-    winner: string;
-    scores: {
-      left: number;
-      right: number;
+    const handleConnect = () => {
+      console.log("Socket connected:", socket.id);
+      setCurrentUser(socket.id ?? "");
     };
-  }) => {
-    console.log("GAME OVER DATA:", data);
 
-    setWinner(data.winner);
-    setScoreLeft(data.scores.left);
-    setScoreRight(data.scores.right);
+    const handleMatchFound = (data: {
+      room: string;
+      players: string[];
+    }) => {
+      console.log("Match found!", data);
 
-    setModalState("result");
-  };
+      const opponent = data.players.find(
+        (player) => player !== socket.id
+      );
 
-  socket.on("connect", handleConnect);
-  socket.on("match_found", handleMatchFound);
-  socket.on("game_over", handleGameOver);
+      setOpponentName(opponent ?? "Opponent");
+      setMatchmakingStatus("found");
 
-  return () => {
-    console.log("CLEANING SOCKET LISTENERS");
+      setTimeout(() => {
+        setModalState("playing");
+      }, 1000);
+    };
 
-    socket.off("connect", handleConnect);
-    socket.off("match_found", handleMatchFound);
-    socket.off("game_over", handleGameOver);
+    const handleGameOver = (data: {
+      winner: string;
+      scores: {
+        left: number;
+        right: number;
+      };
+    }) => {
+      console.log("GAME OVER DATA:", data);
 
-    socket.disconnect();
-  };
-}, []);
+      setWinner(data.winner);
+      setScoreLeft(data.scores.left);
+      setScoreRight(data.scores.right);
+
+      setModalState("result");
+    };
+
+    socket.on("connect", handleConnect);
+    socket.on("match_found", handleMatchFound);
+    socket.on("game_over", handleGameOver);
+
+    return () => {
+      console.log("CLEANING SOCKET LISTENERS");
+
+      socket.off("connect", handleConnect);
+      socket.off("match_found", handleMatchFound);
+      socket.off("game_over", handleGameOver);
+
+      socket.disconnect();
+    };
+  }, []);
   const joinQueue = () => {
     if (!socket.connected) {
       console.warn("Socket not connected yet");
@@ -180,6 +125,11 @@ useEffect(() => {
     setModalState("select");
   };
 
+  const returnHome = () => {
+    setModalState("select");
+    router.push("/home");
+  };
+
 
   return (
     <div className="game-page">
@@ -189,9 +139,10 @@ useEffect(() => {
 
       <MatchSelectModal
         isOpen={modalState === "select"}
-        onClose={() => {}}
+        onBack={returnHome}
         onStartOnline={joinQueue}
         onPlayFriend={playFriend}
+        onReturnHome={returnHome}
       />
 
       <MatchmakingModal

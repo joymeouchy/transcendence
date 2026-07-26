@@ -97,7 +97,13 @@
 
 
 /* ADD FRIEND */
+/* ADD FRIEND */
 .addFriend {
+	position: relative;
+}
+
+
+.searchBox {
 	display: flex;
 
 	gap: 4px;
@@ -129,6 +135,44 @@
 	}
 }
 
+
+.searchResults {
+	position: absolute;
+
+	top: 28px;
+	left: 0;
+
+	width: 100%;
+
+	background: white;
+
+	border: 1px solid #7f9db9;
+
+	z-index: 20;
+}
+
+
+.searchItem {
+	display: flex;
+
+	align-items: center;
+
+	gap: 8px;
+
+	padding: 5px 8px;
+
+	font-size: 12px;
+
+	cursor: pointer;
+
+	color: black;
+
+
+	&:hover {
+		background: #316ac5;
+		color: white;
+	}
+}
 
 /* LIST */
 .list {
