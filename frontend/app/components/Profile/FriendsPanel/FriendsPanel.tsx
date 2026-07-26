@@ -1,62 +1,134 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 import styles from "./FriendsPanel.module.scss";
 
-type Friend = {
-	id: number;
-	name: string;
-	status: "online" | "offline";
+import { UserService, UserSearchResult } from "@/services/user.services";
+import { FriendshipService, Friend } from "@/services/friendships.service";
+
+type Props = {
+  userId: number;
 };
 
-export default function FriendsPanel() {
-	const [friends, setFriends] = useState<Friend[]>([
-		{ id: 1, name: "Neo", status: "online" },
-		{ id: 2, name: "Trinity", status: "offline" },
-	]);
+export default function FriendsPanel({ userId }: Props) {
+  const [friends, setFriends] = useState<Friend[]>([]);
+  const [input, setInput] = useState("");
 
-	const [input, setInput] = useState("");
+  const [results, setResults] = useState<UserSearchResult[]>([]);
+  const [loading, setLoading] = useState(true);
 
-	const addFriend = () => {
-		if (!input.trim()) return;
+  async function loadFriends() {
+    try {
+      const data = await FriendshipService.getFriends(userId);
+      setFriends(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-		setFriends((prev) => [
-			...prev,
-			{
-				id: Date.now(),
-				name: input,
-				status: "offline",
-			},
-		]);
+  useEffect(() => {
+    loadFriends();
+  }, [userId]);
 
-		setInput("");
-	};
+  useEffect(() => {
+    async function search() {
+      if (!input.trim()) {
+        setResults([]);
+        return;
+      }
 
-	return (
-		<div className={styles.groupBox}>
-  <div className={styles.groupTitle}>Friends</div>
+      try {
+        const users = await UserService.search(input);
 
-  <div className={styles.addBar}>
-    <input
-      value={input}
-      onChange={(e) => setInput(e.target.value)}
-      placeholder="Add friend..."
-      className={styles.input}
-    />
-    <button onClick={addFriend} className={styles.button}>
-      Add
-    </button>
-  </div>
+        // Don't show yourself
+        setResults(users.filter((u) => u.id !== userId));
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
-  <div className={styles.list}>
-    {friends.map((f) => (
-      <div key={f.id} className={styles.friend}>
-        <span className={`${styles.dot} ${styles[f.status]}`} />
-        {f.name}
+    search();
+  }, [input, userId]);
+
+  async function sendRequest(receiverId: number) {
+    try {
+      await FriendshipService.sendRequest(userId, receiverId);
+
+      setInput("");
+      setResults([]);
+
+      // Optional: reload friends if your backend immediately returns accepted friendships
+      await loadFriends();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  return (
+    <div className={styles.groupBox}>
+      <div className={styles.groupTitle}>Friends</div>
+
+      <div className={styles.addBar}>
+        <input
+          className={styles.input}
+          placeholder="Search username..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+
+        <button
+          className={styles.button}
+          onClick={() => {
+            if (results.length > 0) {
+              sendRequest(results[0].id);
+            }
+          }}
+          disabled={results.length === 0}
+        >
+          Add
+        </button>
       </div>
-    ))}
-  </div>
-</div>
-	);
-}
 
+      {results.length > 0 && (
+        <div className={styles.searchResults}>
+          {results.map((user) => (
+            <div
+              key={user.id}
+              className={styles.searchItem}
+              onClick={() => sendRequest(user.id)}
+            >
+              <span
+                className={`${styles.dot} ${
+                  user.isOnline ? styles.online : styles.offline
+                }`}
+              />
+
+              {user.username}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className={styles.list}>
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          friends.map((friend) => (
+            <div key={friend.id} className={styles.friend}>
+              <span
+                className={`${styles.dot} ${
+                  friend.isOnline ? styles.online : styles.offline
+                }`}
+              />
+
+              {friend.username}
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}

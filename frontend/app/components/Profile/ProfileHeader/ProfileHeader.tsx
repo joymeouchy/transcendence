@@ -4,14 +4,14 @@ import { images } from "@/lib/images";
 
 type Props = {
   username: string;
-  tagline: string;
+  avatarUrl: string | null;
 };
 
-export default function ProfileHeader({ username, tagline }: Props) {
+export default function ProfileHeader({ username, avatarUrl }: Props) {
   return (
     <div className={styles.header}>
       <Image
-        src={images.defaultUserIcon}
+        src={avatarUrl ?? images.defaultUserIcon}
         alt="Avatar"
         width={72}
         height={72}
@@ -20,7 +20,6 @@ export default function ProfileHeader({ username, tagline }: Props) {
 
       <div className={styles.info}>
         <h1 className={styles.username}>{username}</h1>
-        <p className={styles.tagline}>{tagline}</p>
       </div>
     </div>
   );

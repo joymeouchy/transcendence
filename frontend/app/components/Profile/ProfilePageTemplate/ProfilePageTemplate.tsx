@@ -6,12 +6,12 @@ import FriendsPanel from "../FriendsPanel/FriendsPanel";
 import DesktopLayout from "../../DesktopLayout/DesktopLayout";
 import XPWindow from "../../ui/XPWindow/XPWindow";
 
-import { UserProfileFields } from "@/app/data/profile/profile";
+import { UserProfile } from "@/types/types.dto";
 
 import styles from "./ProfilePageTemplate.module.scss";
 
 interface ProfilePageTemplateProps {
-  user: UserProfileFields;
+  user: UserProfile;
   actions?: React.ReactNode;
   onClose?: () => void;
 }
@@ -21,11 +21,6 @@ export default function ProfilePageTemplate({
   actions,
   onClose,
 }: ProfilePageTemplateProps) {
-  const winRate =
-    user.wins + user.losses > 0
-      ? Math.round((user.wins / (user.wins + user.losses)) * 100)
-      : 0;
-
   return (
     <DesktopLayout>
       <XPWindow title="User Profile" onClose={onClose}>
@@ -35,7 +30,7 @@ export default function ProfilePageTemplate({
           <aside className={styles.leftPanel}>
             <ProfileHeader
               username={user.username}
-              tagline={user.tagline}
+              avatarUrl={user.avatarUrl}
             />
 
             {actions && (
@@ -66,7 +61,7 @@ export default function ProfilePageTemplate({
                 <ProfileStats
                   wins={user.wins}
                   losses={user.losses}
-                  winRate={winRate}
+                  winRate={user.winRate}
                 />
               </div>
 
@@ -77,9 +72,9 @@ export default function ProfilePageTemplate({
 
                 <div className={styles.infoGrid}>
                   <div>Username: {user.username}</div>
-                  <div>Rank: {user.rank}</div>
-                  <div>Mode: {user.mode}</div>
-                  <div>Member since: {user.memberSince}</div>
+                  <div>Email: {user.email}</div>
+                  <div>Provider: {user.provider}</div>
+                  <div>Total Matches: {user.totalMatches}</div>
                 </div>
               </div>
 
@@ -87,7 +82,7 @@ export default function ProfilePageTemplate({
 
             <div className={styles.groupBox}>
               <div className={styles.groupTitle}>Friends</div>
-              <FriendsPanel />
+              <FriendsPanel userId={user.id} />
             </div>
 
           </section>
