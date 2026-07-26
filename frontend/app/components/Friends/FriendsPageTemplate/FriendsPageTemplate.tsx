@@ -11,634 +11,581 @@ import styles from "./FriendsPageTemplate.module.scss";
 
 
 type Friend = {
-  friendshipId: number;
-  id: number;
-  username: string;
-  avatarUrl: string | null;
-  isOnline: boolean;
+	friendshipId: number;
+	id: number;
+	username: string;
+	avatarUrl: string | null;
+	isOnline: boolean;
 };
 
 
 type FriendRequest = {
-  id: number;
+	id: number;
 
-  sender: {
-    id: number;
-    username: string;
-    avatarUrl: string | null;
-  };
+	sender: {
+		id: number;
+		username: string;
+		avatarUrl: string | null;
+	};
 };
 
 
 
 interface Props {
+	friends: Friend[];
+	requests: FriendRequest[];
 
-  friends: Friend[];
+	loading?: boolean;
 
-  requests: FriendRequest[];
+	onAccept?: (id: number) => void;
+	onReject?: (id: number) => void;
 
+	onRemoveFriend?: (id: number) => Promise<void>;
 
-  onAccept?: (id: number) => void;
+	onAddFriend?: (
+		receiverId: number
+	) => Promise<void>;
 
-  onReject?: (id: number) => void;
-
-  onRemoveFriend?: (id: number) => Promise<void>;
-
-  onAddFriend?: (
-    receiverId: number
-  ) => Promise<void>;
-
-
-  onClose?: () => void;
-
+	onClose?: () => void;
 }
 
 
 
-
 export default function FriendsPageTemplate({
-  friends,
-  requests,
-  onAccept,
-  onReject,
-  onRemoveFriend,
-  onAddFriend,
-  onClose,
+	friends,
+	requests,
+	loading = false,
+	onAccept,
+	onReject,
+	onRemoveFriend,
+	onAddFriend,
+	onClose,
 }: Props) {
 
 
-  const [friendUsername, setFriendUsername] =
-    useState("");
+	const [friendUsername, setFriendUsername] =
+		useState("");
 
 
-  const [searchResults, setSearchResults] =
-    useState<UserSearchResult[]>([]);
+	const [searchResults, setSearchResults] =
+		useState<UserSearchResult[]>([]);
 
 
-  const [selectedUser, setSelectedUser] =
-    useState<UserSearchResult | null>(null);
+	const [selectedUser, setSelectedUser] =
+		useState<UserSearchResult | null>(null);
 
 
-  const [isAdding, setIsAdding] =
-    useState(false);
+	const [removingFriendId, setRemovingFriendId] =
+		useState<number | null>(null);
 
 
-  const [removingFriendId, setRemovingFriendId] =
-    useState<number | null>(null);
+	const [loadingMessage, setLoadingMessage] =
+		useState<string | null>(null);
 
 
 
+	useEffect(() => {
 
-  useEffect(() => {
+		async function searchUsers() {
 
-    async function searchUsers() {
+			if (
+				!friendUsername.trim()
+				||
+				selectedUser
+			) {
+				setSearchResults([]);
+				return;
+			}
 
-      if (
-        !friendUsername.trim()
-        ||
-        selectedUser
-      ) {
-        setSearchResults([]);
-        return;
-      }
 
+			try {
 
-      try {
+				const users =
+					await UserService.search(
+						friendUsername
+					);
 
-        const users =
-          await UserService.search(
-            friendUsername
-          );
 
+				setSearchResults(users);
 
-        setSearchResults(users);
 
+			} catch (err) {
 
-      } catch (err) {
+				console.error(
+					"Search failed:",
+					err
+				);
 
-        console.error(
-          "Search failed:",
-          err
-        );
+				setSearchResults([]);
 
-        setSearchResults([]);
+			}
 
-      }
+		}
 
-    }
 
+		searchUsers();
 
 
-    searchUsers();
+	}, [
+		friendUsername,
+		selectedUser
+	]);
 
 
-  }, [
-    friendUsername,
-    selectedUser
-  ]);
 
 
 
+	async function handleAddFriend() {
 
+		if (!selectedUser) return;
 
 
+		try {
 
-  async function handleAddFriend() {
+			setLoadingMessage(
+				"Sending friend request..."
+			);
 
-    if (!selectedUser) {
-      return;
-    }
 
+			await onAddFriend?.(
+				selectedUser.id
+			);
 
 
-    try {
+			setFriendUsername("");
 
-      setIsAdding(true);
+			setSelectedUser(null);
 
+			setSearchResults([]);
 
-      await onAddFriend?.(
-        selectedUser.id
-      );
 
+		} catch (err) {
 
-      setFriendUsername("");
+			console.error(
+				"Failed to send friend request:",
+				err
+			);
 
-      setSelectedUser(null);
 
-      setSearchResults([]);
+		} finally {
 
+			setLoadingMessage(null);
 
+		}
 
-    } catch (err) {
+	}
 
-      console.error(
-        "Failed to send friend request:",
-        err
-      );
 
 
-    } finally {
 
-      setIsAdding(false);
 
-    }
 
-  }
+	async function handleRemoveFriend(
+		friendshipId:number
+	) {
 
+		try {
 
+			setRemovingFriendId(
+				friendshipId
+			);
 
 
+			setLoadingMessage(
+				"Removing friendship..."
+			);
 
 
+			await onRemoveFriend?.(
+				friendshipId
+			);
 
-  async function handleRemoveFriend(
-    friendshipId: number
-  ) {
 
-    try {
+		} catch(err) {
 
-      setRemovingFriendId(
-        friendshipId
-      );
+			console.error(
+				"Failed to remove friend:",
+				err
+			);
 
 
-      await onRemoveFriend?.(
-        friendshipId
-      );
+		} finally {
 
+			setRemovingFriendId(null);
 
-    } catch (err) {
+			setLoadingMessage(null);
 
-      console.error(
-        "Failed to remove friend:",
-        err
-      );
+		}
 
+	}
 
-    } finally {
 
-      setRemovingFriendId(null);
 
-    }
 
-  }
 
+	if (loading) {
 
+		return (
 
+			<DesktopLayout>
 
+				<XPWindow
+					title="Friends"
+					onClose={onClose}
+				>
 
+					<div className={styles.loading}>
+						Loading friends list...
+					</div>
 
+				</XPWindow>
 
-  return (
+			</DesktopLayout>
 
-    <DesktopLayout>
+		);
 
+	}
 
-      <XPWindow
-        title="Friends"
-        onClose={onClose}
-      >
 
 
-        <div className={styles.page}>
 
 
+	return (
 
-          {/* LEFT SIDE */}
+		<DesktopLayout>
 
-          <div className={styles.leftColumn}>
 
+			<XPWindow
+				title="Friends"
+				onClose={onClose}
+			>
 
 
+				<div className={styles.page}>
 
-            {/* ADD FRIEND */}
 
-            <div className={styles.addFriend}>
+					<div className={styles.leftColumn}>
 
 
-              <div className={styles.searchBox}>
+						<div className={styles.addFriend}>
 
 
-                <input
+							<div className={styles.searchBox}>
 
-                  type="text"
 
-                  placeholder="Search username..."
+								<input
+									type="text"
+									placeholder="Search username..."
+									value={friendUsername}
 
-                  value={friendUsername}
+									onChange={(e)=>{
 
-                  onChange={(e) => {
+										setFriendUsername(
+											e.target.value
+										);
 
-                    setFriendUsername(
-                      e.target.value
-                    );
+										setSelectedUser(null);
 
-                    setSelectedUser(null);
+									}}
+								/>
 
-                  }}
 
-                />
 
 
+								<button
 
-                <button
+									onClick={handleAddFriend}
 
-                  onClick={handleAddFriend}
+									disabled={
+										!selectedUser ||
+										loadingMessage !== null
+									}
 
-                  disabled={
-                    !selectedUser ||
-                    isAdding
-                  }
+								>
 
-                >
+									{
+										loadingMessage
+											? "Please wait..."
+											: "Add"
+									}
 
-                  {
-                    isAdding
-                      ? "Sending..."
-                      : "Add"
-                  }
+								</button>
 
-                </button>
 
+							</div>
 
-              </div>
 
 
 
 
+							{searchResults.length > 0 && (
 
-              {searchResults.length > 0 && (
+								<div className={styles.searchResults}>
 
-                <div className={styles.searchResults}>
 
+									{searchResults.map((user)=>(
 
-                  {searchResults.map((user) => (
 
+										<div
 
-                    <div
+											key={user.id}
 
-                      key={user.id}
+											className={styles.searchItem}
 
-                      className={styles.searchItem}
+											onClick={()=>{
 
+												setSelectedUser(
+													user
+												);
 
-                      onClick={() => {
 
-                        setSelectedUser(
-                          user
-                        );
+												setFriendUsername(
+													user.username
+												);
 
 
-                        setFriendUsername(
-                          user.username
-                        );
+												setSearchResults([]);
 
+											}}
 
-                        setSearchResults([]);
+										>
 
 
-                      }}
+											<span
 
-                    >
+												className={`${styles.dot} ${
+													user.isOnline
+														? styles.online
+														: styles.offline
+												}`}
 
+											/>
 
 
-                      <span
+											{user.username}
 
-                        className={`${styles.dot} ${
-                          user.isOnline
-                            ? styles.online
-                            : styles.offline
-                        }`}
 
-                      />
+										</div>
 
 
+									))}
 
-                      {user.username}
 
+								</div>
 
+							)}
 
-                    </div>
 
+						</div>
 
-                  ))}
 
 
-                </div>
 
-              )}
 
+						<div className={styles.panel}>
 
 
-            </div>
+							<div className={styles.title}>
+								Friend Requests
+							</div>
 
 
 
+							<div className={styles.list}>
 
 
+								{requests.length === 0 ? (
 
+									<div className={styles.empty}>
+										No requests
+									</div>
 
-            {/* FRIEND REQUESTS */}
 
+								) : (
 
-            <div className={styles.panel}>
 
+									requests.map((request)=>(
 
-              <div className={styles.title}>
 
-                Friend Requests
+										<div
 
-              </div>
+											key={request.id}
 
+											className={styles.friend}
 
+										>
 
-              <div className={styles.list}>
 
+											<span>
+												{request.sender.username}
+											</span>
 
-                {requests.length === 0 ? (
 
 
-                  <div className={styles.empty}>
+											<div className={styles.actions}>
 
-                    No requests
 
-                  </div>
+												<button
+													onClick={() =>
+														onAccept?.(
+															request.id
+														)
+													}
+												>
+													Accept
+												</button>
 
 
 
-                ) : (
+												<button
+													onClick={() =>
+														onReject?.(
+															request.id
+														)
+													}
+												>
+													Reject
+												</button>
 
 
-                  requests.map((request) => (
+											</div>
 
 
-                    <div
+										</div>
 
-                      key={request.id}
 
-                      className={styles.friend}
+									))
 
-                    >
 
+								)}
 
 
-                      <span>
+							</div>
 
-                        {request.sender.username}
 
-                      </span>
+						</div>
 
 
+					</div>
 
 
-                      <div className={styles.actions}>
 
 
-                        <button
 
-                          onClick={() =>
-                            onAccept?.(
-                              request.id
-                            )
-                          }
 
-                        >
+					<div className={styles.friendsPanel}>
 
-                          Accept
 
-                        </button>
+						<div className={styles.panel}>
 
 
+							<div className={styles.title}>
+								Friends
+							</div>
 
 
-                        <button
 
-                          onClick={() =>
-                            onReject?.(
-                              request.id
-                            )
-                          }
+							<div className={styles.list}>
 
-                        >
 
-                          Reject
+								{friends.length === 0 ? (
 
-                        </button>
+									<div className={styles.empty}>
+										No friends yet
+									</div>
 
 
-                      </div>
+								) : (
 
 
+									friends.map((friend)=>(
 
-                    </div>
 
+										<div
 
-                  ))
+											key={friend.friendshipId}
 
+											className={styles.friend}
 
-                )}
+										>
 
 
+											<div className={styles.user}>
 
-              </div>
 
+												<span
 
+													className={`${styles.dot} ${
+														friend.isOnline
+															? styles.online
+															: styles.offline
+													}`}
 
-            </div>
+												/>
 
 
+												{friend.username}
 
 
+											</div>
 
-          </div>
 
 
 
 
+											<button
 
+												disabled={
+													removingFriendId ===
+													friend.friendshipId
+												}
 
 
+												onClick={() =>
+													handleRemoveFriend(
+														friend.friendshipId
+													)
+												}
 
+											>
 
-          {/* RIGHT SIDE */}
+												{
+													removingFriendId ===
+													friend.friendshipId
+														? "Removing..."
+														: "Remove"
+												}
 
 
-          <div className={styles.friendsPanel}>
+											</button>
 
 
-            <div className={styles.panel}>
+										</div>
 
 
-              <div className={styles.title}>
+									))
 
-                Friends
 
-              </div>
+								)}
 
 
+							</div>
 
 
-              <div className={styles.list}>
+						</div>
 
 
-                {friends.length === 0 ? (
+					</div>
 
 
-                  <div className={styles.empty}>
+				</div>
 
-                    No friends yet
 
-                  </div>
+			</XPWindow>
 
 
+		</DesktopLayout>
 
-                ) : (
-
-
-
-                  friends.map((friend) => (
-
-
-                    <div
-
-                      key={friend.friendshipId}
-
-                      className={styles.friend}
-
-                    >
-
-
-
-                      <div className={styles.user}>
-
-
-                        <span
-
-                          className={`${styles.dot} ${
-                            friend.isOnline
-                              ? styles.online
-                              : styles.offline
-                          }`}
-
-                        />
-
-
-
-                        {friend.username}
-
-
-
-                      </div>
-
-
-
-
-
-                      <button
-
-                        disabled={
-                          removingFriendId ===
-                          friend.friendshipId
-                        }
-
-
-                        onClick={() =>
-                          handleRemoveFriend(
-                            friend.friendshipId
-                          )
-                        }
-
-                      >
-
-                        {
-                          removingFriendId ===
-                          friend.friendshipId
-                            ? "Removing..."
-                            : "Remove"
-                        }
-
-
-                      </button>
-
-
-
-
-                    </div>
-
-
-
-                  ))
-
-
-                )}
-
-
-
-              </div>
-
-
-
-            </div>
-
-
-
-          </div>
-
-
-
-
-
-        </div>
-
-
-
-      </XPWindow>
-
-
-
-    </DesktopLayout>
-
-  );
+	);
 
 }
