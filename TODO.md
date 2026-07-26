@@ -2,10 +2,10 @@ what joy needs:
 --add rematch to backend
 
 what rawan needs:
---add api to get user info when online
-returns l current user id? ye3ne l id taba3 l person logged in
---add search by nickname
-backend API to search users by username kermel l add friend feature
+--need to recheck isOnline
+--add api for getting friend list of the user (not all users)
+--implement chat system
+--connect the match results to the Match table
 
 
  photo sources:
