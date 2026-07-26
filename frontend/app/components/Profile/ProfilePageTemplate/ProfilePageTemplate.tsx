@@ -68,8 +68,8 @@ export default function ProfilePageTemplate({
 
               <div className={styles.status}>
                 {user.isOnline
-                  ? "🟢 Online"
-                  : "⚫ Offline"}
+                  ? "⚫ Offline"
+                  : "🟢 Online"}
               </div>
             </div>
 
