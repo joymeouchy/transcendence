@@ -10,20 +10,28 @@ import { UserProfile } from "@/types/types.dto";
 export default function ProfilePage() {
   const router = useRouter();
 
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<UserProfile>();
 
   useEffect(() => {
     async function loadUser() {
-      const data = await UserService.getMe();
-      setUser(data);
+      try {
+        const data = await UserService.getMe();
+
+        setUser(data);
+
+      } catch (error) {
+        console.error(
+          "Failed to load profile:",
+          error
+        );
+      }
     }
 
+
     loadUser();
+
   }, []);
 
-  if (!user) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <ProfilePageTemplate
