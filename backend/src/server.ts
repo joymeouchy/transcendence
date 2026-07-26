@@ -5,6 +5,7 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import http from "http";
+import path from "path";
 import { Server } from "socket.io";
 import authRoutes from "../routes/auth";
 import {
@@ -35,7 +36,7 @@ const swaggerOptions = {
       description: "Pong game backend API",
     },
   },
-  apis: ["/app/routes/*.ts"],
+  apis: [path.join(__dirname, "../routes/*.ts")],
 };
 
 const PORT = 3001;
