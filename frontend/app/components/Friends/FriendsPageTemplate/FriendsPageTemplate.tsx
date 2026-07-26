@@ -9,6 +9,7 @@ import { UserService, UserSearchResult } from "@/services/user.services";
 
 import styles from "./FriendsPageTemplate.module.scss";
 
+
 type Friend = {
   friendshipId: number;
   id: number;
@@ -17,8 +18,10 @@ type Friend = {
   isOnline: boolean;
 };
 
+
 type FriendRequest = {
   id: number;
+
   sender: {
     id: number;
     username: string;
@@ -26,58 +29,117 @@ type FriendRequest = {
   };
 };
 
+
+
 interface Props {
+
   friends: Friend[];
+
   requests: FriendRequest[];
 
+
   onAccept?: (id: number) => void;
+
   onReject?: (id: number) => void;
 
-  onAddFriend?: (receiverId: number) => Promise<void>;
+  onRemoveFriend?: (id: number) => Promise<void>;
+
+  onAddFriend?: (
+    receiverId: number
+  ) => Promise<void>;
+
 
   onClose?: () => void;
+
 }
+
+
+
 
 export default function FriendsPageTemplate({
   friends,
   requests,
   onAccept,
   onReject,
+  onRemoveFriend,
   onAddFriend,
   onClose,
 }: Props) {
-  const [friendUsername, setFriendUsername] = useState("");
-  const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
+
+
+  const [friendUsername, setFriendUsername] =
+    useState("");
+
+
+  const [searchResults, setSearchResults] =
+    useState<UserSearchResult[]>([]);
+
+
   const [selectedUser, setSelectedUser] =
     useState<UserSearchResult | null>(null);
 
 
+  const [isAdding, setIsAdding] =
+    useState(false);
+
+
+  const [removingFriendId, setRemovingFriendId] =
+    useState<number | null>(null);
+
+
+
+
   useEffect(() => {
+
     async function searchUsers() {
 
-      // Don't search if input is empty
-      // or a user has already been selected
-      if (!friendUsername.trim() || selectedUser) {
+      if (
+        !friendUsername.trim()
+        ||
+        selectedUser
+      ) {
         setSearchResults([]);
         return;
       }
 
 
       try {
-        const users = await UserService.search(friendUsername);
+
+        const users =
+          await UserService.search(
+            friendUsername
+          );
+
 
         setSearchResults(users);
 
+
       } catch (err) {
-        console.error("Search failed:", err);
+
+        console.error(
+          "Search failed:",
+          err
+        );
+
         setSearchResults([]);
+
       }
+
     }
+
 
 
     searchUsers();
 
-  }, [friendUsername, selectedUser]);
+
+  }, [
+    friendUsername,
+    selectedUser
+  ]);
+
+
+
+
 
 
 
@@ -88,14 +150,23 @@ export default function FriendsPageTemplate({
     }
 
 
+
     try {
 
-      await onAddFriend?.(selectedUser.id);
+      setIsAdding(true);
+
+
+      await onAddFriend?.(
+        selectedUser.id
+      );
 
 
       setFriendUsername("");
+
       setSelectedUser(null);
+
       setSearchResults([]);
+
 
 
     } catch (err) {
@@ -105,46 +176,128 @@ export default function FriendsPageTemplate({
         err
       );
 
+
+    } finally {
+
+      setIsAdding(false);
+
     }
 
   }
 
 
 
+
+
+
+
+  async function handleRemoveFriend(
+    friendshipId: number
+  ) {
+
+    try {
+
+      setRemovingFriendId(
+        friendshipId
+      );
+
+
+      await onRemoveFriend?.(
+        friendshipId
+      );
+
+
+    } catch (err) {
+
+      console.error(
+        "Failed to remove friend:",
+        err
+      );
+
+
+    } finally {
+
+      setRemovingFriendId(null);
+
+    }
+
+  }
+
+
+
+
+
+
+
   return (
+
     <DesktopLayout>
 
-      <XPWindow title="Friends" onClose={onClose}>
+
+      <XPWindow
+        title="Friends"
+        onClose={onClose}
+      >
+
 
         <div className={styles.page}>
 
 
+
           {/* LEFT SIDE */}
+
           <div className={styles.leftColumn}>
 
 
+
+
             {/* ADD FRIEND */}
+
             <div className={styles.addFriend}>
 
 
               <div className={styles.searchBox}>
 
+
                 <input
+
                   type="text"
+
                   placeholder="Search username..."
+
                   value={friendUsername}
+
                   onChange={(e) => {
-                    setFriendUsername(e.target.value);
+
+                    setFriendUsername(
+                      e.target.value
+                    );
+
                     setSelectedUser(null);
+
                   }}
+
                 />
 
 
+
                 <button
+
                   onClick={handleAddFriend}
-                  disabled={!selectedUser}
+
+                  disabled={
+                    !selectedUser ||
+                    isAdding
+                  }
+
                 >
-                  Add
+
+                  {
+                    isAdding
+                      ? "Sending..."
+                      : "Add"
+                  }
+
                 </button>
 
 
@@ -152,41 +305,62 @@ export default function FriendsPageTemplate({
 
 
 
+
+
               {searchResults.length > 0 && (
 
                 <div className={styles.searchResults}>
 
+
                   {searchResults.map((user) => (
 
+
                     <div
+
                       key={user.id}
+
                       className={styles.searchItem}
+
+
                       onClick={() => {
 
-                        setSelectedUser(user);
+                        setSelectedUser(
+                          user
+                        );
+
 
                         setFriendUsername(
                           user.username
                         );
 
+
                         setSearchResults([]);
 
+
                       }}
+
                     >
 
+
+
                       <span
+
                         className={`${styles.dot} ${
                           user.isOnline
                             ? styles.online
                             : styles.offline
                         }`}
+
                       />
+
 
 
                       {user.username}
 
 
+
                     </div>
+
 
                   ))}
 
@@ -196,17 +370,25 @@ export default function FriendsPageTemplate({
               )}
 
 
+
             </div>
 
 
 
 
+
+
+
             {/* FRIEND REQUESTS */}
+
+
             <div className={styles.panel}>
 
 
               <div className={styles.title}>
+
                 Friend Requests
+
               </div>
 
 
@@ -216,9 +398,13 @@ export default function FriendsPageTemplate({
 
                 {requests.length === 0 ? (
 
+
                   <div className={styles.empty}>
+
                     No requests
+
                   </div>
+
 
 
                 ) : (
@@ -226,15 +412,23 @@ export default function FriendsPageTemplate({
 
                   requests.map((request) => (
 
+
                     <div
+
                       key={request.id}
+
                       className={styles.friend}
+
                     >
 
 
+
                       <span>
+
                         {request.sender.username}
+
                       </span>
+
 
 
 
@@ -242,42 +436,59 @@ export default function FriendsPageTemplate({
 
 
                         <button
+
                           onClick={() =>
                             onAccept?.(
                               request.id
                             )
                           }
+
                         >
+
                           Accept
+
                         </button>
 
 
 
+
                         <button
+
                           onClick={() =>
                             onReject?.(
                               request.id
                             )
                           }
+
                         >
+
                           Reject
+
                         </button>
 
 
                       </div>
 
 
+
                     </div>
+
 
                   ))
 
+
                 )}
+
 
 
               </div>
 
 
+
             </div>
+
+
+
 
 
           </div>
@@ -286,7 +497,13 @@ export default function FriendsPageTemplate({
 
 
 
+
+
+
+
           {/* RIGHT SIDE */}
+
+
           <div className={styles.friendsPanel}>
 
 
@@ -294,8 +511,11 @@ export default function FriendsPageTemplate({
 
 
               <div className={styles.title}>
+
                 Friends
+
               </div>
+
 
 
 
@@ -304,58 +524,121 @@ export default function FriendsPageTemplate({
 
                 {friends.length === 0 ? (
 
+
                   <div className={styles.empty}>
+
                     No friends yet
+
                   </div>
+
 
 
                 ) : (
 
 
+
                   friends.map((friend) => (
 
+
                     <div
+
                       key={friend.friendshipId}
+
                       className={styles.friend}
+
                     >
 
 
-                      <span
-                        className={`${styles.dot} ${
-                          friend.isOnline
-                            ? styles.online
-                            : styles.offline
-                        }`}
-                      />
+
+                      <div className={styles.user}>
+
+
+                        <span
+
+                          className={`${styles.dot} ${
+                            friend.isOnline
+                              ? styles.online
+                              : styles.offline
+                          }`}
+
+                        />
 
 
 
-                      {friend.username}
+                        {friend.username}
+
+
+
+                      </div>
+
+
+
+
+
+                      <button
+
+                        disabled={
+                          removingFriendId ===
+                          friend.friendshipId
+                        }
+
+
+                        onClick={() =>
+                          handleRemoveFriend(
+                            friend.friendshipId
+                          )
+                        }
+
+                      >
+
+                        {
+                          removingFriendId ===
+                          friend.friendshipId
+                            ? "Removing..."
+                            : "Remove"
+                        }
+
+
+                      </button>
+
+
 
 
                     </div>
 
+
+
                   ))
 
+
                 )}
+
 
 
               </div>
 
 
+
             </div>
+
 
 
           </div>
 
 
 
+
+
         </div>
+
 
 
       </XPWindow>
 
 
+
     </DesktopLayout>
+
   );
+
 }

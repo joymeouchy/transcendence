@@ -69,8 +69,6 @@ export default function FriendsPanel({ userId }: Props) {
 
   return (
     <div className={styles.groupBox}>
-      <div className={styles.groupTitle}>Friends</div>
-
       <div className={styles.addBar}>
         <input
           className={styles.input}
