@@ -6,6 +6,7 @@
 
 import { Router } from "express";
 import { PrismaClient, FriendshipStatus } from "../generated/prisma/client";
+import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -32,9 +33,10 @@ const prisma = new PrismaClient();
  *       400:
  *         description: Friendship already exists
  */
-router.post("/send", async (req, res) => {
+router.post("/send", authHelper, async (req: AuthRequest, res) => {
   try {
-    const { senderId, receiverId } = req.body;
+    const senderId = req.userId!;
+    const { receiverId } = req.body;
 
     if (senderId === receiverId) {
       return res.status(400).json({ error: "Cannot add yourself as a friend" });
