@@ -9,8 +9,8 @@ what joy needs:
 
 what rawan needs:
 --need to recheck isOnline
---add api for getting friend list of the user (not all users)
---handle rematch
+<!-- --add api for getting friend list of the user (not all users) -->
+<!-- --handle rematch -->
 --implement chat system
 --connect the match results to the Match table
 --make a new Customization table
