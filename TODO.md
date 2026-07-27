@@ -5,6 +5,7 @@ what joy needs:
 --when logged in with google, make sure the "change password" is inactive
 --add forget password option to login page
 --when register fails, it's giving an error 400 (probably needs handling from both sides)
+--need handling errors from apis
 
 what rawan needs:
 --need to recheck isOnline
