@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { GameConfig, GameState, pongConfig } from "./gameState";
-import { PrismaClient } from "../generated/prisma/client";
+import { PrismaClient, MatchStatus } from "../generated/prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -191,6 +191,7 @@ async function updateGame(io: Server, room: string) {
     const p1UserId = socketToUser.get(game.players.left);
     const p2UserId = socketToUser.get(game.players.right);
     const winnerUserId = socketToUser.get(winnerSocketId);
+    let winnerUsername = "Unknown";
 
     if (p1UserId && p2UserId) {
       await prisma.match.create({
@@ -200,12 +201,25 @@ async function updateGame(io: Server, room: string) {
           winnerId: winnerUserId ?? null,
           player1Score: game.scores.left,
           player2Score: game.scores.right,
+          status: MatchStatus.finished,
         },
       });
+
+      console.log("winneruserid is: ", winnerUserId);
+      // fetch winner username only if we have their userId
+      if (winnerUserId) {
+        const winner = await prisma.user.findUnique({
+          where: { id: winnerUserId },
+          select: { id: true, username: true },
+        });
+        winnerUsername = winner?.username ?? "Unknown";
+      }
     }
 
     io.to(room).emit("game_over", {
-      winner: winnerSocketId,
+      winnerSocketId,
+      winnerId: winnerUserId,
+      winnerUsername,
       scores: game.scores,
     });
 
