@@ -1,6 +1,4 @@
 what joy needs:
---add rematch to backend
---change play icon
 --add customizations to the game
 --when logged in with google, make sure the "change password" is inactive
 --add forget password option to login page

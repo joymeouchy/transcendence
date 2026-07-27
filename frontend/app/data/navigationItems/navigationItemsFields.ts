@@ -6,16 +6,16 @@ export const homeItem = {
   href: "/home",
 };
 
-export const profileItem = {
-  image: images.user,
-  label: "My Profile",
-  href: "/profile",
-};
-
 export const gameItem = {
   image: images.game,
   label: "Play",
   href: "/game",
+};
+
+export const profileItem = {
+  image: images.user,
+  label: "My Profile",
+  href: "/profile",
 };
 
 export const messagingItem = {

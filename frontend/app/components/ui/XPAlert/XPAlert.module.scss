@@ -1,0 +1,20 @@
+.alert {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 20px;
+
+	padding: 20px;
+	min-width: 250px;
+}
+
+.message {
+	text-align: center;
+}
+
+.button {
+	min-width: 70px;
+	padding: 4px 16px;
+
+	cursor: pointer;
+}
