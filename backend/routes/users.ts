@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { PrismaClient } from "../generated/prisma/client";
 import jwt from "jsonwebtoken";
+import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -50,25 +51,13 @@ const prisma = new PrismaClient();
  *       500:
  *         description: Server error
  */
-router.get("/me", async (req, res) => {
+router.get("/me", authHelper, async (req: AuthRequest, res) => {
+  console.log("userId from token:", req.userId); // add this
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(401).json({ error: "No token provided" });
-    }
-
-    const token = authHeader.split(" ")[1]; // "Bearer <token>"
-    if (!token) {
-      return res.status(401).json({ error: "No token provided" });
-    }
-
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || "supersecretkey",
-    ) as any;
+    const userId = req.userId!;
 
     const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+      where: { id: userId },
       select: {
         id: true,
         username: true,
@@ -106,6 +95,7 @@ router.get("/me", async (req, res) => {
       winRate: totalMatches > 0 ? Math.round((wins / totalMatches) * 100) : 0,
     });
   } catch (err) {
+    console.error("GET /me error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -130,9 +120,10 @@ router.get("/me", async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.get("/search", async (req, res) => {
+router.get("/search", authHelper, async (req: AuthRequest, res) => {
   try {
     const query = req.query.q as string;
+    const currentUserId = req.userId!;
 
     if (!query) {
       return res.status(400).json({ error: "Missing search query" });
@@ -144,6 +135,7 @@ router.get("/search", async (req, res) => {
           contains: query,
           mode: "insensitive", // doesn't care if it's upper or lower case
         },
+        NOT: { id: currentUserId }, // exclude the user itself from searching his name
       },
       select: {
         id: true,
