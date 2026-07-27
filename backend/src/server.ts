@@ -187,6 +187,13 @@ io.on("connection", (socket) => {
     console.log(`User ${userId} is online`);
   });
 
+  socket.on("leave_queue", () => {
+    if (waitingPlayer?.id === socket.id) {
+      waitingPlayer = null;
+      console.log(socket.id, "left the queue");
+    }
+  });
+
   socket.on("disconnect", async () => {
     const userId = socketToUser.get(socket.id);
     if (userId) {
