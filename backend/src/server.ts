@@ -45,6 +45,7 @@ let waitingPlayer: any = null;
 let matchId = 0;
 const socketToUser = new Map<string, number>(); // socketId → userId
 const onlineUsers = new Map<number, string>(); // userId → socketId
+const rematches = new Map<string, string[]>(); // room → [socketIds who want rematch]
 
 const app = express();
 app.use(
@@ -127,28 +128,77 @@ io.on("connection", (socket) => {
     },
   );
 
-  socket.on("user_online", ({ userId }: { userId: number }) => {
+  socket.on("request_rematch", ({ room }: { room: string }) => {
+    if (!rematches.has(room)) {
+      rematches.set(room, []);
+    }
+
+    const players = rematches.get(room)!;
+
+    if (!players.includes(socket.id)) {
+      players.push(socket.id);
+    }
+
+    // notify other player that this player wants a rematch
+    socket.to(room).emit("rematch_requested");
+
+    // if both players want a rematch
+    if (players.length === 2) {
+      rematches.delete(room);
+
+      // create new room
+      const newRoom = `match-${matchId++}`;
+      const [player1, player2] = players;
+
+      if (!player1 || !player2) return;
+
+      const p1Socket = io.sockets.sockets.get(player1);
+      const p2Socket = io.sockets.sockets.get(player2);
+
+      if (p1Socket && p2Socket) {
+        p1Socket.join(newRoom);
+        p2Socket.join(newRoom);
+
+        io.to(newRoom).emit("match_found", {
+          room: newRoom,
+          players: [player1, player2],
+        });
+
+        startGame(io, newRoom, player1, player2, socketToUser);
+        console.log("Rematch started in room:", newRoom);
+      }
+    }
+  });
+
+  socket.on("decline_rematch", ({ room }: { room: string }) => {
+    rematches.delete(room);
+    socket.to(room).emit("rematch_declined");
+  });
+
+  socket.on("user_online", async ({ userId }: { userId: number }) => {
     socketToUser.set(socket.id, userId);
     onlineUsers.set(userId, socket.id);
 
-    // update isOnline in DB
-    prisma.user.update({
+    await prisma.user.update({
       where: { id: userId },
       data: { isOnline: true },
     });
+
+    console.log(`User ${userId} is online`);
   });
 
-  socket.on("disconnect", () => {
+  socket.on("disconnect", async () => {
     const userId = socketToUser.get(socket.id);
     if (userId) {
       onlineUsers.delete(userId);
       socketToUser.delete(socket.id);
 
-      // set offline in DB
-      prisma.user.update({
+      await prisma.user.update({
         where: { id: userId },
         data: { isOnline: false },
       });
+
+      console.log(`User ${userId} is offline`);
     }
     console.log("Disconnected:", socket.id);
 
