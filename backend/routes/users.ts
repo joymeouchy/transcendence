@@ -157,6 +157,48 @@ router.get("/search", authHelper, async (req: AuthRequest, res) => {
 
 /**
  * @swagger
+ * /users/username:
+ *   patch:
+ *     summary: Update username
+ *     responses:
+ *       200:
+ *         description: Username updated
+ *       400:
+ *         description: Username already taken
+ *       401:
+ *         description: No token provided
+ */
+router.patch("/username", authHelper, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.userId!;
+    const { username } = req.body;
+
+    if (!username) {
+      return res.status(400).json({ error: "Username is required" });
+    }
+
+    // check if username is already taken
+    const existing = await prisma.user.findUnique({
+      where: { username },
+    });
+
+    if (existing && existing.id !== userId) {
+      return res.status(400).json({ error: "Username already taken" });
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { username },
+    });
+
+    res.json({ message: "Username updated", username: updated.username });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+/**
+ * @swagger
  * /users/{id}:
  *   get:
  *     summary: Get user profile by ID

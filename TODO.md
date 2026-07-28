@@ -5,6 +5,7 @@ what joy needs:
     so it returns an error if they try to change pass for google, u can check it in swagger)
 
 --link forget/reset/change password buttons to their api (add for each their own page)
+--link update username
 
 --when register fails, it's giving an error 400 (probably needs handling from both sides)
 --need handling errors from apis
@@ -19,7 +20,7 @@ what rawan needs:
 --connect the match results to the Match table
 --make a new Customization table
 <!-- --user should be able to change avatar -->
---user should be able to change username
+<!-- --user should be able to change username -->
 <!-- --forget password/change password implimentaion -->
 --add powerups
 
