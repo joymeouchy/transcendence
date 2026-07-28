@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import XPModal from "../../ui/XPModal/XPModal";
+import XPModal from "../../../ui/XPModal/XPModal";
 
 // import "./MatchmakingModal.scss";
 

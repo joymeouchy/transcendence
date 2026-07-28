@@ -1,175 +1,67 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { socket } from "../../lib/socket";
-
 import GameCanvas from "../components/game/GameCanvas";
-import MatchSelectModal from "../components/game/MatchSelectModal/MatchSelectModal";
-import MatchmakingModal, {
-  MatchmakingStatus,
-} from "../components/game/MatchMakingModal/MatchmakingModal";
+import GameModals from "../components/game/GameModals/GameModals";
 
-import GameOverModal from "../components/game/MatchMakingModal/GameOverModal";
+import useGameSocket from "../components/game/GameModals/UseGameSockets";
 
 import "./page.scss";
 
-type ModalState =
-  | "select"
-  | "matchmaking"
-  | "playing"
-  | "result";
-
 export default function GamePage() {
-  const router = useRouter();
+	const router = useRouter();
 
-  const [modalState, setModalState] =
-    useState<ModalState>("select");
+	const game = useGameSocket();
 
-  const [matchmakingStatus, setMatchmakingStatus] =
-    useState<MatchmakingStatus>("searching");
+	return (
+		<div className="game-page">
+			<div className="game-container">
+				<GameCanvas />
+			</div>
 
-  const [opponentName, setOpponentName] =
-    useState("");
+			<GameModals
+				modalState={
+					game.modalState
+				}
+				matchmakingStatus={
+					game.matchmakingStatus
+				}
+				opponentName={
+					game.opponentName
+				}
+				winner={
+					game.winner
+				}
+				currentUser={
+					game.currentUser
+				}
+				scoreLeft={
+					game.scoreLeft
+				}
+				scoreRight={
+					game.scoreRight
+				}
+				onStartOnline={
+					game.joinQueue
+				}
+				onPlayFriend={
+					game.playFriend
+				}
+				onCancel={
+					game.cancelMatchmaking
+				}
+				onReset={
+					game.resetGame
+				}
+				onExit={() => {
+					game.resetGame();
 
-  const [winner, setWinner] = useState("");
-  const [scoreLeft, setScoreLeft] = useState(0);
-  const [scoreRight, setScoreRight] = useState(0);
-  const [currentUser, setCurrentUser] = useState("");
-
-
-
-  useEffect(() => {
-
-    socket.connect();
-
-    const handleConnect = () => {
-      console.log("Socket connected:", socket.id);
-      setCurrentUser(socket.id ?? "");
-    };
-
-    const handleMatchFound = (data: {
-      room: string;
-      players: string[];
-    }) => {
-      console.log("Match found!", data);
-
-      const opponent = data.players.find(
-        (player) => player !== socket.id
-      );
-
-      setOpponentName(opponent ?? "Opponent");
-      setMatchmakingStatus("found");
-
-      setTimeout(() => {
-        setModalState("playing");
-      }, 1000);
-    };
-
-    const handleGameOver = (data: {
-      winner: string;
-      scores: {
-        left: number;
-        right: number;
-      };
-    }) => {
-      console.log("GAME OVER DATA:", data);
-
-      setWinner(data.winner);
-      setScoreLeft(data.scores.left);
-      setScoreRight(data.scores.right);
-
-      setModalState("result");
-    };
-
-    socket.on("connect", handleConnect);
-    socket.on("match_found", handleMatchFound);
-    socket.on("game_over", handleGameOver);
-
-    return () => {
-      console.log("CLEANING SOCKET LISTENERS");
-
-      socket.off("connect", handleConnect);
-      socket.off("match_found", handleMatchFound);
-      socket.off("game_over", handleGameOver);
-
-      socket.disconnect();
-    };
-  }, []);
-  const joinQueue = () => {
-    if (!socket.connected) {
-      console.warn("Socket not connected yet");
-      return;
-    }
-    socket.emit("join_queue");
-
-    setMatchmakingStatus("searching");
-    setModalState("matchmaking");
-  };
-
-  const playFriend = () => {
-    // Friend matchmaking can be implemented later.
-    // For now we reuse the matchmaking modal.
-
-    setMatchmakingStatus("waitingFriend");
-    setModalState("matchmaking");
-  };
-
-  const cancelMatchmaking = () => {
-    if (socket.connected) {
-      socket.emit("leave_queue");
-    }
-
-    setOpponentName("");
-    setModalState("select");
-  };
-
-  const returnHome = () => {
-    setModalState("select");
-    router.push("/home");
-  };
-
-
-  return (
-    <div className="game-page">
-      <div className="game-container">
-        <GameCanvas />
-      </div>
-
-      <MatchSelectModal
-        isOpen={modalState === "select"}
-        onBack={returnHome}
-        onStartOnline={joinQueue}
-        onPlayFriend={playFriend}
-        onReturnHome={returnHome}
-      />
-
-      <MatchmakingModal
-        isOpen={modalState === "matchmaking"}
-        status={matchmakingStatus}
-        opponentName={opponentName}
-        onCancel={cancelMatchmaking}
-      />
-      <GameOverModal
-        isOpen={modalState === "result"}
-        winner={winner}
-        currentUser={currentUser}
-        scoreLeft={scoreLeft}
-        scoreRight={scoreRight}
-        onRematch={() => {
-          socket.emit("request_rematch");
-        }}
-        onFindNew={() => {
-          setWinner("");
-          joinQueue();
-        }}
-        onExit={() => {
-          setWinner("");
-          setOpponentName("");
-          setModalState("select");
-        }}
-      />
-    </div>
-  );
+					router.push(
+						"/home"
+					);
+				}}
+			/>
+		</div>
+	);
 }

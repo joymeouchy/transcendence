@@ -1,157 +1,186 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 import { authService } from "@/services/auth.services";
+import { isAuthenticated } from "@/lib/auth";
 
 import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
+import XPAlert from "../components/ui/XPAlert/XPAlert";
 
 import { registerFields } from "../data/auth/registerFields";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { isAuthenticated } from "@/lib/auth";
 
 export default function RegisterPage() {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+	const router = useRouter();
 
-  const router = useRouter();
+	const [formData, setFormData] = useState({
+		username: "",
+		email: "",
+		password: "",
+		confirmPassword: "",
+	});
 
-    useEffect(() => {
-    if (isAuthenticated()) {
-      router.replace("/home");
-    }
-  }, []);
+	const [alertMessage, setAlertMessage] =
+		useState<string | null>(null);
 
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
-    e.preventDefault();
+	const [alertTitle, setAlertTitle] =
+		useState("Alert");
 
-    if (
-      formData.password !==
-      formData.confirmPassword
-    ) {
-      alert("Passwords do not match");
-      return;
-    }
+	useEffect(() => {
+		if (isAuthenticated()) {
+			router.replace("/home");
+		}
+	}, [router]);
 
-    try {
-      const response =
-        await authService.register({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        });
+	const handleSubmit = async (
+		e: React.FormEvent<HTMLFormElement>
+	) => {
+		e.preventDefault();
 
-      console.log(
-        "Register success:",
-        response
-      );
-       alert("Registration Successful");
-      router.replace("/home");
+		if (
+			formData.password !==
+			formData.confirmPassword
+		) {
+			setAlertTitle(
+				"Password Error"
+			);
 
-    } catch (err: any) {
-      console.error(err);
-      console.error(err.response?.data);
+			setAlertMessage(
+				"Passwords do not match"
+			);
 
-      alert(
-        err.response?.data?.message ||
-        "Registration failed"
-      );
-    }
+			return;
+		}
 
-    // console.log(
-    //   "Username:",
-    //   formData.username
-    // );
+		try {
+			const response =
+				await authService.register({
+					username: formData.username,
+					email: formData.email,
+					password: formData.password,
+				});
 
-    // console.log(
-    //   "Email:",
-    //   formData.email
-    // );
+			console.log(
+				"Register success:",
+				response
+			);
 
-    // console.log(
-    //   "Password:",
-    //   formData.password
-    // );
+			setAlertTitle(
+				"Success"
+			);
 
-    // console.log(
-    //   "Confirmed Password:",
-    //   formData.confirmPassword
-    // );
-  };
+			setAlertMessage(
+				"Registration successful"
+			);
 
-  return (
-    <AuthLayout>
+			setTimeout(() => {
+				router.replace("/home");
+			}, 1000);
 
-      <AuthPanel>
+		} catch (err) {
+			console.error(
+				"Register error:",
+				err
+			);
 
-        <form
-          onSubmit={handleSubmit}
-          className="xp-form"
-        >
+			if (axios.isAxiosError(err)) {
+				setAlertTitle(
+					"Registration Failed"
+				);
 
-          <h3 className="xp-title">
-            Register for PONG
-          </h3>
+				setAlertMessage(
+					err.response?.data?.error ||
+					err.response?.data?.message ||
+					"Registration failed"
+				);
+			} else {
+				setAlertTitle(
+					"Registration Failed"
+				);
 
-          {registerFields.map((field) => (
-            <div
-              key={field.key}
-              className="xp-field"
-            >
+				setAlertMessage(
+					"Something went wrong"
+				);
+			}
+		}
+	};
 
-              <label className="xp-label">
-                {field.label}
-              </label>
+	return (
+		<AuthLayout>
+			<AuthPanel>
+				<form
+					onSubmit={handleSubmit}
+					className="xp-form"
+				>
+					<h3 className="xp-title">
+						Register for PONG
+					</h3>
 
-              <input
-                type={field.type}
-                placeholder={field.placeholder}
-                value={
-                  formData[
-                  field.key as keyof typeof formData
-                  ]
-                }
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    [
-                      field.key as keyof typeof formData
-                    ]: e.target.value,
-                  }))
-                }
-                className="xp-input"
-                required={field.required}
-              />
+					{registerFields.map((field) => (
+						<div
+							key={field.key}
+							className="xp-field"
+						>
+							<label className="xp-label">
+								{field.label}
+							</label>
 
-            </div>
-          ))}
+							<input
+								type={field.type}
+								placeholder={field.placeholder}
+								value={
+									formData[
+										field.key as keyof typeof formData
+									]
+								}
+								onChange={(e) =>
+									setFormData((prev) => ({
+										...prev,
+										[
+											field.key as keyof typeof formData
+										]: e.target.value,
+									}))
+								}
+								className="xp-input"
+								required={field.required}
+							/>
+						</div>
+					))}
 
-          <button
-            type="submit"
-            className="xp-submit"
-          >
-            Register
-          </button>
+					<button
+						type="submit"
+						className="xp-submit"
+					>
+						Register
+					</button>
+				</form>
 
-        </form>
+				<Link
+					href="/login"
+					className="xp-link"
+				>
+					Already a user? Login
+				</Link>
+			</AuthPanel>
 
-        <Link
-          href="/login"
-          className="xp-link"
-        >
-          Already a user? Login
-        </Link>
-
-      </AuthPanel>
-    </AuthLayout>
-  );
+			<XPAlert
+				isOpen={
+					alertMessage !== null
+				}
+				title={
+					alertTitle
+				}
+				message={
+					alertMessage ?? ""
+				}
+				onClose={() =>
+					setAlertMessage(null)
+				}
+			/>
+		</AuthLayout>
+	);
 }

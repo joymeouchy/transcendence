@@ -1,6 +1,6 @@
 "use client";
 
-import XPModal from "../../ui/XPModal/XPModal";
+import XPModal from "../../../ui/XPModal/XPModal";
 
 // import "./OpponentDisconnectedModal.scss";
 
