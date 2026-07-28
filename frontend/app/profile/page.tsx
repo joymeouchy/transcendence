@@ -26,12 +26,8 @@ export default function ProfilePage() {
         );
       }
     }
-
-
     loadUser();
-
   }, []);
-
 
   return (
     <ProfilePageTemplate
