@@ -1,7 +1,10 @@
 import { Router } from "express";
+import fs from "fs";
+import path from "path";
 import { PrismaClient } from "../generated/prisma/client";
 import jwt from "jsonwebtoken";
 import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
+import { avatarUpload, AVATAR_UPLOAD_DIR } from "../src/helpers/upload_helpers";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -243,5 +246,85 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+/**
+ * @swagger
+ * /users/me/avatar:
+ *   post:
+ *     summary: Upload/change the current authenticated user's profile picture
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bearer token, e.g. "Bearer <token>"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Avatar updated successfully
+ *       400:
+ *         description: No file uploaded or invalid file
+ *       401:
+ *         description: No token provided
+ *       500:
+ *         description: Server error
+ */
+router.post(
+  "/me/avatar",
+  authHelper,
+  (req: AuthRequest, res, next) => {
+    avatarUpload.single("avatar")(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({ error: err.message || "Upload failed" });
+      }
+      next();
+    });
+  },
+  async (req: AuthRequest, res) => {
+    try {
+      const userId = req.userId!;
+
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const previousUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { avatarUrl: true },
+      });
+
+      const avatarUrl = `${req.protocol}://${req.get("host")}/uploads/avatars/${req.file.filename}`;
+
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data: { avatarUrl },
+        select: { avatarUrl: true },
+      });
+
+      // clean up the previously uploaded file, if it was one of ours
+      if (previousUser?.avatarUrl?.includes("/uploads/avatars/")) {
+        const previousFilename = path.basename(previousUser.avatarUrl);
+        const previousFilePath = path.join(AVATAR_UPLOAD_DIR, previousFilename);
+
+        fs.unlink(previousFilePath, () => {});
+      }
+
+      res.json({ avatarUrl: user.avatarUrl });
+    } catch (err) {
+      console.error("POST /me/avatar error:", err);
+      res.status(500).json({ error: "Server error" });
+    }
+  },
+);
 
 export default router;
