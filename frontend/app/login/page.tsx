@@ -1,54 +1,80 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import "./page.scss";
+
 import { authService } from "@/services/auth.services";
 import { useRouter } from "next/navigation";
-import { loginFields } from "../data/auth/loginFields";
-import AuthLayout from "../components/auth/AuthLayout";
-import AuthPanel from "../components/auth/AuthPanel";
-import { useEffect } from "react";
 import { isAuthenticated } from "@/lib/auth";
 
+import { loginFields } from "../data/auth/loginFields";
+
+import AuthLayout from "../components/auth/AuthLayout";
+import AuthPanel from "../components/auth/AuthPanel";
+import XPAlert from "../components/ui/XPAlert/XPAlert";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  const [alertMessage, setAlertMessage] =
+    useState<string | null>(null);
+
+  const [isLoading, setIsLoading] =
+    useState(false);
+
   const router = useRouter();
 
   useEffect(() => {
-  if (isAuthenticated()) {
-    router.replace("/home");
-  }
-}, []);
+    if (isAuthenticated()) {
+      router.replace("/home");
+    }
+  }, []);
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
 
+    setIsLoading(true);
+
     try {
       const response = await authService.login({
         email: formData.email,
         password: formData.password,
       });
-      console.log("Login success:", response);
+
+      console.log(
+        "Login success:",
+        response
+      );
+
       router.push("/home");
 
     } catch (err: any) {
       console.error(err);
 
-      alert(
+      setAlertMessage(
         err.response?.data?.error ||
         "Login failed"
       );
+
+    } finally {
+      setIsLoading(false);
     }
-    // placeholders for testing
-    console.log("Email:", formData.email);
-    console.log("Password:", formData.password);
+
+    console.log(
+      "Email:",
+      formData.email
+    );
+
+    console.log(
+      "Password:",
+      formData.password
+    );
   };
 
   return (
@@ -58,7 +84,6 @@ export default function LoginPage() {
           onSubmit={handleSubmit}
           className="xp-form"
         >
-
           <h3 className="xp-title">
             Log In to Pong XP
           </h3>
@@ -68,7 +93,6 @@ export default function LoginPage() {
               key={field.key}
               className="xp-field"
             >
-
               <label className="xp-label">
                 {field.label}
               </label>
@@ -91,27 +115,42 @@ export default function LoginPage() {
                 }
                 className="xp-input"
                 required={field.required}
+                disabled={isLoading}
               />
-
             </div>
           ))}
+          
+          <Link
+            href="/forgot-password"
+            className="xp-link"
+          >
+            Forgot password?
+          </Link>
 
           <button
             type="submit"
             className="xp-submit"
+            disabled={isLoading}
           >
-            Log In
+            {isLoading
+              ? "Logging in..."
+              : "Log In"}
           </button>
 
           <button
-            type="submit"
+            type="button"
             className="xp-submit"
-            onClick={authService.loginWithGoogle}
+            disabled={isLoading}
+            onClick={
+              authService.loginWithGoogle
+            }
           >
-            Log In with Google instead
+            {isLoading
+              ? "Please wait..."
+              : "Log In with Google instead"}
           </button>
-
         </form>
+
         <Link
           href="/register"
           className="xp-link"
@@ -119,6 +158,18 @@ export default function LoginPage() {
           Create a new account
         </Link>
       </AuthPanel>
+
+      <XPAlert
+        isOpen={
+          alertMessage !== null
+        }
+        message={
+          alertMessage ?? ""
+        }
+        onClose={() =>
+          setAlertMessage(null)
+        }
+      />
     </AuthLayout>
   );
 }

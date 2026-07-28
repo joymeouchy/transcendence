@@ -8,8 +8,8 @@ import {
 
 export const sidebarItems = [
   homeItem,
-  profileItem,
   gameItem,
-  messagingItem,
+  profileItem,
   friendshipsItem,  
+  messagingItem,
 ];

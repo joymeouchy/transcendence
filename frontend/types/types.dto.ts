@@ -10,3 +10,21 @@ export interface UserProfile {
   totalMatches: number;
   winRate: number;
 }
+
+export type Friend = {
+	friendshipId: number;
+	id: number;
+	username: string;
+	avatarUrl: string | null;
+	isOnline: boolean;
+};
+
+export type FriendRequest = {
+	id: number;
+
+	sender: {
+		id: number;
+		username: string;
+		avatarUrl: string | null;
+	};
+};

@@ -4,7 +4,7 @@ export const images = {
 
 	user: "/user.png",
 	home: "/home.ico",
-	game: "/game.ico",
+	game: "/game.png",
 
 	defaultUserIcon: "/defaultIcon.png",
 
