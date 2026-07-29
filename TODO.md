@@ -6,12 +6,13 @@ what joy needs:
 
 --link forget/reset/change password buttons to their api (add for each their own page)
 --link update username
+--remove provider from account info
 
 --when register fails, it's giving an error 400 (probably needs handling from both sides)
 --need handling errors from apis
 --add customizations to the game
---remove provider from profile
 --update "game_over" with the new data added from socket event
+--for GameCanvas.tsx u can use the values from backend/src/gameState.ts (GameConfig) l2n they're defined twice
 
 what rawan needs:
 --need to recheck isOnline
@@ -23,6 +24,7 @@ what rawan needs:
 <!-- --user should be able to change avatar -->
 <!-- --user should be able to change username -->
 <!-- --forget password/change password implimentaion -->
+<!-- --fix paddles position -->
 --add powerups
 
  photo sources:
