@@ -11,6 +11,7 @@ what joy needs:
 --need handling errors from apis
 --add customizations to the game
 --remove provider from profile
+--update "game_over" with the new data added from socket event
 
 what rawan needs:
 --need to recheck isOnline

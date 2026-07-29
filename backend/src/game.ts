@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 interface FullGameState extends GameState {
   config: GameConfig;
   socketToUser: Map<string, number>;
+  isEnding: boolean; // flag to indicate if the game is ending
 }
 
 export const games: Record<string, FullGameState> = {};
@@ -52,6 +53,7 @@ export function startGame(
     players: { left: player1Id, right: player2Id },
     config,
     socketToUser,
+    isEnding: false, // initialize the flag
   };
 
   runGameLoop(io, room);
@@ -183,6 +185,14 @@ async function updateGame(io: Server, room: string) {
     game.scores.left >= config.winningScore ||
     game.scores.right >= config.winningScore
   ) {
+    if (game.isEnding) return; // already handling win, skip
+    game.isEnding = true; // mark as ending immediately
+
+    // stop the loop
+    clearInterval(gameIntervals[room]);
+    delete gameIntervals[room];
+    delete games[room];
+
     const winnerSocketId =
       game.scores.left >= config.winningScore
         ? game.players.left
@@ -205,8 +215,6 @@ async function updateGame(io: Server, room: string) {
         },
       });
 
-      console.log("winneruserid is: ", winnerUserId);
-      // fetch winner username only if we have their userId
       if (winnerUserId) {
         const winner = await prisma.user.findUnique({
           where: { id: winnerUserId },
@@ -214,6 +222,8 @@ async function updateGame(io: Server, room: string) {
         });
         winnerUsername = winner?.username ?? "Unknown";
       }
+    } else {
+      console.log("Missing user IDs - p1:", p1UserId, "p2:", p2UserId);
     }
 
     io.to(room).emit("game_over", {
@@ -222,10 +232,6 @@ async function updateGame(io: Server, room: string) {
       winnerUsername,
       scores: game.scores,
     });
-
-    clearInterval(gameIntervals[room]);
-    delete gameIntervals[room];
-    delete games[room];
   }
 }
 
