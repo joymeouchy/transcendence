@@ -6,11 +6,13 @@ what joy needs:
 
 --link forget/reset/change password buttons to their api (add for each their own page)
 --link update username
+--remove provider from account info
 
 --when register fails, it's giving an error 400 (probably needs handling from both sides)
 --need handling errors from apis
 --add customizations to the game
---remove provider from profile
+--update the "game_over" socket to read `winnerSocketId`, `winnerId`, `winnerUsername` for both the normal win and the disconnect game_over paths and to display the winner username
+--for GameCanvas.tsx u can use the values from backend/src/gameState.ts (GameConfig) l2n they're defined twice
 
 what rawan needs:
 --need to recheck isOnline
@@ -19,9 +21,11 @@ what rawan needs:
 --implement chat system
 --connect the match results to the Match table
 --make a new Customization table
+<!-- --stop the user from playing against himself -->
 <!-- --user should be able to change avatar -->
 <!-- --user should be able to change username -->
 <!-- --forget password/change password implimentaion -->
+<!-- --fix paddles position -->
 --add powerups
 
  photo sources:

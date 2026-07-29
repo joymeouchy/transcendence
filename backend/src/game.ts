@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 interface FullGameState extends GameState {
   config: GameConfig;
   socketToUser: Map<string, number>;
+  isEnding: boolean; // flag to indicate if the game is ending
 }
 
 export const games: Record<string, FullGameState> = {};
@@ -52,6 +53,7 @@ export function startGame(
     players: { left: player1Id, right: player2Id },
     config,
     socketToUser,
+    isEnding: false, // initialize the flag
   };
 
   runGameLoop(io, room);
@@ -84,16 +86,30 @@ export function scheduleGameCleanup(
   room: string,
   disconnectedSocketId: string,
 ) {
-  disconnectTimers[room] = setTimeout(() => {
+  disconnectTimers[room] = setTimeout(async () => {
     delete disconnectTimers[room];
     const game = games[room];
     if (game) {
-      const winner =
+      const winnerSocketId =
         game.players.left === disconnectedSocketId
           ? game.players.right
           : game.players.left;
+
+      const winnerUserId = game.socketToUser.get(winnerSocketId);
+      let winnerUsername = "Unknown";
+
+      if (winnerUserId) {
+        const winner = await prisma.user.findUnique({
+          where: { id: winnerUserId },
+          select: { username: true },
+        });
+        winnerUsername = winner?.username ?? "Unknown";
+      }
+
       io.to(room).emit("game_over", {
-        winner,
+        winnerSocketId,
+        winnerId: winnerUserId,
+        winnerUsername,
         scores: game.scores,
         reason: "disconnect",
       });
@@ -148,22 +164,30 @@ async function updateGame(io: Server, room: string) {
 
   // Left paddle collision
   if (
-    ball.x <= config.paddleWidth &&
+    ball.x <= config.leftPaddleOffset + config.paddleWidth &&
     ball.y >= game.paddles.left &&
     ball.y <= game.paddles.left + config.paddleHeight
   ) {
     ball.vx *= -1;
-    ball.x = config.paddleWidth;
+    ball.x = config.leftPaddleOffset + config.paddleWidth;
   }
 
   // Right paddle collision
   if (
-    ball.x >= config.canvasWidth - config.paddleWidth - config.ballSize &&
+    ball.x >=
+      config.canvasWidth -
+        config.rightPaddleOffset -
+        config.paddleWidth -
+        config.ballSize &&
     ball.y >= game.paddles.right &&
     ball.y <= game.paddles.right + config.paddleHeight
   ) {
     ball.vx *= -1;
-    ball.x = config.canvasWidth - config.paddleWidth - config.ballSize;
+    ball.x =
+      config.canvasWidth -
+      config.rightPaddleOffset -
+      config.paddleWidth -
+      config.ballSize;
   }
 
   // Left player misses → right scores
@@ -183,6 +207,14 @@ async function updateGame(io: Server, room: string) {
     game.scores.left >= config.winningScore ||
     game.scores.right >= config.winningScore
   ) {
+    if (game.isEnding) return; // already handling win, skip
+    game.isEnding = true; // mark as ending immediately
+
+    // stop the loop
+    clearInterval(gameIntervals[room]);
+    delete gameIntervals[room];
+    delete games[room];
+
     const winnerSocketId =
       game.scores.left >= config.winningScore
         ? game.players.left
@@ -205,8 +237,6 @@ async function updateGame(io: Server, room: string) {
         },
       });
 
-      console.log("winneruserid is: ", winnerUserId);
-      // fetch winner username only if we have their userId
       if (winnerUserId) {
         const winner = await prisma.user.findUnique({
           where: { id: winnerUserId },
@@ -214,6 +244,8 @@ async function updateGame(io: Server, room: string) {
         });
         winnerUsername = winner?.username ?? "Unknown";
       }
+    } else {
+      console.log("Missing user IDs - p1:", p1UserId, "p2:", p2UserId);
     }
 
     io.to(room).emit("game_over", {
@@ -222,10 +254,6 @@ async function updateGame(io: Server, room: string) {
       winnerUsername,
       scores: game.scores,
     });
-
-    clearInterval(gameIntervals[room]);
-    delete gameIntervals[room];
-    delete games[room];
   }
 }
 

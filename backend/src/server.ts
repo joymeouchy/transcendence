@@ -6,6 +6,7 @@ import express from "express";
 import cors from "cors";
 import http from "http";
 import path from "path";
+import jwt from "jsonwebtoken";
 import { Server } from "socket.io";
 import authRoutes from "../routes/auth";
 import {
@@ -41,6 +42,7 @@ const swaggerOptions = {
 
 const PORT = 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 let waitingPlayer: any = null;
 let matchId = 0;
 const socketToUser = new Map<string, number>(); // socketId → userId
@@ -76,8 +78,36 @@ server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+// Authenticate the socket connection using the same JWT issued by /auth/login
+// or /auth/register, so we know the real userId behind a socket instead of
+// trusting whatever the client claims (this is what lets us tell two tabs of
+// the same account apart from two different accounts).
+io.use((socket, next) => {
+  const token = socket.handshake.auth?.token;
+
+  if (!token) {
+    return next(new Error("No token provided"));
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+    socket.data.userId = decoded.userId;
+    next();
+  } catch (err) {
+    next(new Error("Invalid or expired token"));
+  }
+});
+
 io.on("connection", (socket) => {
-  console.log("Client connected:", socket.id);
+  const userId = socket.data.userId as number;
+  console.log("Client connected:", socket.id, "userId:", userId);
+
+  socketToUser.set(socket.id, userId);
+  onlineUsers.set(userId, socket.id);
+
+  prisma.user
+    .update({ where: { id: userId }, data: { isOnline: true } })
+    .catch((err) => console.error("Failed to mark user online:", err));
 
   if (socket.recovered) {
     const room = findRoomBySocket(socket.id);
@@ -98,6 +128,19 @@ io.on("connection", (socket) => {
     } else if (waitingPlayer.id === socket.id) {
       socket.emit("already_waiting");
     } else {
+      // check if same user joining from different window
+      const waitingUserId = socketToUser.get(waitingPlayer.id);
+      const joiningUserId = socketToUser.get(socket.id);
+
+      if (waitingUserId && joiningUserId && waitingUserId === joiningUserId) {
+        socket.emit("already_waiting");
+        console.log(
+          "Same user tried to play against themselves:",
+          joiningUserId,
+        );
+        return;
+      }
+
       const room = `match-${matchId++}`;
 
       // join both players
@@ -120,7 +163,6 @@ io.on("connection", (socket) => {
       waitingPlayer = null;
     }
   });
-
   // handle paddle movement
   socket.on(
     "paddle_move",
@@ -129,11 +171,16 @@ io.on("connection", (socket) => {
     },
   );
 
-  socket.on("request_rematch", ({ room }: { room: string }) => {
+  socket.on("request_rematch", (data: { room: string } | undefined) => {
+    if (!data?.room) {
+      console.warn("request_rematch received without room:", data);
+      return;
+    }
+    const { room } = data;
+
     if (!rematches.has(room)) {
       rematches.set(room, []);
     }
-
     const players = rematches.get(room)!;
 
     if (!players.includes(socket.id)) {
@@ -171,21 +218,15 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("decline_rematch", ({ room }: { room: string }) => {
+  socket.on("decline_rematch", (data: { room: string } | undefined) => {
+    if (!data?.room) {
+      console.warn("decline_rematch received without room:", data);
+      return;
+    }
+    const { room } = data;
+
     rematches.delete(room);
     socket.to(room).emit("rematch_declined");
-  });
-
-  socket.on("user_online", async ({ userId }: { userId: number }) => {
-    socketToUser.set(socket.id, userId);
-    onlineUsers.set(userId, socket.id);
-
-    await prisma.user.update({
-      where: { id: userId },
-      data: { isOnline: true },
-    });
-
-    console.log(`User ${userId} is online`);
   });
 
   socket.on("leave_queue", () => {
