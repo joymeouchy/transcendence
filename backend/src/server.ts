@@ -129,11 +129,16 @@ io.on("connection", (socket) => {
     },
   );
 
-  socket.on("request_rematch", ({ room }: { room: string }) => {
+  socket.on("request_rematch", (data: { room: string } | undefined) => {
+    if (!data?.room) {
+      console.warn("request_rematch received without room:", data);
+      return;
+    }
+    const { room } = data;
+
     if (!rematches.has(room)) {
       rematches.set(room, []);
     }
-
     const players = rematches.get(room)!;
 
     if (!players.includes(socket.id)) {
@@ -171,7 +176,13 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("decline_rematch", ({ room }: { room: string }) => {
+  socket.on("decline_rematch", (data: { room: string } | undefined) => {
+    if (!data?.room) {
+      console.warn("decline_rematch received without room:", data);
+      return;
+    }
+    const { room } = data;
+
     rematches.delete(room);
     socket.to(room).emit("rematch_declined");
   });
