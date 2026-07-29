@@ -86,16 +86,30 @@ export function scheduleGameCleanup(
   room: string,
   disconnectedSocketId: string,
 ) {
-  disconnectTimers[room] = setTimeout(() => {
+  disconnectTimers[room] = setTimeout(async () => {
     delete disconnectTimers[room];
     const game = games[room];
     if (game) {
-      const winner =
+      const winnerSocketId =
         game.players.left === disconnectedSocketId
           ? game.players.right
           : game.players.left;
+
+      const winnerUserId = game.socketToUser.get(winnerSocketId);
+      let winnerUsername = "Unknown";
+
+      if (winnerUserId) {
+        const winner = await prisma.user.findUnique({
+          where: { id: winnerUserId },
+          select: { username: true },
+        });
+        winnerUsername = winner?.username ?? "Unknown";
+      }
+
       io.to(room).emit("game_over", {
-        winner,
+        winnerSocketId,
+        winnerId: winnerUserId,
+        winnerUsername,
         scores: game.scores,
         reason: "disconnect",
       });
