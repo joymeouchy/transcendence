@@ -150,22 +150,30 @@ async function updateGame(io: Server, room: string) {
 
   // Left paddle collision
   if (
-    ball.x <= config.paddleWidth &&
+    ball.x <= config.leftPaddleOffset + config.paddleWidth &&
     ball.y >= game.paddles.left &&
     ball.y <= game.paddles.left + config.paddleHeight
   ) {
     ball.vx *= -1;
-    ball.x = config.paddleWidth;
+    ball.x = config.leftPaddleOffset + config.paddleWidth;
   }
 
   // Right paddle collision
   if (
-    ball.x >= config.canvasWidth - config.paddleWidth - config.ballSize &&
+    ball.x >=
+      config.canvasWidth -
+        config.rightPaddleOffset -
+        config.paddleWidth -
+        config.ballSize &&
     ball.y >= game.paddles.right &&
     ball.y <= game.paddles.right + config.paddleHeight
   ) {
     ball.vx *= -1;
-    ball.x = config.canvasWidth - config.paddleWidth - config.ballSize;
+    ball.x =
+      config.canvasWidth -
+      config.rightPaddleOffset -
+      config.paddleWidth -
+      config.ballSize;
   }
 
   // Left player misses → right scores
