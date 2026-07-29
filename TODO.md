@@ -14,12 +14,14 @@ what joy needs:
 --update the "game_over" socket to read `winnerSocketId`, `winnerId`, `winnerUsername` for both the normal win and the disconnect game_over paths and to display the winner username
 --for GameCanvas.tsx u can use the values from backend/src/gameState.ts (GameConfig) l2n they're defined twice
 
+--isOnline is only being checked from the game page, need to check where socket.connect and disconnect are called and move them somewhere that reacts to user logging in
+
 what rawan needs:
---need to recheck isOnline
+<!-- --need to recheck isOnline -->
 <!-- --add api for getting friend list of the user (not all users) -->
 <!-- --handle rematch -->
 --implement chat system
---connect the match results to the Match table
+<!-- --connect the match results to the Match table -->
 --make a new Customization table
 <!-- --stop the user from playing against himself -->
 <!-- --user should be able to change avatar -->
