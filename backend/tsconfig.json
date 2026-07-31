@@ -1,8 +1,10 @@
 {
   "exclude": ["node_modules"],
+  "include": ["src/**/*", "routes/**/*", "/shared/**/*"],
   "compilerOptions": {
     "module": "commonjs",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "target": "esnext",
     "types": ["node"],
     "sourceMap": true,
