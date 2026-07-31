@@ -3,18 +3,12 @@
 import { useEffect, useRef } from "react";
 import { socket } from "../../../lib/socket";
 import "./GameCanvas.scss";
-
-// this is compatible with backend struct
-type GameState = {
-  ball: { x: number; y: number; vx: number; vy: number };
-  paddles: { left: number; right: number };
-  scores: { left: number; right: number };
-  players: { left: string; right: string };
-};
+// frontend needs to use these functions to render the game state
+import { GameStateSend, pongConfig, PowerUpType } from "../../../../shared/game_types";
 
 export default function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const gameState = useRef<GameState | null>(null); // null until first game_state arrives
+  const gameState = useRef<GameStateSend | null>(null); // null until first game_state arrives
   const roomRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -24,15 +18,14 @@ export default function GameCanvas() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // change in backend/gameState if u want
-    const width = canvas.width;   // 800
-    const height = canvas.height; // 600
+    const width = canvas.width;
+    const height = canvas.height;
 
     socket.on("match_found", ({ room }: { room: string }) => {
       roomRef.current = room;
     });
 
-    socket.on("game_state", (state: GameState) => {
+    socket.on("game_state", (state: GameStateSend) => {
       gameState.current = state;
     });
 
