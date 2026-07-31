@@ -3,18 +3,12 @@
 import { useEffect, useRef } from "react";
 import { socket } from "../../../lib/socket";
 import "./GameCanvas.scss";
-
-// this is compatible with backend struct
-type GameState = {
-  ball: { x: number; y: number; vx: number; vy: number };
-  paddles: { left: number; right: number };
-  scores: { left: number; right: number };
-  players: { left: string; right: string };
-};
+// use this to get the types for GameState/GameConfig/PowerUp from shared folder
+import { GameStateSend, GameConfig, PowerUp } from "../../../../shared/game_types";
 
 export default function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const gameState = useRef<GameState | null>(null); // null until first game_state arrives
+  const gameState = useRef<GameStateSend | null>(null); // null until first game_state arrives
   const roomRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -32,7 +26,7 @@ export default function GameCanvas() {
       roomRef.current = room;
     });
 
-    socket.on("game_state", (state: GameState) => {
+    socket.on("game_state", (state: GameStateSend) => {
       gameState.current = state;
     });
 
