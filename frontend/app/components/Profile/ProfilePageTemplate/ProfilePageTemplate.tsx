@@ -3,6 +3,7 @@
 import ProfileHeader from "../ProfileHeader/ProfileHeader";
 import ProfileStats from "../ProfileStats/ProfileStats";
 import AccountInfo from "../AccountInfo/AccountInfo";
+import AccountActions from "../AccountActions/AccountActions";
 import FriendsPanel from "../FriendsPanel/FriendsPanel";
 
 import DesktopLayout from "../../DesktopLayout/DesktopLayout";
@@ -14,13 +15,11 @@ import styles from "./ProfilePageTemplate.module.scss";
 
 interface ProfilePageTemplateProps {
 	user?: UserProfile;
-	actions?: React.ReactNode;
 	onClose?: () => void;
 }
 
 export default function ProfilePageTemplate({
 	user,
-	actions,
 	onClose,
 }: ProfilePageTemplateProps) {
 	if (!user) {
@@ -51,15 +50,15 @@ export default function ProfilePageTemplate({
 							avatarUrl={user.avatarUrl}
 						/>
 
-						{actions && (
-							<div className={styles.groupBox}>
-								<div className={styles.groupTitle}>
-									Actions
-								</div>
-
-								{actions}
+						<div className={styles.groupBox}>
+							<div className={styles.groupTitle}>
+								Actions
 							</div>
-						)}
+
+							<AccountActions
+								provider={user.provider}
+							/>
+						</div>
 
 						<div className={styles.groupBox}>
 							<div className={styles.groupTitle}>
@@ -96,7 +95,6 @@ export default function ProfilePageTemplate({
 								<AccountInfo
 									username={user.username}
 									email={user.email}
-									provider={user.provider}
 									totalMatches={user.totalMatches}
 								/>
 							</div>
@@ -108,7 +106,7 @@ export default function ProfilePageTemplate({
 							</div>
 
 							<FriendsPanel
-								userId={user.id}
+							userId={user.id}
 							/>
 						</div>
 					</section>
