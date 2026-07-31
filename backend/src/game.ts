@@ -1,20 +1,62 @@
 import { Server } from "socket.io";
-import { GameConfig, GameState, pongConfig } from "./gameState";
+import {
+  GameConfig,
+  GameStateSend,
+  FullGameState,
+  pongConfig,
+  PowerUp,
+} from "../../shared/game_types";
 import { PrismaClient, MatchStatus } from "../generated/prisma/client";
 
 const prisma = new PrismaClient();
 
-interface FullGameState extends GameState {
-  config: GameConfig;
-  socketToUser: Map<string, number>;
-  isEnding: boolean; // flag to indicate if the game is ending
-}
-
 export const games: Record<string, FullGameState> = {};
 export const gameIntervals: Record<string, NodeJS.Timeout> = {};
 export const disconnectTimers: Record<string, NodeJS.Timeout> = {};
+export const powerUpTimers: Record<string, NodeJS.Timeout> = {};
 
 const DISCONNECT_GRACE_MS = 15000;
+
+function applyPowerUp(
+  game: FullGameState,
+  side: "left" | "right",
+  type: PowerUp["type"],
+  io: Server,
+  room: string,
+) {
+  const opponent = side === "left" ? "right" : "left";
+  const expiresAt = Date.now() + 5000; // 5 seconds
+
+  switch (type) {
+    case "bigPaddle":
+      game.activeEffects[side] = { type, expiresAt };
+      game.config = { ...game.config, paddleHeight: 200 }; // double size
+      break;
+
+    case "freeze":
+      game.activeEffects[opponent] = { type, expiresAt };
+      break;
+
+    case "speedBoost":
+      game.ball.vx *= 1.5;
+      game.ball.vy *= 1.5;
+      break;
+
+    case "smallBall":
+      game.activeEffects[side] = { type, expiresAt };
+      game.config = { ...game.config, ballSize: 5 }; // half size
+      break;
+  }
+
+  // reset effect after duration
+  setTimeout(() => {
+    if (!games[room]) return;
+    game.activeEffects[side] = null;
+    game.activeEffects[opponent] = null;
+    game.config = { ...game.config, paddleHeight: 100, ballSize: 10 }; // reset
+    io.to(room).emit("power_up_expired", { type, side });
+  }, 5000);
+}
 
 function runGameLoop(io: Server, room: string) {
   gameIntervals[room] = setInterval(() => {
@@ -25,7 +67,20 @@ function runGameLoop(io: Server, room: string) {
     }
     updateGame(io, room);
     if (!games[room]) return; // check again after updateGame deletes it
-    const { config: _, ...stateToSend } = games[room]!;
+
+    const game = games[room]!;
+    const stateToSend: GameStateSend = {
+      ball: game.ball,
+      paddles: game.paddles,
+      scores: game.scores,
+      players: game.players,
+      powerUp: game.powerUp,
+      activeEffects: game.activeEffects,
+      dynamicConfig: {
+        paddleHeight: game.config.paddleHeight,
+        ballSize: game.config.ballSize,
+      },
+    };
     io.to(room).emit("game_state", stateToSend);
   }, 1000 / 60);
 }
@@ -53,8 +108,32 @@ export function startGame(
     players: { left: player1Id, right: player2Id },
     config,
     socketToUser,
-    isEnding: false, // initialize the flag
+    isEnding: false,
+    powerUp: null,
+    activeEffects: {
+      left: null,
+      right: null,
+    },
   };
+
+  powerUpTimers[room] = setInterval(() => {
+    if (!games[room]) {
+      clearInterval(powerUpTimers[room]);
+      delete powerUpTimers[room];
+      return;
+    }
+
+    games[room].powerUp = {
+      x: Math.random() * (config.canvasWidth - 100) + 50,
+      y: Math.random() * (config.canvasHeight - 100) + 50,
+      type: ["bigPaddle", "freeze", "speedBoost", "smallBall"][
+        Math.floor(Math.random() * 4)
+      ] as PowerUp["type"],
+      active: true,
+    };
+
+    io.to(room).emit("power_up_spawned", games[room]!.powerUp);
+  }, 15000);
 
   runGameLoop(io, room);
 }
@@ -116,6 +195,7 @@ export function scheduleGameCleanup(
     }
     delete games[room];
     delete gameIntervals[room];
+    delete powerUpTimers[room];
   }, DISCONNECT_GRACE_MS);
 }
 
@@ -136,7 +216,11 @@ export function handlePaddleMove(
 
   const { config } = game;
   const side = game.players.left === socketId ? "left" : "right";
-
+  // check if frozen
+  const effect = game.activeEffects[side];
+  if (effect?.type === "freeze" && Date.now() < effect.expiresAt) {
+    return; // ignore paddle movement
+  }
   if (direction === "up") {
     game.paddles[side] = Math.max(0, game.paddles[side] - config.paddleSpeed);
   } else {
@@ -202,6 +286,19 @@ async function updateGame(io: Server, room: string) {
     resetBall(game);
   }
 
+  // check power up collision
+  const powerUp = game.powerUp;
+  if (powerUp?.active) {
+    const dist = Math.hypot(ball.x - powerUp.x, ball.y - powerUp.y);
+    if (dist < 20) {
+      // determine which player hit it
+      const side = ball.vx < 0 ? "right" : "left"; // last direction
+      applyPowerUp(game, side, powerUp.type, io, room);
+      game.powerUp = null;
+      io.to(room).emit("power_up_collected", { type: powerUp.type, side });
+    }
+  }
+
   // Win condition
   if (
     game.scores.left >= config.winningScore ||
@@ -212,7 +309,9 @@ async function updateGame(io: Server, room: string) {
 
     // stop the loop
     clearInterval(gameIntervals[room]);
+    clearInterval(powerUpTimers[room]);
     delete gameIntervals[room];
+    delete powerUpTimers[room];
     delete games[room];
 
     const winnerSocketId =
