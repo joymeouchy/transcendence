@@ -1,44 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import ProfilePageTemplate from "../components/Profile/ProfilePageTemplate/ProfilePageTemplate";
-import { UserService } from "@/services/user.services";
-import { UserProfile } from "@/types/types.dto";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ProfilePage() {
-  const router = useRouter();
+	const router = useRouter();
 
-  const [user, setUser] = useState<UserProfile>();
+	const { user } = useAuth();
 
-  useEffect(() => {
-    async function loadUser() {
-      try {
-        const data = await UserService.getMe();
-
-        setUser(data);
-
-      } catch (error) {
-        console.error(
-          "Failed to load profile:",
-          error
-        );
-      }
-    }
-    loadUser();
-  }, []);
-
-  return (
-    <ProfilePageTemplate
-      user={user}
-      onClose={() => router.push("/home")}
-      actions={
-        <ul>
-          <li>Edit profile</li>
-          <li>Change password</li>
-        </ul>
-      }
-    />
-  );
+	return (
+		<ProfilePageTemplate
+			user={user ?? undefined}
+			onClose={() =>
+				router.push("/home")
+			}
+		/>
+	);
 }
