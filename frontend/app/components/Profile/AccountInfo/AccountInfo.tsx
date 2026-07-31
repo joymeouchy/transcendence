@@ -3,14 +3,14 @@ import styles from "./AccountInfo.module.scss";
 interface Props {
 	username: string;
 	email: string;
-	provider: string;
+	// provider: string;
 	totalMatches: number;
 }
 
 export default function AccountInfo({
 	username,
 	email,
-	provider,
+	// provider,
 	totalMatches,
 }: Props) {
 	const info = [
@@ -22,10 +22,10 @@ export default function AccountInfo({
 			label: "Email",
 			value: email,
 		},
-		{
-			label: "Provider",
-			value: provider,
-		},
+		// {
+		// 	label: "Provider",
+		// 	value: provider,
+		// },
 		{
 			label: "Total Matches",
 			value: totalMatches,
