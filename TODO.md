@@ -1,9 +1,13 @@
 what joy needs:
 --update the "game_over" socket to read `winnerSocketId`, `winnerId`, `winnerUsername` for both the normal win and the disconnect game_over paths and to display the winner username
 
---for GameCanvas.tsx u can use the values from shared/game_types.ts (pongConfig/GameConfig) instead of hardcoding them, so it doesn't get out of sync ma3 backend
+--for GameCanvas.tsx u should use the values from shared/game_types.ts (pongConfig) instead of hardcoding them (canvas width/height, paddle offsets/width), so it doesn't get out of sync ma3 backend
 
---GameCanvas.tsx needs to draw the power-up on the canvas (backend sends it in game_state), and use state.dynamicConfig (paddleHeight/ballSize) when drawing the paddles/ball instead of fixed numbers, so power-up effects show up visually
+--GameCanvas.tsx needs to use state.dynamicConfig (paddleHeight/ballSize) for the paddles/ball, same for the powerups
+
+--better to visually show the pendingPowerUps before it auto-activates (will tell u more details about in wp)
+
+--add countdown at the beginning of match (3,2,1,GO!) before the ball moves — backend already exposes countdownEndsAt in game_state, just need to render it (big centered number, then flash "GO!")
 
 --isOnline is only being checked from the game page, need to check where socket.connect and disconnect are called and move them somewhere that reacts to user logging in
 
