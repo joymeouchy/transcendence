@@ -1,4 +1,4 @@
-what joy needs:
+**what joy needs:**
 --update the "game_over" socket to read `winnerSocketId`, `winnerId`, `winnerUsername` for both the normal win and the disconnect game_over paths and to display the winner username
 
 --for GameCanvas.tsx u should use the values from shared/game_types.ts (pongConfig) instead of hardcoding them (canvas width/height, paddle offsets/width), so it doesn't get out of sync ma3 backend
@@ -21,22 +21,22 @@ what joy needs:
 --need handling errors from apis
 
 --add customizations to the game
-<!--remove provider from account info>
+
+--check why the image (pfp) is changing
+--remove the underline under change password/username and add hover effect so it changes color when the cursor touches the buttons (same for friend list)
 
 
-what rawan needs:
-<!-- --need to recheck isOnline -->
-<!-- --add api for getting friend list of the user (not all users) -->
+**what rawan needs:**
+--need to recheck isOnline
 <!-- --handle rematch -->
 --implement chat system
-<!-- --connect the match results to the Match table -->
---make a new Customization table
+<!-- --make a new Customization table -->
 <!-- --stop the user from playing against himself -->
 <!-- --user should be able to change avatar -->
 <!-- --user should be able to change username -->
 <!-- --forget password/change password implimentaion -->
-<!-- --fix paddles position -->
---add powerups
+<!-- --add powerups -->
+--add apis for getting and updating themes
 
  photo sources:
  https://www.deviantart.com/windowsaesthetics/art/Windows-HD-User-Account-Picture-Pack-843341713
