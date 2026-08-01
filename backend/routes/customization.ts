@@ -114,6 +114,8 @@ router.get("/", async (req, res) => {
  *                   type: boolean
  *       401:
  *         description: No token provided
+ *       404:
+ *         description: No theme available (user's preferred theme is unknown and no default theme is configured)
  *       500:
  *         description: Server error
  */
@@ -135,6 +137,11 @@ router.get("/me", authHelper, async (req: AuthRequest, res) => {
       const defaultTheme = await prisma.customization.findFirst({
         where: { isDefault: true },
       });
+
+      if (!defaultTheme) {
+        return res.status(404).json({ error: "No theme available" });
+      }
+
       return res.json(defaultTheme);
     }
 
