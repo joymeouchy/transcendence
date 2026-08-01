@@ -15,37 +15,54 @@ import { UserProfile } from "@/types/types.dto";
 type AuthContextType = {
   user: UserProfile | null;
   loading: boolean;
+
   login: (
     email: string,
     password: string
   ) => Promise<void>;
+
   register: (
     username: string,
     email: string,
     password: string
   ) => Promise<void>;
+
   logout: () => void;
+
   refreshUser: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
-);
+const AuthContext =
+  createContext<AuthContextType | undefined>(
+    undefined
+  );
 
 export function AuthProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] =
+    useState<UserProfile | null>(null);
+
+  const [loading, setLoading] =
+    useState(true);
 
   /**
-   * Load current user from API
+   * Load current authenticated user
    */
   const refreshUser = async () => {
+    const token = authService.getToken();
+
+    if (!token) {
+      setUser(null);
+      return;
+    }
+
     try {
-      const currentUser = await UserService.getMe();
+      const currentUser =
+        await UserService.getMe();
+
       setUser(currentUser);
     } catch (error) {
       console.error(
@@ -58,22 +75,24 @@ export function AuthProvider({
     }
   };
 
-  // Restore session on refresh
+  /**
+   * Restore session after page refresh
+   */
   useEffect(() => {
     async function restoreSession() {
-      const token = authService.getToken();
-
-      if (token) {
+      try {
         await refreshUser();
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     }
 
     restoreSession();
   }, []);
 
-  // Login
+  /**
+   * Login
+   */
   const login = async (
     email: string,
     password: string
@@ -86,7 +105,9 @@ export function AuthProvider({
     await refreshUser();
   };
 
-  // Register
+  /**
+   * Register
+   */
   const register = async (
     username: string,
     email: string,
@@ -101,10 +122,17 @@ export function AuthProvider({
     await refreshUser();
   };
 
-  // Logout
+  /**
+   * Logout
+   */
   const logout = () => {
     authService.logout();
+
+    // Clear React state
     setUser(null);
+
+    // Force clean app state
+    window.location.href = "/login";
   };
 
   return (
@@ -124,7 +152,9 @@ export function AuthProvider({
 }
 
 
-// hook
+/**
+ * Auth hook
+ */
 export function useAuth() {
   const ctx = useContext(AuthContext);
 

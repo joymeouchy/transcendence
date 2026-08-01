@@ -13,6 +13,7 @@ export default function ProfilePage() {
 	return (
 		<ProfilePageTemplate
 			user={user ?? undefined}
+			isOwnProfile={true}
 			onClose={() =>
 				router.push("/home")
 			}

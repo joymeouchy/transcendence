@@ -1,33 +1,54 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 
 import ChangePasswordModal from "../ChangePasswordModal/ChangePasswordModal";
+import ChangeProfilePictureModal from "../ChangeProfilePictureModal/ChangeProfilePictureModal";
+import ChangeUsernameModal from "../ChangeUsernameModal/ChangeUsernameModal";
 
 import styles from "./AccountActions.module.scss";
 
 type AccountActionsProps = {
   provider?: "local" | "google" | string;
+  username: string;
 };
 
 export default function AccountActions({
   provider,
+  username,
 }: AccountActionsProps) {
-  const [showChangePassword, setShowChangePassword] =
+  const [showPassword, setShowPassword] =
     useState(false);
 
-  const isGoogleAccount = provider === "google";
+  const [showPicture, setShowPicture] =
+    useState(false);
+
+  const [showUsername, setShowUsername] =
+    useState(false);
+
+  const isGoogleAccount =
+    provider === "google";
 
   return (
     <>
       <div className={styles.container}>
-        <Link
-          href="/profile/edit"
+        <button
           className={styles.link}
+          onClick={() =>
+            setShowPicture(true)
+          }
         >
-          Edit Profile
-        </Link>
+          Change Profile Picture
+        </button>
+
+        <button
+          className={styles.link}
+          onClick={() =>
+            setShowUsername(true)
+          }
+        >
+          Change Username
+        </button>
 
         {isGoogleAccount ? (
           <>
@@ -36,16 +57,14 @@ export default function AccountActions({
             </span>
 
             <p className={styles.note}>
-              Passwords for Google accounts are managed
-              through Google.
+              Passwords for Google accounts are managed through Google.
             </p>
           </>
         ) : (
           <button
-            type="button"
             className={styles.link}
             onClick={() =>
-              setShowChangePassword(true)
+              setShowPassword(true)
             }
           >
             Change Password
@@ -53,10 +72,25 @@ export default function AccountActions({
         )}
       </div>
 
-      <ChangePasswordModal
-        isOpen={showChangePassword}
+      <ChangeProfilePictureModal
+        isOpen={showPicture}
         onClose={() =>
-          setShowChangePassword(false)
+          setShowPicture(false)
+        }
+      />
+
+      <ChangeUsernameModal
+        isOpen={showUsername}
+        onClose={() =>
+          setShowUsername(false)
+        }
+        currentUsername={username}
+      />
+
+      <ChangePasswordModal
+        isOpen={showPassword}
+        onClose={() =>
+          setShowPassword(false)
         }
       />
     </>

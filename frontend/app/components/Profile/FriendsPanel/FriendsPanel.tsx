@@ -1,22 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 import styles from "./FriendsPanel.module.scss";
 
-import { FriendshipService, Friend } from "@/services/friendships.service";
+import {
+  FriendshipService,
+  Friend,
+} from "@/services/friendships.service";
 
 type Props = {
   userId: number;
 };
 
-export default function FriendsPanel({ userId }: Props) {
-  const [friends, setFriends] = useState<Friend[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function FriendsPanel({
+  userId,
+}: Props) {
+  const [friends, setFriends] =
+    useState<Friend[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
 
   async function loadFriends() {
     try {
-      const data = await FriendshipService.getFriends(userId);
+      const data =
+        await FriendshipService.getFriends(userId);
+
       setFriends(data);
     } catch (err) {
       console.error(err);
@@ -29,17 +40,16 @@ export default function FriendsPanel({ userId }: Props) {
     loadFriends();
   }, [userId]);
 
-
   return (
     <div className={styles.groupBox}>
-
       <div className={styles.list}>
         {loading ? (
           <div>Loading...</div>
         ) : (
           friends.map((friend) => (
-            <div
+            <Link
               key={friend.id}
+              href={`/profile/${friend.id}`}
               className={styles.friend}
             >
               <span
@@ -51,11 +61,10 @@ export default function FriendsPanel({ userId }: Props) {
               />
 
               {friend.username}
-            </div>
+            </Link>
           ))
         )}
       </div>
-
     </div>
   );
 }

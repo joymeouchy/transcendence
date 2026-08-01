@@ -15,7 +15,7 @@ export default function ProfileHeader({ username, avatarUrl }: Props) {
         alt="Avatar"
         width={72}
         height={72}
-        className={styles.avatar}
+        unoptimized
       />
 
       <div className={styles.info}>

@@ -11,17 +11,18 @@ what joy needs:
 
 --isOnline is only being checked from the game page, need to check where socket.connect and disconnect are called and move them somewhere that reacts to user logging in
 
---when logged in with google, make sure the "change password" is inactive (it's handled in backend so it returns an error if they try to change pass for google, u can check it in swagger)
+<!-- --when logged in with google, make sure the "change password" is inactive (it's handled in backend so it returns an error if they try to change pass for google, u can check it in swagger) -->
 
---for the "change profile picture" button: POST FormData (field name "avatar") to /users/me/avatar with the Bearer token, then use the returned avatarUrl. Also add the backend host to next.config.ts images.remotePatterns (currently only allows lh3.googleusercontent.com) so next/image can render it
+<!-- --for the "change profile picture" button: POST FormData (field name "avatar") to /users/me/avatar with the Bearer token, then use the returned avatarUrl. Also add the backend host to next.config.ts images.remotePatterns (currently only allows lh3.googleusercontent.com) so next/image can render it -->
 
 --link forget/reset/change password buttons to their api (add for each their own page)
---link update username
+<!-- --link update username -->
 
 --need handling errors from apis
 
 --add customizations to the game
---remove provider from account info
+<!--remove provider from account info>
+
 
 what rawan needs:
 <!-- --need to recheck isOnline -->

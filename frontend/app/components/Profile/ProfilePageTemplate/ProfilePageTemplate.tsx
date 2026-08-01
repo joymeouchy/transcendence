@@ -16,11 +16,13 @@ import styles from "./ProfilePageTemplate.module.scss";
 interface ProfilePageTemplateProps {
 	user?: UserProfile;
 	onClose?: () => void;
+	isOwnProfile?: boolean;
 }
 
 export default function ProfilePageTemplate({
 	user,
 	onClose,
+	isOwnProfile = false,
 }: ProfilePageTemplateProps) {
 	if (!user) {
 		return (
@@ -50,15 +52,18 @@ export default function ProfilePageTemplate({
 							avatarUrl={user.avatarUrl}
 						/>
 
-						<div className={styles.groupBox}>
-							<div className={styles.groupTitle}>
-								Actions
-							</div>
+						{isOwnProfile && (
+							<div className={styles.groupBox}>
+								<div className={styles.groupTitle}>
+									Edit Profile
+								</div>
 
-							<AccountActions
-								provider={user.provider}
-							/>
-						</div>
+								<AccountActions
+									provider={user.provider}
+									username={user.username}
+								/>
+							</div>
+						)}
 
 						<div className={styles.groupBox}>
 							<div className={styles.groupTitle}>
@@ -88,7 +93,8 @@ export default function ProfilePageTemplate({
 							</div>
 
 							<div className={styles.groupBox}>
-								<div className={styles.groupTitle}>
+								<div className={styles.groupTitle}
+								>
 									Account Info
 								</div>
 
@@ -106,7 +112,7 @@ export default function ProfilePageTemplate({
 							</div>
 
 							<FriendsPanel
-							userId={user.id}
+								userId={user.id}
 							/>
 						</div>
 					</section>
