@@ -259,11 +259,9 @@ router.post("/forgot-password", async (req, res) => {
 
     if (!user.password) {
       // in case the user registered using a provider
-      return res
-        .status(400)
-        .json({
-          error: "This account uses social login. No password to reset.",
-        });
+      return res.status(400).json({
+        error: "This account uses social login. No password to reset.",
+      });
     }
 
     // generate reset token
@@ -401,7 +399,9 @@ router.patch("/change-password", authHelper, async (req: AuthRequest, res) => {
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
     if (!user || !user.password) {
-      return res.status(400).json({ error: "No password set for this account" });
+      return res
+        .status(400)
+        .json({ error: "No password set for this account" });
     }
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);

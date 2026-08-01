@@ -22,6 +22,7 @@ import passport from "./OAuth";
 import userRoutes from "../routes/users";
 import { PrismaClient } from "../generated/prisma/client";
 import friendshipRoutes from "../routes/friendships";
+import customizationRoutes from "../routes/customization";
 
 const prisma = new PrismaClient();
 
@@ -61,6 +62,7 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use(passport.initialize());
 app.use("/friendships", friendshipRoutes);
+app.use("/customization", customizationRoutes);
 
 const server = http.createServer(app);
 
