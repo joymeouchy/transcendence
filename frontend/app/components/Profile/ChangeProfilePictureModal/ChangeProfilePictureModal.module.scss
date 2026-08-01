@@ -1,0 +1,39 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.upload {
+  cursor: pointer;
+  font-size: 14px;
+
+  input {
+    display: block;
+    margin-top: 8px;
+  }
+}
+
+.preview {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  align-self: center;
+}
+
+.error {
+  color: #c62828;
+  font-size: 13px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  button {
+    cursor: pointer;
+    padding: 6px 14px;
+  }
+}
