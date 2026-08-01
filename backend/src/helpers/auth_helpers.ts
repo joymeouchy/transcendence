@@ -8,7 +8,7 @@ export interface AuthRequest extends Request {
 export const authHelper = (
   req: AuthRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const authHeader = req.headers.authorization;
@@ -25,12 +25,11 @@ export const authHelper = (
 
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || "supersecretkey"
+      process.env.JWT_SECRET || "supersecretkey",
     ) as any;
 
     req.userId = decoded.userId;
     next();
-
   } catch (err) {
     return res.status(401).json({ error: "Invalid or expired token" });
   }
