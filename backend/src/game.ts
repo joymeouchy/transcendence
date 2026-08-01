@@ -427,7 +427,6 @@ async function updateGame(io: Server, room: string) {
             winnerId: winnerUserId ?? null,
             player1Score: game.scores.left,
             player2Score: game.scores.right,
-            // status: MatchStatus.finished,
           },
         })
         .catch((err) => console.error("Failed to save match:", err));
