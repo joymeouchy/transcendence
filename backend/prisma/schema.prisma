@@ -1,3 +1,9 @@
+// To deploy the changes
+// cd backend
+// npx prisma migrate dev --name describe_your_change
+// npx prisma migrate deploy
+// npx prisma generate
+
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -20,21 +26,15 @@ enum FriendshipStatus {
   accepted
 }
 
-enum MatchStatus {
-  ongoing
-  finished
-  abandoned
-}
-
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  email     String   @unique
+  id        Int     @id @default(autoincrement())
+  username  String  @unique
+  email     String  @unique
   password  String?
   avatarUrl String?
-  isOnline  Boolean  @default(false)
+  isOnline  Boolean @default(false)
 
-  oauthId  String?      @unique
+  oauthId  String?  @unique
   provider AuthProvider?
 
   resetToken          String?
@@ -49,12 +49,13 @@ model User {
 
   messagesSent     Message[] @relation("MessageSender")
   messagesReceived Message[] @relation("MessageReceiver")
+
+  preferredTheme String @default("classic")
 }
 
 model Match {
   id        Int         @id @default(autoincrement())
   createdAt DateTime    @default(now())
-  status    MatchStatus @default(ongoing)
 
   player1Id    Int
   player2Id    Int
@@ -76,6 +77,24 @@ model Friendship {
 
   sender   User @relation("FriendshipSender", fields: [senderId], references: [id])
   receiver User @relation("FriendshipReceiver", fields: [receiverId], references: [id])
+}
+
+model Customization {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  backgroundColor    String?
+  backgroundImageUrl String?
+
+  leftPaddleColor     String?
+  leftPaddleImageUrl  String?
+  rightPaddleColor    String?
+  rightPaddleImageUrl String?
+
+  ballColor    String?
+  ballImageUrl String?
+
+  isDefault Boolean @default(false)
 }
 
 model Message {
