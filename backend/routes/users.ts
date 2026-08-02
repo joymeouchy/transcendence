@@ -7,7 +7,7 @@ import { avatarUpload, AVATAR_UPLOAD_DIR } from "../src/helpers/upload_helpers";
 import prisma from "../src/prisma";
 
 const router = Router();
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3001";
+const BACKEND_URL = (process.env.BACKEND_URL || "http://localhost:3001").replace(/\/+$/, "");
 
 /**
  * @swagger
