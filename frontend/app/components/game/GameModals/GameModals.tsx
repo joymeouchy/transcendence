@@ -4,7 +4,7 @@ import MatchSelectModal from "./MatchSelectModal/MatchSelectModal";
 import MatchmakingModal from "./MatchMakingModal/MatchmakingModal";
 import GameOverModal from "./MatchMakingModal/GameOverModal";
 import CustomizationModal from "./CustomizationModal/CustomizationModal";
-
+import RematchRequestModal from "./RematchRequestModal/RematchRequestModal";
 import { socket } from "@/lib/socket";
 
 import { MatchmakingStatus } from "./MatchMakingModal/MatchmakingModal";
@@ -13,6 +13,19 @@ import { MatchmakingStatus } from "./MatchMakingModal/MatchmakingModal";
 import { CustomizationTheme } from "@/services/Customization.services";
 
 interface Props {
+
+	room: string;
+
+waitingRematch: boolean;
+
+rematchRequested: boolean;
+
+onRematch: () => void;
+
+onAcceptRematch: () => void;
+
+onDeclineRematch: () => void;
+
 	modalState:
 	| "select"
 	| "customization"
@@ -51,6 +64,12 @@ interface Props {
 
 
 export default function GameModals({
+	room,
+	waitingRematch,
+	rematchRequested,
+	onRematch,
+	onAcceptRematch,
+	onDeclineRematch,
 	modalState,
 	matchmakingStatus,
 	opponentName,
@@ -126,33 +145,37 @@ export default function GameModals({
 
 
 			<GameOverModal
-				isOpen={
-					modalState === "result"
-				}
-				winner={
-					winner
-				}
-				currentUser={
-					currentUser
-				}
-				scoreLeft={
-					scoreLeft
-				}
-				scoreRight={
-					scoreRight
-				}
-				onRematch={() => {
-					socket.emit(
-						"request_rematch"
-					);
-				}}
-				onFindNew={
-					onStartOnline
-				}
-				onExit={
-					onReset
-				}
-			/>
+	isOpen={
+		modalState === "result"
+	}
+
+	winner={winner}
+
+	currentUser={currentUser}
+
+	scoreLeft={scoreLeft}
+
+	scoreRight={scoreRight}
+
+	onRematch={onRematch}
+
+	waitingRematch={waitingRematch}
+
+	onFindNew={onStartOnline}
+
+	onExit={onReset}
+/>
+
+
+<RematchRequestModal
+	isOpen={rematchRequested}
+
+	opponentName={opponentName}
+
+	onAccept={onAcceptRematch}
+
+	onDecline={onDeclineRematch}
+/>
 
 		</>
 	);
