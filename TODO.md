@@ -15,10 +15,12 @@
 
 --need handling errors from apis
 
---add customizations to the game
+<!-- --add customizations to the game -->
 
 --check why the image (pfp) is changing
 --remove the underline under change password/username and add hover effect so it changes color when the cursor touches the buttons (same for friend list)
+
+--add usernames in gameplay
 
 <!-- --when logged in with google, make sure the "change password" is inactive (it's handled in backend so it returns an error if they try to change pass for google, u can check it in swagger) -->
 <!-- --link update username -->
@@ -34,7 +36,8 @@
 <!-- --user should be able to change username -->
 <!-- --forget password/change password implimentaion -->
 <!-- --add powerups -->
---add apis for getting and updating themes
+<!-- --add apis for getting and updating themes -->
+--make sure to ban other from seeing ur acc info if not friends
 
  photo sources:
  https://www.deviantart.com/windowsaesthetics/art/Windows-HD-User-Account-Picture-Pack-843341713
