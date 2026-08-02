@@ -1,6 +1,5 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
-// import { PrismaClient, AuthProvider } from "../generated/prisma/client";
 import jwt from "jsonwebtoken";
 import passport from "../src/OAuth";
 import nodemailer from "nodemailer";

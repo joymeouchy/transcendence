@@ -5,7 +5,6 @@ dotenv.config();
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { AuthProvider } from "../generated/prisma/client";
-
 import prisma from "../src/prisma";
 
 passport.use(

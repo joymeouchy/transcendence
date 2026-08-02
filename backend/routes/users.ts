@@ -1,7 +1,6 @@
 import { Router } from "express";
 import fs from "fs";
 import path from "path";
-import { PrismaClient } from "../generated/prisma/client";
 import jwt from "jsonwebtoken";
 import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
 import { avatarUpload, AVATAR_UPLOAD_DIR } from "../src/helpers/upload_helpers";

@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { PrismaClient } from "../generated/prisma/client";
 import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
 
 const router = Router();
