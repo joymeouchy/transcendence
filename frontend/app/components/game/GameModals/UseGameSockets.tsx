@@ -49,8 +49,9 @@ export default function useGameSocket() {
 	const [currentUser, setCurrentUser] =
 		useState("");
 
-
-
+	const [room, setRoom] = useState("");
+const [rematchRequested, setRematchRequested] = useState(false);
+const [waitingRematch, setWaitingRematch] = useState(false);
 
 	useEffect(() => {
 
@@ -76,48 +77,58 @@ export default function useGameSocket() {
 
 
 		const handleMatchFound = (data: {
-			room: string;
-			players: string[];
-		}) => {
+	room: string;
+	players: string[];
+}) => {
 
-			console.log(
-				"Match found!",
-				data
-			);
+	console.log("Match found!", data);
 
+	setRoom(data.room);
 
+	const opponent =
+		data.players.find(
+			(player) =>
+				player !== user?.username
+		);
 
-			const opponent =
-				data.players.find(
-					(player) =>
-						player !== user?.username
-				);
+	setOpponentName(
+		opponent ?? "Opponent"
+	);
 
+	setMatchmakingStatus("found");
 
-
-			setOpponentName(
-				opponent ?? "Opponent"
-			);
-
-
-
-			setMatchmakingStatus(
-				"found"
-			);
+	setTimeout(() => {
+		setModalState("playing");
+	}, 1000);
 
 
 
-			setTimeout(() => {
-
-				setModalState(
-					"playing"
-				);
-
-			}, 1000);
-
-		};
 
 
+};
+	const handleRematchRequested = () => {
+
+	console.log(
+		"Opponent requested rematch"
+	);
+
+	setRematchRequested(true);
+
+};
+
+const handleRematchDeclined = () => {
+
+	console.log(
+		"Rematch declined"
+	);
+
+	setWaitingRematch(false);
+
+	setRematchRequested(false);
+
+	setModalState("result");
+
+};
 
 
 
@@ -187,6 +198,16 @@ export default function useGameSocket() {
 			handleGameOver
 		);
 
+		socket.on(
+	"rematch_requested",
+	handleRematchRequested
+);
+
+
+socket.on(
+	"rematch_declined",
+	handleRematchDeclined
+);
 
 
 
@@ -211,6 +232,16 @@ export default function useGameSocket() {
 				"game_over",
 				handleGameOver
 			);
+			socket.off(
+	"rematch_requested",
+	handleRematchRequested
+);
+
+
+socket.off(
+	"rematch_declined",
+	handleRematchDeclined
+);
 
 		};
 
@@ -318,34 +349,76 @@ export default function useGameSocket() {
 	}
 
 
+function requestRematch() {
 
+	if (!room)
+		return;
+
+
+	socket.emit(
+		"request_rematch",
+		{
+			room,
+		}
+	);
+
+
+	setWaitingRematch(true);
+
+}
+
+function acceptRematch() {
+
+	if (!room)
+		return;
+
+
+	socket.emit(
+		"request_rematch",
+		{
+			room,
+		}
+	);
+
+
+	setRematchRequested(false);
+
+}
+
+function declineRematch() {
+
+	if (!room)
+		return;
+
+
+	socket.emit(
+		"decline_rematch",
+		{
+			room,
+		}
+	);
+
+
+	setRematchRequested(false);
+
+}
 
 
 
 
 	function resetGame() {
 
-
 		setWinner("");
-
-
 
 		setOpponentName("");
 
-
-
 		setScoreLeft(0);
-
-
 
 		setScoreRight(0);
 
+		setRoom("");
 
-
-		setModalState(
-			"select"
-		);
-
+		setModalState("select");
 	}
 
 
@@ -354,6 +427,7 @@ export default function useGameSocket() {
 
 
 	return {
+		room,
 
 		modalState,
 
@@ -379,6 +453,8 @@ export default function useGameSocket() {
 
 
 		currentUser,
+					waitingRematch,
+	rematchRequested,
 
 
 
@@ -395,6 +471,11 @@ export default function useGameSocket() {
 
 
 		resetGame,
+
+
+	requestRematch,
+	acceptRematch,
+	declineRematch,
 
 	};
 

@@ -64,6 +64,28 @@ export default function GamePage() {
 
 
 			<GameModals
+					room={game.room}
+
+	waitingRematch={
+		game.waitingRematch
+	}
+
+	rematchRequested={
+		game.rematchRequested
+	}
+
+	onRematch={
+		game.requestRematch
+	}
+
+	onAcceptRematch={
+		game.acceptRematch
+	}
+
+	onDeclineRematch={
+		game.declineRematch
+	}
+
 
 				modalState={
 					game.modalState
