@@ -1,6 +1,6 @@
 import { PrismaClient } from "../generated/prisma/client";
 
-const prisma = new PrismaClient();
+import prisma from "../src/prisma";
 
 async function main() {
   await prisma.$transaction([

@@ -3,7 +3,7 @@ import { PrismaClient } from "../generated/prisma/client";
 import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
 
 const router = Router();
-const prisma = new PrismaClient();
+import prisma from "../src/prisma";
 
 /**
  * @swagger
