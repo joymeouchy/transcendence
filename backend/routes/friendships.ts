@@ -5,11 +5,11 @@
 // DELETE-> Delete data	(Delete a friendship)
 
 import { Router } from "express";
-import { PrismaClient, FriendshipStatus } from "../generated/prisma/client";
+import { FriendshipStatus } from "../generated/prisma/client";
 import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
+import prisma from "../src/prisma";
 
 const router = Router();
-const prisma = new PrismaClient();
 
 /**
  * @swagger
@@ -84,12 +84,19 @@ router.post("/send", authHelper, async (req: AuthRequest, res) => {
  *     responses:
  *       200:
  *         description: Friend request accepted
+ *       400:
+ *         description: Invalid friendship ID
  *       404:
  *         description: Friend request not found
  */
-router.patch("/accept/:id", async (req, res) => {
+router.patch("/accept/:id", authHelper, async (req: AuthRequest<{ id: string }>, res) => {
   try {
     const id = parseInt(req.params.id);
+    const userId = req.userId!;
+
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "Invalid friendship ID" });
+    }
 
     const friendship = await prisma.friendship.findUnique({
       where: { id },
@@ -97,6 +104,11 @@ router.patch("/accept/:id", async (req, res) => {
 
     if (!friendship) {
       return res.status(404).json({ error: "Friend request not found" });
+    }
+
+    // make sure only the receiver can accept
+    if (friendship.receiverId !== userId) {
+      return res.status(403).json({ error: "Not authorized" });
     }
 
     if (friendship.status === FriendshipStatus.accepted) {
@@ -128,12 +140,19 @@ router.patch("/accept/:id", async (req, res) => {
  *     responses:
  *       200:
  *         description: Friendship removed
+ *       400:
+ *         description: Invalid friendship ID
  *       404:
  *         description: Friendship not found
  */
-router.delete("/reject/:id", async (req, res) => {
+router.delete("/reject/:id", authHelper, async (req: AuthRequest<{ id: string }>, res) => {
   try {
     const id = parseInt(req.params.id);
+    const userId = req.userId!;
+
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "Invalid friendship ID" });
+    }
 
     const friendship = await prisma.friendship.findUnique({
       where: { id },
@@ -143,11 +162,60 @@ router.delete("/reject/:id", async (req, res) => {
       return res.status(404).json({ error: "Friendship not found" });
     }
 
-    await prisma.friendship.delete({
-      where: { id },
+    // make sure only sender or receiver can delete
+    if (friendship.senderId !== userId && friendship.receiverId !== userId) {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
+    await prisma.friendship.delete({ where: { id } });
+    res.json({ message: "Friendship removed" });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+/**
+ * @swagger
+ * /friendships/pending/{userId}:
+ *   get:
+ *     summary: Get pending friend requests for a user
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: List of pending requests
+ *       400:
+ *         description: Invalid user ID
+ */
+router.get("/pending/:userId", async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+
+    const pending = await prisma.friendship.findMany({
+      where: {
+        receiverId: userId,
+        status: FriendshipStatus.pending,
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            avatarUrl: true,
+          },
+        },
+      },
     });
 
-    res.json({ message: "Friendship removed" });
+    res.json(pending);
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
@@ -167,10 +235,16 @@ router.delete("/reject/:id", async (req, res) => {
  *     responses:
  *       200:
  *         description: List of friends
+ *       400:
+ *         description: Invalid user ID
  */
 router.get("/:userId", async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
+
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
 
     const friendships = await prisma.friendship.findMany({
       where: {
@@ -209,47 +283,6 @@ router.get("/:userId", async (req, res) => {
     });
 
     res.json(friends);
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-/**
- * @swagger
- * /friendships/pending/{userId}:
- *   get:
- *     summary: Get pending friend requests for a user
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: List of pending requests
- */
-router.get("/pending/:userId", async (req, res) => {
-  try {
-    const userId = parseInt(req.params.userId);
-
-    const pending = await prisma.friendship.findMany({
-      where: {
-        receiverId: userId,
-        status: FriendshipStatus.pending,
-      },
-      include: {
-        sender: {
-          select: {
-            id: true,
-            username: true,
-            avatarUrl: true,
-          },
-        },
-      },
-    });
-
-    res.json(pending);
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
