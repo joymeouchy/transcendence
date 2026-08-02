@@ -3,17 +3,22 @@
 import MatchSelectModal from "./MatchSelectModal/MatchSelectModal";
 import MatchmakingModal from "./MatchMakingModal/MatchmakingModal";
 import GameOverModal from "./MatchMakingModal/GameOverModal";
+import CustomizationModal from "./CustomizationModal/CustomizationModal";
 
 import { socket } from "@/lib/socket";
 
 import { MatchmakingStatus } from "./MatchMakingModal/MatchmakingModal";
+// import { GameTheme } from "@/app/data/game/gameCustomization";
+
+import { CustomizationTheme } from "@/services/Customization.services";
 
 interface Props {
 	modalState:
-		| "select"
-		| "matchmaking"
-		| "playing"
-		| "result";
+	| "select"
+	| "customization"
+	| "matchmaking"
+	| "playing"
+	| "result";
 
 	matchmakingStatus: MatchmakingStatus;
 
@@ -36,7 +41,14 @@ interface Props {
 	onExit: () => void;
 
 	onReset: () => void;
+
+	onCustomize: () => void;
+
+	onSaveTheme: (theme: CustomizationTheme) => void;
+
+	onBackToSelect: () => void;
 }
+
 
 export default function GameModals({
 	modalState,
@@ -51,9 +63,14 @@ export default function GameModals({
 	onCancel,
 	onExit,
 	onReset,
+	onCustomize,
+	onSaveTheme,
+	onBackToSelect,
 }: Props) {
+
 	return (
 		<>
+
 			<MatchSelectModal
 				isOpen={
 					modalState === "select"
@@ -64,6 +81,9 @@ export default function GameModals({
 				onPlayFriend={
 					onPlayFriend
 				}
+				onCustomize={
+					onCustomize
+				}
 				onBack={
 					onExit
 				}
@@ -71,6 +91,22 @@ export default function GameModals({
 					onExit
 				}
 			/>
+
+
+
+			<CustomizationModal
+				isOpen={
+					modalState === "customization"
+				}
+				onBack={
+					onBackToSelect
+				}
+				onSave={
+					onSaveTheme
+				}
+			/>
+
+
 
 			<MatchmakingModal
 				isOpen={
@@ -86,6 +122,8 @@ export default function GameModals({
 					onCancel
 				}
 			/>
+
+
 
 			<GameOverModal
 				isOpen={
@@ -115,6 +153,7 @@ export default function GameModals({
 					onReset
 				}
 			/>
+
 		</>
 	);
 }

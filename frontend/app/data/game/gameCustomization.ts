@@ -1,11 +1,18 @@
 // app/data/gameCustomization.ts
 
 export const gameThemes = {
+	classic: {
+		leftPaddle: "/pong_padel_0.png",
+		rightPaddle: "/pong_padel_0.png",
+		ball: "/pong_ball_0.png",
+		background: "/pong_bg_0.png",
+	},
+
 	football: {
-		leftPaddle: "frontend/public/pong_leftpadel_1.png",
-		rightPaddle: "frontend/public/pong_rightpadel_1.png",
-		ball: "/frontend/public/pong_ball_1.png",
-		background: "/frontend/public/pong_bg_1.png",
+		leftPaddle: "/pong_leftpadel_1.png",
+		rightPaddle: "/pong_rightpadel_1.png",
+		ball: "/pong_ball_1.png",
+		background: "/pong_bg_1.png",
 	},
 
 	// neon: {
@@ -16,5 +23,4 @@ export const gameThemes = {
 	// },
 };
 
-export type GameTheme =
-	keyof typeof gameThemes;
+export type GameTheme = keyof typeof gameThemes;

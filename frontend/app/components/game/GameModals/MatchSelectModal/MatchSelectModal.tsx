@@ -9,6 +9,7 @@ type Props = {
   onBack: () => void;
   onStartOnline: () => void;
   onPlayFriend: () => void;
+  onCustomize: () => void;
   onReturnHome: () => void;
 };
 
@@ -17,6 +18,7 @@ export default function MatchSelectModal({
   onBack,
   onStartOnline,
   onPlayFriend,
+  onCustomize,
   onReturnHome,
 }: Props) {
   return (
@@ -37,20 +39,32 @@ export default function MatchSelectModal({
           </span>
         </div>
 
+
         <div className="mode-buttons">
+
           <button onClick={onStartOnline}>
             🎮 Play Online
           </button>
 
+
           <button onClick={onPlayFriend}>
             👥 Play Friend
           </button>
+
+
+          <button onClick={onCustomize}>
+            🎨 Customize Game
+          </button>
+
         </div>
 
+
         <div className="return-button">
+
           <button onClick={onReturnHome}>
             🏠 Return to Homepage
           </button>
+
         </div>
 
       </div>
