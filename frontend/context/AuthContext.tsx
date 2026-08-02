@@ -79,16 +79,24 @@ export function AuthProvider({
    * Restore session after page refresh
    */
   useEffect(() => {
-    async function restoreSession() {
-      try {
-        await refreshUser();
-      } finally {
+  let mounted = true;
+
+  async function restoreSession() {
+    try {
+      await refreshUser();
+    } finally {
+      if (mounted) {
         setLoading(false);
       }
     }
+  }
 
-    restoreSession();
-  }, []);
+  restoreSession();
+
+  return () => {
+    mounted = false;
+  };
+}, []);
 
   /**
    * Login
