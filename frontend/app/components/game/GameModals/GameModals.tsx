@@ -16,15 +16,16 @@ interface Props {
 
 	room: string;
 
-waitingRematch: boolean;
+	waitingRematch: boolean;
 
-rematchRequested: boolean;
+	rematchRequested: boolean;
+	rematchDeclined: boolean;
 
-onRematch: () => void;
+	onRematch: () => void;
 
-onAcceptRematch: () => void;
+	onAcceptRematch: () => void;
 
-onDeclineRematch: () => void;
+	onDeclineRematch: () => void;
 
 	modalState:
 	| "select"
@@ -67,6 +68,7 @@ export default function GameModals({
 	room,
 	waitingRematch,
 	rematchRequested,
+	rematchDeclined,
 	onRematch,
 	onAcceptRematch,
 	onDeclineRematch,
@@ -145,37 +147,37 @@ export default function GameModals({
 
 
 			<GameOverModal
-	isOpen={
-		modalState === "result"
-	}
+				isOpen={modalState === "result"}
 
-	winner={winner}
+				winner={winner}
 
-	currentUser={currentUser}
+				currentUser={currentUser}
 
-	scoreLeft={scoreLeft}
+				scoreLeft={scoreLeft}
 
-	scoreRight={scoreRight}
+				scoreRight={scoreRight}
 
-	onRematch={onRematch}
+				waitingRematch={waitingRematch}
 
-	waitingRematch={waitingRematch}
+				rematchDeclined={rematchDeclined}
 
-	onFindNew={onStartOnline}
+				onRematch={onRematch}
 
-	onExit={onReset}
-/>
+				onFindNew={onStartOnline}
+
+				onExit={onReset}
+			/>
 
 
-<RematchRequestModal
-	isOpen={rematchRequested}
+			<RematchRequestModal
+				isOpen={rematchRequested}
 
-	opponentName={opponentName}
+				opponentName={opponentName}
 
-	onAccept={onAcceptRematch}
+				onAccept={onAcceptRematch}
 
-	onDecline={onDeclineRematch}
-/>
+				onDecline={onDeclineRematch}
+			/>
 
 		</>
 	);
