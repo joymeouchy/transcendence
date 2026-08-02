@@ -6,9 +6,7 @@ import {
   pongConfig,
   PowerUpType,
 } from "../../shared/game_types";
-import { PrismaClient } from "../generated/prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "../src/prisma";
 
 export const games: Record<string, FullGameState> = {};
 export const gameIntervals: Record<string, NodeJS.Timeout> = {};
