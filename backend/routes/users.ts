@@ -7,7 +7,7 @@ import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
 import { avatarUpload, AVATAR_UPLOAD_DIR } from "../src/helpers/upload_helpers";
 
 const router = Router();
-const prisma = new PrismaClient();
+import prisma from "../src/prisma";
 
 /**
  * @swagger

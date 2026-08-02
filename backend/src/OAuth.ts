@@ -4,9 +4,9 @@ dotenv.config();
 
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { AuthProvider, PrismaClient } from "../generated/prisma/client";
+import { AuthProvider } from "../generated/prisma/client";
 
-const prisma = new PrismaClient();
+import prisma from "../src/prisma";
 
 passport.use(
   new GoogleStrategy(
@@ -26,12 +26,31 @@ passport.use(
         let user = await prisma.user.findUnique({
           where: { email },
         });
-
         if (!user) {
-          // create new user
+          // generate unique username by appending random number if taken
+          let username = profile.displayName;
+          let isUsernameTaken = await prisma.user.findUnique({
+            where: { username },
+          });
+          let attempts = 0;
+
+          while (isUsernameTaken && attempts < 10) {
+            username = `${profile.displayName}${Math.floor(Math.random() * 9999)}`;
+            isUsernameTaken = await prisma.user.findUnique({
+              where: { username },
+            });
+            attempts++;
+          }
+
+          if (attempts >= 10) {
+            return done(
+              new Error("Could not generate unique username, please try again"),
+            );
+          }
+
           user = await prisma.user.create({
             data: {
-              username: profile.displayName,
+              username,
               email,
               avatarUrl: avatarUrl ?? null,
               oauthId: profile.id,
