@@ -50,8 +50,10 @@ export default function useGameSocket() {
 		useState("");
 
 	const [room, setRoom] = useState("");
-const [rematchRequested, setRematchRequested] = useState(false);
-const [waitingRematch, setWaitingRematch] = useState(false);
+	const [rematchRequested, setRematchRequested] = useState(false);
+	const [waitingRematch, setWaitingRematch] = useState(false);
+	const [rematchDeclined, setRematchDeclined] = useState(false);
+	
 
 	useEffect(() => {
 
@@ -77,59 +79,58 @@ const [waitingRematch, setWaitingRematch] = useState(false);
 
 
 		const handleMatchFound = (data: {
-	room: string;
-	players: string[];
-}) => {
+			room: string;
+			players: string[];
+		}) => {
 
-	console.log("Match found!", data);
+			console.log("Match found!", data);
 
-	setRoom(data.room);
+			setRoom(data.room);
 
-	const opponent =
-		data.players.find(
-			(player) =>
-				player !== user?.username
-		);
+			const opponent =
+				data.players.find(
+					(player) =>
+						player !== user?.username
+				);
 
-	setOpponentName(
-		opponent ?? "Opponent"
-	);
+			setOpponentName(
+				opponent ?? "Opponent"
+			);
 
-	setMatchmakingStatus("found");
+			setMatchmakingStatus("found");
 
-	setTimeout(() => {
-		setModalState("playing");
-	}, 1000);
-
-
+			setTimeout(() => {
+				setModalState("playing");
+			}, 1000);
 
 
 
-};
-	const handleRematchRequested = () => {
 
-	console.log(
-		"Opponent requested rematch"
-	);
 
-	setRematchRequested(true);
+		};
+		const handleRematchRequested = () => {
 
-};
+			console.log(
+				"Opponent requested rematch"
+			);
 
-const handleRematchDeclined = () => {
+			setRematchRequested(true);
 
-	console.log(
-		"Rematch declined"
-	);
+		};
 
-	setWaitingRematch(false);
+		const handleRematchDeclined = () => {
 
-	setRematchRequested(false);
+			console.log(
+				"Rematch declined"
+			);
 
-	setModalState("result");
+			setWaitingRematch(false);
 
-};
+			setRematchRequested(false);
 
+			setRematchDeclined(true);
+
+		};
 
 
 		const handleGameOver = (data: {
@@ -199,15 +200,15 @@ const handleRematchDeclined = () => {
 		);
 
 		socket.on(
-	"rematch_requested",
-	handleRematchRequested
-);
+			"rematch_requested",
+			handleRematchRequested
+		);
 
 
-socket.on(
-	"rematch_declined",
-	handleRematchDeclined
-);
+		socket.on(
+			"rematch_declined",
+			handleRematchDeclined
+		);
 
 
 
@@ -233,15 +234,15 @@ socket.on(
 				handleGameOver
 			);
 			socket.off(
-	"rematch_requested",
-	handleRematchRequested
-);
+				"rematch_requested",
+				handleRematchRequested
+			);
 
 
-socket.off(
-	"rematch_declined",
-	handleRematchDeclined
-);
+			socket.off(
+				"rematch_declined",
+				handleRematchDeclined
+			);
 
 		};
 
@@ -349,41 +350,41 @@ socket.off(
 	}
 
 
-function requestRematch() {
+	function requestRematch() {
 
-	if (!room)
-		return;
-
-
-	socket.emit(
-		"request_rematch",
-		{
-			room,
-		}
-	);
+		if (!room)
+			return;
 
 
-	setWaitingRematch(true);
-
-}
-
-function acceptRematch() {
-
-	if (!room)
-		return;
+		socket.emit(
+			"request_rematch",
+			{
+				room,
+			}
+		);
 
 
-	socket.emit(
-		"request_rematch",
-		{
-			room,
-		}
-	);
+		setWaitingRematch(true);
+
+	}
+
+	function acceptRematch() {
+
+		if (!room)
+			return;
 
 
-	setRematchRequested(false);
+		socket.emit(
+			"request_rematch",
+			{
+				room,
+			}
+		);
 
-}
+
+		setRematchRequested(false);
+
+	}
 
 function declineRematch() {
 
@@ -401,25 +402,33 @@ function declineRematch() {
 
 	setRematchRequested(false);
 
+	setRematchDeclined(false);
+
 }
 
 
-
+	
 
 	function resetGame() {
 
-		setWinner("");
+	setWinner("");
 
-		setOpponentName("");
+	setOpponentName("");
 
-		setScoreLeft(0);
+	setScoreLeft(0);
 
-		setScoreRight(0);
+	setScoreRight(0);
 
-		setRoom("");
+	setRoom("");
 
-		setModalState("select");
-	}
+	setWaitingRematch(false);
+
+	setRematchRequested(false);
+
+	setRematchDeclined(false);
+
+	setModalState("select");
+}
 
 
 
@@ -433,50 +442,33 @@ function declineRematch() {
 
 		setModalState,
 
-
-
 		matchmakingStatus,
-
 
 		opponentName,
 
-
-
 		winner,
-
 
 		scoreLeft,
 
-
 		scoreRight,
 
-
-
 		currentUser,
-					waitingRematch,
-	rematchRequested,
 
-
+		waitingRematch,
+		rematchRequested,
+		rematchDeclined,
 
 		joinQueue,
-
-
 		playFriend,
-
 
 		cancelMatchmaking,
 
-
 		backToSelect,
-
 
 		resetGame,
 
-
-	requestRematch,
-	acceptRematch,
-	declineRematch,
-
+		requestRematch,
+		acceptRematch,
+		declineRematch,
 	};
-
 }
