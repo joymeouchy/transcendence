@@ -1,9 +1,8 @@
 import { Router } from "express";
-import { PrismaClient } from "../generated/prisma/client";
 import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
+import prisma from "../src/prisma";
 
 const router = Router();
-import prisma from "../src/prisma";
 
 /**
  * @swagger

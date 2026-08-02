@@ -1,5 +1,3 @@
-import { PrismaClient } from "../generated/prisma/client";
-
 import prisma from "../src/prisma";
 
 async function main() {
