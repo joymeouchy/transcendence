@@ -1,13 +1,13 @@
 import { Router } from "express";
 import fs from "fs";
 import path from "path";
-import { PrismaClient } from "../generated/prisma/client";
 import jwt from "jsonwebtoken";
 import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
 import { avatarUpload, AVATAR_UPLOAD_DIR } from "../src/helpers/upload_helpers";
+import prisma from "../src/prisma";
 
 const router = Router();
-const prisma = new PrismaClient();
+const BACKEND_URL = (process.env.BACKEND_URL || "http://localhost:3001").replace(/\/+$/, "");
 
 /**
  * @swagger
@@ -347,7 +347,7 @@ router.post(
         select: { avatarUrl: true },
       });
 
-      const avatarUrl = `${req.protocol}://${req.get("host")}/uploads/avatars/${req.file.filename}`;
+      const avatarUrl = `${BACKEND_URL}/uploads/avatars/${req.file.filename}`;
 
       const user = await prisma.user.update({
         where: { id: userId },
