@@ -20,12 +20,10 @@ import {
 } from "./game";
 import passport from "./OAuth";
 import userRoutes from "../routes/users";
-import { PrismaClient } from "../generated/prisma/client";
 import friendshipRoutes from "../routes/friendships";
 import customizationRoutes from "../routes/customization";
 
-const prisma = new PrismaClient();
-
+import prisma from "../src/prisma";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 
