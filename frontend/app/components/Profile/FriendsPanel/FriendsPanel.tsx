@@ -1,70 +1,66 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import styles from "./FriendsPanel.module.scss";
 
 import {
-  FriendshipService,
-  Friend,
+	Friend,
 } from "@/services/friendships.service";
 
+
 type Props = {
-  userId: number;
+	friends: Friend[];
+	loading: boolean;
 };
 
+
 export default function FriendsPanel({
-  userId,
+	friends,
+	loading,
 }: Props) {
-  const [friends, setFriends] =
-    useState<Friend[]>([]);
 
-  const [loading, setLoading] =
-    useState(true);
 
-  async function loadFriends() {
-    try {
-      const data =
-        await FriendshipService.getFriends(userId);
+	return (
+		<div className={styles.groupBox}>
 
-      setFriends(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }
+			<div className={styles.list}>
 
-  useEffect(() => {
-    loadFriends();
-  }, [userId]);
+				{
+					loading ?
 
-  return (
-    <div className={styles.groupBox}>
-      <div className={styles.list}>
-        {loading ? (
-          <div>Loading...</div>
-        ) : (
-          friends.map((friend) => (
-            <Link
-              key={friend.id}
-              href={`/profile/${friend.id}`}
-              className={styles.friend}
-            >
-              <span
-                className={`${styles.dot} ${
-                  friend.isOnline
-                    ? styles.online
-                    : styles.offline
-                }`}
-              />
+					<div>
+						Loading...
+					</div>
 
-              {friend.username}
-            </Link>
-          ))
-        )}
-      </div>
-    </div>
-  );
+					:
+
+					friends.map((friend) => (
+
+						<Link
+							key={friend.id}
+							href={`/profile/${friend.id}`}
+							className={styles.friend}
+						>
+
+							<span
+								className={`${styles.dot} ${
+									friend.isOnline
+										? styles.online
+										: styles.offline
+								}`}
+							/>
+
+							{friend.username}
+
+						</Link>
+
+					))
+
+				}
+
+			</div>
+
+		</div>
+	);
 }
