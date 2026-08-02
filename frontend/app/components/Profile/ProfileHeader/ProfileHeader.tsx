@@ -10,12 +10,15 @@ type Props = {
 export default function ProfileHeader({ username, avatarUrl }: Props) {
   return (
     <div className={styles.header}>
-      <Image
-        src={avatarUrl ?? images.defaultUserIcon}
+      <img
+        src={avatarUrl || images.defaultUserIcon}
         alt="Avatar"
         width={72}
         height={72}
-        unoptimized
+        onLoad={() => console.log("loaded")}
+        onError={(e) => {
+          console.log("failed", e.currentTarget.src);
+        }}
       />
 
       <div className={styles.info}>
