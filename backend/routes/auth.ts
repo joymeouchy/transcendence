@@ -1,14 +1,13 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
-import { PrismaClient, AuthProvider } from "../generated/prisma/client";
 import jwt from "jsonwebtoken";
 import passport from "../src/OAuth";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
+import prisma from "../src/prisma";
 
 const router = Router();
-const prisma = new PrismaClient();
 const SALT_ROUNDS = 12;
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 const transporter = nodemailer.createTransport({
