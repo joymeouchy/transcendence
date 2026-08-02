@@ -74,6 +74,9 @@ export default function GamePage() {
 		game.rematchRequested
 	}
 
+	rematchDeclined={
+	game.rematchDeclined
+}
 	onRematch={
 		game.requestRematch
 	}
