@@ -1,24 +1,66 @@
-// services/customization.service.ts
+// services/Customization.services.ts
 
-import { GameTheme } from "@/app/data/game/gameCustomization";
+import { api } from "@/lib/api";
 
 
-export interface GameCustomization {
-	theme: GameTheme;
+export interface CustomizationTheme {
+	id: number;
+	name: string;
+
+	backgroundColor: string | null;
+	backgroundImageUrl: string | null;
+
+	leftPaddleColor: string | null;
+	leftPaddleImageUrl: string | null;
+
+	rightPaddleColor: string | null;
+	rightPaddleImageUrl: string | null;
+
+	ballColor: string | null;
+	ballImageUrl: string | null;
+
+	isDefault: boolean;
 }
 
 
-export const CustomizationService = {
 
-	async getMine(): Promise<GameCustomization> {
-		return {
-			theme: "football",
-		};
+export const customizationService = {
+
+	async getThemes(): Promise<CustomizationTheme[]> {
+		const response =
+			await api.get(
+				"/customization"
+			);
+
+		return response.data;
 	},
 
-	async update(
-		data: GameCustomization
-	) {
-		return data;
+
+
+	async getMyTheme(): Promise<CustomizationTheme> {
+		const response =
+			await api.get(
+				"/customization/me"
+			);
+
+		return response.data;
 	},
+
+
+
+	async updateTheme(
+		themeName: string
+	): Promise<CustomizationTheme> {
+
+		const response =
+			await api.patch(
+				"/customization/me",
+				{
+					themeName,
+				}
+			);
+
+		return response.data.theme;
+	},
+
 };
