@@ -19,7 +19,7 @@ interface Props {
 
 	rematchRequested: boolean;
 	rematchDeclined: boolean;
-opponentDisconnected: boolean;
+	opponentDisconnected: boolean;
 	onRematch: () => void;
 
 	onAcceptRematch: () => void;
@@ -60,18 +60,22 @@ opponentDisconnected: boolean;
 	onSaveTheme: (theme: CustomizationTheme) => void;
 
 	onBackToSelect: () => void;
+
+	onFindAnother: () => void;
 }
 
 
 export default function GameModals({
 	room,
+
 	waitingRematch,
 	rematchRequested,
 	rematchDeclined,
 	onRematch,
 	onAcceptRematch,
 	onDeclineRematch,
-		opponentDisconnected,
+	opponentDisconnected,
+	onFindAnother,
 	modalState,
 	matchmakingStatus,
 	opponentName,
@@ -180,11 +184,10 @@ export default function GameModals({
 			/>
 
 			<OpponentDisconnectedModal
-	isOpen={opponentDisconnected}
-	onFindAnother={onStartOnline}
-	onExit={onReset}
-/>
-
+				isOpen={opponentDisconnected}
+				onFindAnother={onFindAnother}
+				onExit={onReset}
+			/>
 		</>
 	);
 }

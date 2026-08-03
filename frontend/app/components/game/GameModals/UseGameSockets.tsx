@@ -50,11 +50,16 @@ export default function useGameSocket() {
 		useState("");
 
 	const [room, setRoom] = useState("");
-const [rematchRequested, setRematchRequested] = useState(false);
-const [waitingRematch, setWaitingRematch] = useState(false);
-const [rematchDeclined, setRematchDeclined] = useState(false);
-const [opponentDisconnected, setOpponentDisconnected] = useState(false);
-	
+	const [rematchRequested, setRematchRequested] = useState(false);
+	const [waitingRematch, setWaitingRematch] = useState(false);
+	const [rematchDeclined, setRematchDeclined] = useState(false);
+	const [opponentDisconnected, setOpponentDisconnected] = useState(false);
+	const [pendingPowerUp, setPendingPowerUp] = useState<{
+	type: string;
+	side: "left" | "right";
+	applyAt: number;
+} | null>(null);
+
 
 	useEffect(() => {
 
@@ -111,55 +116,55 @@ const [opponentDisconnected, setOpponentDisconnected] = useState(false);
 		};
 		const handleRematchRequested = () => {
 
-	console.log(
-		"Opponent requested rematch"
-	);
+			console.log(
+				"Opponent requested rematch"
+			);
 
-	setRematchRequested(true);
+			setRematchRequested(true);
 
-};
-
-
-
-const handleRematchAccepted = () => {
-
-	console.log(
-		"Rematch accepted"
-	);
-
-	setWaitingRematch(false);
-
-	setRematchRequested(false);
-
-};
+		};
 
 
 
-const handleRematchDeclined = () => {
+		const handleRematchAccepted = () => {
 
-	console.log(
-		"Rematch declined"
-	);
+			console.log(
+				"Rematch accepted"
+			);
 
-	setWaitingRematch(false);
+			setWaitingRematch(false);
 
-	setRematchDeclined(true);
+			setRematchRequested(false);
 
-};
+		};
 
 
 
-const handleRematchFailed = () => {
+		const handleRematchDeclined = () => {
 
-	console.log(
-		"Rematch failed"
-	);
+			console.log(
+				"Rematch declined"
+			);
 
-	setWaitingRematch(false);
+			setWaitingRematch(false);
 
-	setRematchRequested(false);
+			setRematchDeclined(true);
 
-};
+		};
+
+
+
+		const handleRematchFailed = () => {
+
+			console.log(
+				"Rematch failed"
+			);
+
+			setWaitingRematch(false);
+
+			setRematchRequested(false);
+
+		};
 
 
 		const handleGameOver = (data: {
@@ -207,11 +212,30 @@ const handleRematchFailed = () => {
 
 		const handleOpponentDisconnected = () => {
 
-	console.log(
-		"Opponent disconnected"
-	);
+			console.log(
+				"Opponent disconnected"
+			);
 
-	setOpponentDisconnected(true);
+			setOpponentDisconnected(true);
+
+		};
+
+		const handlePowerUpIncoming = (data: {
+	type: string;
+	side: "left" | "right";
+	applyAt: number;
+}) => {
+
+	console.log("Power up incoming:", data);
+
+	setPendingPowerUp(data);
+
+};
+
+
+const handlePowerUpActivated = () => {
+
+	setPendingPowerUp(null);
 
 };
 
@@ -238,32 +262,42 @@ const handleRematchFailed = () => {
 		);
 
 		socket.on(
-	"rematch_requested",
-	handleRematchRequested
+			"rematch_requested",
+			handleRematchRequested
+		);
+
+
+		socket.on(
+			"rematch_accepted",
+			handleRematchAccepted
+		);
+
+
+		socket.on(
+			"rematch_declined",
+			handleRematchDeclined
+		);
+
+
+		socket.on(
+			"rematch_failed",
+			handleRematchFailed
+		);
+
+
+		socket.on(
+			"player_disconnected",
+			handleOpponentDisconnected
+		);
+		socket.on(
+	"power_up_incoming",
+	handlePowerUpIncoming
 );
 
 
 socket.on(
-	"rematch_accepted",
-	handleRematchAccepted
-);
-
-
-socket.on(
-	"rematch_declined",
-	handleRematchDeclined
-);
-
-
-socket.on(
-	"rematch_failed",
-	handleRematchFailed
-);
-
-
-socket.on(
-	"player_disconnected",
-	handleOpponentDisconnected
+	"power_up_activated",
+	handlePowerUpActivated
 );
 
 		return () => {
@@ -287,31 +321,41 @@ socket.on(
 				handleGameOver
 			);
 			socket.off(
-	"rematch_requested",
-	handleRematchRequested
+				"rematch_requested",
+				handleRematchRequested
+			);
+
+
+			socket.off(
+				"rematch_accepted",
+				handleRematchAccepted
+			);
+
+
+			socket.off(
+				"rematch_declined",
+				handleRematchDeclined
+			);
+
+
+			socket.off(
+				"rematch_failed",
+				handleRematchFailed
+			);
+
+			socket.off(
+				"player_disconnected",
+				handleOpponentDisconnected
+			);
+			socket.on(
+	"power_up_incoming",
+	handlePowerUpIncoming
 );
 
 
-socket.off(
-	"rematch_accepted",
-	handleRematchAccepted
-);
-
-
-socket.off(
-	"rematch_declined",
-	handleRematchDeclined
-);
-
-
-socket.off(
-	"rematch_failed",
-	handleRematchFailed
-);
-
-socket.off(
-	"player_disconnected",
-	handleOpponentDisconnected
+socket.on(
+	"power_up_activated",
+	handlePowerUpActivated
 );
 		};
 
@@ -421,85 +465,96 @@ socket.off(
 
 	function requestRematch() {
 
-	if (!room)
-		return;
+		if (!room)
+			return;
 
 
-	setRematchDeclined(false);
+		setRematchDeclined(false);
 
 
-	socket.emit(
-		"request_rematch",
-		{
-			room,
-		}
-	);
+		socket.emit(
+			"request_rematch",
+			{
+				room,
+			}
+		);
 
 
-	setWaitingRematch(true);
+		setWaitingRematch(true);
 
-}
+	}
 
 	function acceptRematch() {
 
-	if (!room)
-		return;
+		if (!room)
+			return;
 
 
-	socket.emit(
-		"request_rematch",
-		{
-			room,
-		}
-	);
+		socket.emit(
+			"request_rematch",
+			{
+				room,
+			}
+		);
 
 
-	setRematchRequested(false);
+		setRematchRequested(false);
 
-}function declineRematch() {
+	} function declineRematch() {
 
-	if (!room)
-		return;
-
-
-	socket.emit(
-		"decline_rematch",
-		{
-			room,
-		}
-	);
+		if (!room)
+			return;
 
 
-	setRematchRequested(false);
+		socket.emit(
+			"decline_rematch",
+			{
+				room,
+			}
+		);
 
-	setRematchDeclined(false);
 
-}
+		setRematchRequested(false);
+
+		setRematchDeclined(false);
+
+	}
+
+	function findAnotherPlayer() {
+		setOpponentDisconnected(false);
+
+		setWinner("");
+		setScoreLeft(0);
+		setScoreRight(0);
+		setOpponentName("");
+
+		joinQueue();
+	}
 
 
-	
+
 
 	function resetGame() {
 
-	setWinner("");
+		setWinner("");
 
-	setOpponentName("");
+		setOpponentName("");
 
-	setScoreLeft(0);
+		setScoreLeft(0);
 
-	setScoreRight(0);
+		setScoreRight(0);
 
-	setRoom("");
+		setRoom("");
 
-	setWaitingRematch(false);
+		setWaitingRematch(false);
 
-	setRematchRequested(false);
+		setRematchRequested(false);
 
-	setRematchDeclined(false);
+		setRematchDeclined(false);
 
-	setModalState("select");
-	setOpponentDisconnected(false);
-}
+		setModalState("select");
+		setOpponentDisconnected(false);
+	}
 
 
 
@@ -508,39 +563,27 @@ socket.off(
 
 	return {
 		room,
-
 		modalState,
-
 		setModalState,
-
 		matchmakingStatus,
-
 		opponentName,
-
 		winner,
-
 		scoreLeft,
-
 		scoreRight,
-
 		currentUser,
-
 		waitingRematch,
 		rematchRequested,
 		rematchDeclined,
-
+		opponentDisconnected,
+		pendingPowerUp,
 		joinQueue,
+		findAnotherPlayer,
 		playFriend,
-
 		cancelMatchmaking,
-
 		backToSelect,
-
 		resetGame,
-
 		requestRematch,
 		acceptRematch,
 		declineRematch,
-		opponentDisconnected,
 	};
 }

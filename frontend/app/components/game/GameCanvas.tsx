@@ -6,13 +6,13 @@ import { socket } from "../../../lib/socket";
 import "./GameCanvas.scss";
 
 import { GameStateSend, pongConfig } from "@/types/game_types";
-
 import { gameThemes } from "@/app/data/game/gameCustomization";
 
 import {
   customizationService,
   CustomizationTheme,
 } from "@/services/Customization.services";
+
 
 
 export default function GameCanvas() {
@@ -28,38 +28,31 @@ export default function GameCanvas() {
   const rightPaddleImg = useRef<HTMLImageElement | null>(null);
   const ballImg = useRef<HTMLImageElement | null>(null);
 
+  const getAssetUrl = (path: string | null) => {
+    if (!path)
+      return "";
 
-const getAssetUrl = (path: string | null) => {
-	if (!path)
-		return "";
+    if (path.startsWith("http"))
+      return path;
 
-	if (path.startsWith("http"))
-		return path;
+    if (path.startsWith("/pong"))
+      return path;
 
-	// frontend public folder
-	if (path.startsWith("/pong"))
-		return path;
+    return `http://localhost:3001${path}`;
+  };
 
-	// backend uploads
-	return `http://localhost:3001${path}`;
-};
-
-  /*
-    Load user's customization
-  */
   useEffect(() => {
     const loadTheme = async () => {
       try {
-
         const userTheme =
           await customizationService.getMyTheme();
+
         theme.current = userTheme;
 
         backgroundImg.current = new Image();
         leftPaddleImg.current = new Image();
         rightPaddleImg.current = new Image();
         ballImg.current = new Image();
-
 
         backgroundImg.current.src =
           getAssetUrl(
@@ -93,31 +86,22 @@ const getAssetUrl = (path: string | null) => {
       }
     };
 
-
     loadTheme();
   }, []);
 
-
-
-  /*
-    Game rendering
-  */
   useEffect(() => {
     const canvas = canvasRef.current;
 
     if (!canvas)
       return;
 
-
     const ctx = canvas.getContext("2d");
 
     if (!ctx)
       return;
 
-
     const width = pongConfig.canvasWidth;
     const height = pongConfig.canvasHeight;
-
 
     const handleMatchFound = ({
       room,
@@ -127,11 +111,11 @@ const getAssetUrl = (path: string | null) => {
       roomRef.current = room;
     };
 
-
-    const handleGameState = (state: GameStateSend) => {
+    const handleGameState = (
+      state: GameStateSend
+    ) => {
       gameState.current = state;
     };
-
 
     socket.on(
       "match_found",
@@ -143,14 +127,11 @@ const getAssetUrl = (path: string | null) => {
       handleGameState
     );
 
-
-
     const draw = () => {
       const state = gameState.current;
 
       if (!state)
         return;
-
 
       ctx.clearRect(
         0,
@@ -159,11 +140,6 @@ const getAssetUrl = (path: string | null) => {
         height
       );
 
-
-
-      /*
-        Background
-      */
       if (
         backgroundImg.current &&
         backgroundImg.current.complete
@@ -175,9 +151,9 @@ const getAssetUrl = (path: string | null) => {
           width,
           height
         );
-      }
-      else {
+      } else {
         ctx.fillStyle = "#111827";
+
         ctx.fillRect(
           0,
           0,
@@ -186,31 +162,6 @@ const getAssetUrl = (path: string | null) => {
         );
       }
 
-
-
-      /*
-        Center line
-      */
-      // ctx.fillStyle = "#475569";
-
-      // for (
-      //   let i = 0;
-      //   i < height;
-      //   i += 30
-      // ) {
-      //   ctx.fillRect(
-      //     width / 2 - 2,
-      //     i,
-      //     4,
-      //     20
-      //   );
-      // }
-
-
-
-      /*
-        Left paddle
-      */
       if (
         leftPaddleImg.current &&
         leftPaddleImg.current.complete
@@ -224,11 +175,6 @@ const getAssetUrl = (path: string | null) => {
         );
       }
 
-
-
-      /*
-        Right paddle
-      */
       if (
         rightPaddleImg.current &&
         rightPaddleImg.current.complete
@@ -244,11 +190,6 @@ const getAssetUrl = (path: string | null) => {
         );
       }
 
-
-
-      /*
-        Ball
-      */
       if (
         ballImg.current &&
         ballImg.current.complete
@@ -265,31 +206,50 @@ const getAssetUrl = (path: string | null) => {
         );
       }
 
+      /*
+  Score
+*/
+ctx.fillStyle = "white";
+ctx.font = "48px monospace";
+ctx.textAlign = "center";
 
+ctx.fillText(
+  String(state.scores.left),
+  width / 4,
+  60
+);
+
+ctx.fillText(
+  String(state.scores.right),
+  (width * 3) / 4,
+  60
+);
+
+
+/*
+  Power Up Incoming
+*/
+if (state.pendingPowerUp) {
+  const remaining = Math.ceil(
+    (state.pendingPowerUp.applyAt - Date.now()) / 1000
+  );
+
+  if (remaining > 0) {
+    ctx.fillStyle = "yellow";
+    ctx.font = "22px monospace";
+
+    ctx.fillText(
+      `${state.pendingPowerUp.type} in ${remaining}`,
+      width / 2,
+      60
+    );
+  }
+}
+
+    
 
       /*
-        Score
-      */
-      ctx.fillStyle = "white";
-      ctx.font = "48px monospace";
-      ctx.textAlign = "center";
-
-      ctx.fillText(
-        String(state.scores.left),
-        width / 4,
-        60
-      );
-
-      ctx.fillText(
-        String(state.scores.right),
-        (width * 3) / 4,
-        60
-      );
-
-
-
-      /*
-        Countdown
+        Match countdown
       */
       if (state.countdownEndsAt) {
         const remaining =
@@ -300,10 +260,8 @@ const getAssetUrl = (path: string | null) => {
             ) / 1000
           );
 
-
         ctx.fillStyle = "white";
         ctx.font = "80px monospace";
-
 
         if (remaining > 0) {
           ctx.fillText(
@@ -311,8 +269,7 @@ const getAssetUrl = (path: string | null) => {
             width / 2,
             height / 2
           );
-        }
-        else if (remaining === 0) {
+        } else if (remaining === 0) {
           ctx.fillText(
             "GO!",
             width / 2,
@@ -322,10 +279,7 @@ const getAssetUrl = (path: string | null) => {
       }
     };
 
-
-
     let animationFrame: number;
-
 
     const renderLoop = () => {
       draw();
@@ -336,10 +290,7 @@ const getAssetUrl = (path: string | null) => {
         );
     };
 
-
     renderLoop();
-
-
 
     return () => {
       cancelAnimationFrame(
@@ -357,22 +308,14 @@ const getAssetUrl = (path: string | null) => {
       );
     };
 
-  }, []);
+  });
 
-
-
-  /*
-    Controls
-  */
   useEffect(() => {
-
     const handleKeyDown = (
       event: KeyboardEvent
     ) => {
-
       if (!roomRef.current)
         return;
-
 
       if (
         event.key === "w" ||
@@ -386,7 +329,6 @@ const getAssetUrl = (path: string | null) => {
           }
         );
       }
-
 
       if (
         event.key === "s" ||
@@ -402,12 +344,10 @@ const getAssetUrl = (path: string | null) => {
       }
     };
 
-
     window.addEventListener(
       "keydown",
       handleKeyDown
     );
-
 
     return () => {
       window.removeEventListener(
