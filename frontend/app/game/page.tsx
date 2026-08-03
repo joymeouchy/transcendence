@@ -20,171 +20,122 @@ export default function GamePage() {
 
 	const game = useGameSocket();
 
-
-
 	const handleCustomize = () => {
-
-		game.setModalState(
-			"customization"
-		);
-
+		game.setModalState("customization");
 	};
-
-
 
 	const handleSaveTheme = (
 		theme: CustomizationTheme
 	) => {
+		console.log("Selected theme:", theme);
 
-		console.log(
-			"Selected theme:",
-			theme
-		);
-
-
-		game.setModalState(
-			"select"
-		);
-
+		game.setModalState("select");
 	};
 
-
-
 	return (
-
 		<div className="game-page">
 
-
 			<div className="game-container">
-
 				<GameCanvas />
-
 			</div>
 
-
-
 			<GameModals
-					room={game.room}
+				opponentDisconnected={
+					game.opponentDisconnected
+				}
 
-	waitingRematch={
-		game.waitingRematch
-	}
+				onFindAnother={
+					game.findAnotherPlayer
+				}
 
-	rematchRequested={
-		game.rematchRequested
-	}
+				room={game.room}
 
-	rematchDeclined={
-	game.rematchDeclined
-}
-	onRematch={
-		game.requestRematch
-	}
+				waitingRematch={
+					game.waitingRematch
+				}
 
-	onAcceptRematch={
-		game.acceptRematch
-	}
+				rematchRequested={
+					game.rematchRequested
+				}
 
-	onDeclineRematch={
-		game.declineRematch
-	}
+				rematchDeclined={
+					game.rematchDeclined
+				}
 
+				onRematch={
+					game.requestRematch
+				}
+
+				onAcceptRematch={
+					game.acceptRematch
+				}
+
+				onDeclineRematch={
+					game.declineRematch
+				}
 
 				modalState={
 					game.modalState
 				}
 
-
 				matchmakingStatus={
 					game.matchmakingStatus
 				}
-
 
 				opponentName={
 					game.opponentName
 				}
 
-
 				winner={
 					game.winner
 				}
-
 
 				currentUser={
 					game.currentUser
 				}
 
-
 				scoreLeft={
 					game.scoreLeft
 				}
-
 
 				scoreRight={
 					game.scoreRight
 				}
 
-
-
 				onStartOnline={
 					game.joinQueue
 				}
-
 
 				onPlayFriend={
 					game.playFriend
 				}
 
-
 				onCancel={
 					game.cancelMatchmaking
 				}
-
-
 
 				onReset={
 					game.resetGame
 				}
 
-
-
 				onCustomize={
 					handleCustomize
 				}
-
-
 
 				onSaveTheme={
 					handleSaveTheme
 				}
 
-
-
 				onBackToSelect={
 					game.backToSelect
 				}
 
-opponentDisconnected={
-		game.opponentDisconnected
-	}
-
-
 				onExit={() => {
-
 					game.resetGame();
-
-
-					router.push(
-						"/home"
-					);
-
+					router.push("/home");
 				}}
-
 			/>
 
-
 		</div>
-
 	);
-
 }
