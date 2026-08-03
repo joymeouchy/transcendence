@@ -90,8 +90,12 @@ io.use((socket, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      userId: number;
+      username: string;
+    };
     socket.data.userId = decoded.userId;
+    socket.data.username = decoded.username;
     next();
   } catch (err) {
     next(new Error("Invalid or expired token"));
@@ -152,7 +156,7 @@ io.on("connection", (socket) => {
       // notify both players
       io.to(room).emit("match_found", {
         room,
-        players: [waitingPlayer.id, socket.id],
+        players: [waitingPlayer.data.username, socket.data.username],
       });
 
       // start game loop
@@ -187,11 +191,10 @@ io.on("connection", (socket) => {
       players.push(socket.id);
     }
 
-    // notify other player that this player wants a rematch
-    socket.to(room).emit("rematch_requested");
-
-    // if both players want a rematch
+    // if both players want a rematch, let the other one know theirs got
+    // accepted; otherwise this is the first request, so ask the other player
     if (players.length === 2) {
+      socket.to(room).emit("rematch_accepted");
       rematches.delete(room);
 
       // create new room
@@ -209,12 +212,19 @@ io.on("connection", (socket) => {
 
         io.to(newRoom).emit("match_found", {
           room: newRoom,
-          players: [player1, player2],
+          players: [p1Socket.data.username, p2Socket.data.username],
         });
 
         startGame(io, newRoom, player1, player2, socketToUser);
         console.log("Rematch started in room:", newRoom);
+      } else {
+        // one of them disconnected between requesting and matching
+        // whoever's still around know so they're not stuck waiting forever
+        (p1Socket ?? p2Socket)?.emit("rematch_failed");
       }
+    } else {
+      // notify the other player that this player wants a rematch
+      socket.to(room).emit("rematch_requested");
     }
   });
 

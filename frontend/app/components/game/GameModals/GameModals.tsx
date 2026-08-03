@@ -4,15 +4,28 @@ import MatchSelectModal from "./MatchSelectModal/MatchSelectModal";
 import MatchmakingModal from "./MatchMakingModal/MatchmakingModal";
 import GameOverModal from "./MatchMakingModal/GameOverModal";
 import CustomizationModal from "./CustomizationModal/CustomizationModal";
-
-import { socket } from "@/lib/socket";
-
+import RematchRequestModal from "./RematchRequestModal/RematchRequestModal";
+import OpponentDisconnectedModal from "./MatchMakingModal/OpponentDisconnectedModal";
 import { MatchmakingStatus } from "./MatchMakingModal/MatchmakingModal";
 // import { GameTheme } from "@/app/data/game/gameCustomization";
 
 import { CustomizationTheme } from "@/services/Customization.services";
 
 interface Props {
+
+	room: string;
+
+	waitingRematch: boolean;
+
+	rematchRequested: boolean;
+	rematchDeclined: boolean;
+	opponentDisconnected: boolean;
+	onRematch: () => void;
+
+	onAcceptRematch: () => void;
+
+	onDeclineRematch: () => void;
+
 	modalState:
 	| "select"
 	| "customization"
@@ -47,10 +60,22 @@ interface Props {
 	onSaveTheme: (theme: CustomizationTheme) => void;
 
 	onBackToSelect: () => void;
+
+	onFindAnother: () => void;
 }
 
 
 export default function GameModals({
+	room,
+
+	waitingRematch,
+	rematchRequested,
+	rematchDeclined,
+	onRematch,
+	onAcceptRematch,
+	onDeclineRematch,
+	opponentDisconnected,
+	onFindAnother,
 	modalState,
 	matchmakingStatus,
 	opponentName,
@@ -126,34 +151,43 @@ export default function GameModals({
 
 
 			<GameOverModal
-				isOpen={
-					modalState === "result"
-				}
-				winner={
-					winner
-				}
-				currentUser={
-					currentUser
-				}
-				scoreLeft={
-					scoreLeft
-				}
-				scoreRight={
-					scoreRight
-				}
-				onRematch={() => {
-					socket.emit(
-						"request_rematch"
-					);
-				}}
-				onFindNew={
-					onStartOnline
-				}
-				onExit={
-					onReset
-				}
+				isOpen={modalState === "result"}
+
+				winner={winner}
+
+				currentUser={currentUser}
+
+				scoreLeft={scoreLeft}
+
+				scoreRight={scoreRight}
+
+				waitingRematch={waitingRematch}
+
+				rematchDeclined={rematchDeclined}
+
+				onRematch={onRematch}
+
+				onFindNew={onStartOnline}
+
+				onExit={onReset}
 			/>
 
+
+			<RematchRequestModal
+				isOpen={rematchRequested}
+
+				opponentName={opponentName}
+
+				onAccept={onAcceptRematch}
+
+				onDecline={onDeclineRematch}
+			/>
+
+			<OpponentDisconnectedModal
+				isOpen={opponentDisconnected}
+				onFindAnother={onFindAnother}
+				onExit={onReset}
+			/>
 		</>
 	);
 }

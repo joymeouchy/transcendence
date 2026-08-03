@@ -2,10 +2,10 @@
 
 export const gameThemes = {
 	classic: {
-		leftPaddle: "/pong_padel_0.png",
-		rightPaddle: "/pong_padel_0.png",
-		ball: "/pong_ball_0.png",
-		background: "/pong_bg_0.png",
+		leftPaddle: "/pong_leftpadel_2.png",
+		rightPaddle: "/pong_rightpadel_2.png",
+		ball: "/pong_ball_2.png",
+		background: "/pong_bg_2.png",
 	},
 
 	football: {
