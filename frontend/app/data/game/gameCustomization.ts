@@ -2,9 +2,9 @@
 
 export const gameThemes = {
 	classic: {
-		leftPaddle: "/pong_leftpadel_2.png",
-		rightPaddle: "/pong_rightpadel_2.png",
-		ball: "/pong_ball_2.png",
+		leftPaddle: "/pong_bluepaddle.png",
+		rightPaddle: "/pong_redpaddle.png",
+		ball: "/pong_earth_ball_og.png",
 		background: "/pong_bg_2.png",
 	},
 
