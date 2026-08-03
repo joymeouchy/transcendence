@@ -1,11 +1,13 @@
 **what joy needs:**
---update the "game_over" socket to read `winnerSocketId`, `winnerId`, `winnerUsername` for both the normal win and the disconnect game_over paths and to display the winner username
+
+--the get user profile api requires a bearer token and now it returns diff values for the profile depending on friendship (if not friends return only username, avatar, and game stats)
+<!-- --update the "game_over" socket to read `winnerSocketId`, `winnerId`, `winnerUsername` for both the normal win and the disconnect game_over paths and to display the winner username -->
 
 <!-- --for GameCanvas.tsx u should use the values from shared/game_types.ts (pongConfig) instead of hardcoding them (canvas width/height, paddle offsets/width), so it doesn't get out of sync ma3 backend -->
 
 <!-- --GameCanvas.tsx needs to use state.dynamicConfig (paddleHeight/ballSize) for the paddles/ball, same for the powerups -->
 
---better to visually show the pendingPowerUps before it auto-activates (will tell u more details about in wp)
+<!-- --better to visually show the pendingPowerUps before it auto-activates (will tell u more details about in wp) -->
 
 <!-- --add countdown at the beginning of match (3,2,1,GO!) before the ball moves — backend already exposes countdownEndsAt in game_state, just need to render it (big centered number, then flash "GO!") -->
 
@@ -38,6 +40,7 @@
 <!-- --add powerups -->
 <!-- --add apis for getting and updating themes -->
 --make sure to ban other from seeing ur acc info if not friends
+--invite friends to join game
 
  photo sources:
  https://www.deviantart.com/windowsaesthetics/art/Windows-HD-User-Account-Picture-Pack-843341713
