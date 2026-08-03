@@ -49,7 +49,9 @@ the server tell two tabs of the same account apart from two different accounts.
 
 **REMATCH**
 | `rematch_requested` | none | Opponent wants a rematch |
+| `rematch_accepted` | none | Opponent accepted your rematch request - `match_found` follows right after |
 | `rematch_declined` | none | Opponent declined rematch |
+| `rematch_failed` | none | Both players requested a rematch, but the other one disconnected before the new match could start |
 
 **MESSAGES**
 <!-- | `receive_message` | `{ id, createdAt, content, senderId, receiverId, sender }` | Incoming chat message |
