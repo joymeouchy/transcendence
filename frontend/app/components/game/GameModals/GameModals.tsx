@@ -5,8 +5,7 @@ import MatchmakingModal from "./MatchMakingModal/MatchmakingModal";
 import GameOverModal from "./MatchMakingModal/GameOverModal";
 import CustomizationModal from "./CustomizationModal/CustomizationModal";
 import RematchRequestModal from "./RematchRequestModal/RematchRequestModal";
-import { socket } from "@/lib/socket";
-
+import OpponentDisconnectedModal from "./MatchMakingModal/OpponentDisconnectedModal";
 import { MatchmakingStatus } from "./MatchMakingModal/MatchmakingModal";
 // import { GameTheme } from "@/app/data/game/gameCustomization";
 
@@ -20,7 +19,7 @@ interface Props {
 
 	rematchRequested: boolean;
 	rematchDeclined: boolean;
-
+opponentDisconnected: boolean;
 	onRematch: () => void;
 
 	onAcceptRematch: () => void;
@@ -72,6 +71,7 @@ export default function GameModals({
 	onRematch,
 	onAcceptRematch,
 	onDeclineRematch,
+		opponentDisconnected,
 	modalState,
 	matchmakingStatus,
 	opponentName,
@@ -178,6 +178,12 @@ export default function GameModals({
 
 				onDecline={onDeclineRematch}
 			/>
+
+			<OpponentDisconnectedModal
+	isOpen={opponentDisconnected}
+	onFindAnother={onStartOnline}
+	onExit={onReset}
+/>
 
 		</>
 	);

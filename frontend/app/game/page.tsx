@@ -164,6 +164,9 @@ export default function GamePage() {
 					game.backToSelect
 				}
 
+opponentDisconnected={
+		game.opponentDisconnected
+	}
 
 
 				onExit={() => {
