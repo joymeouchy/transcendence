@@ -2,6 +2,7 @@ import { Router } from "express";
 import fs from "fs";
 import path from "path";
 import jwt from "jsonwebtoken";
+import { FriendshipStatus } from "../generated/prisma/client";
 import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
 import { avatarUpload, AVATAR_UPLOAD_DIR } from "../src/helpers/upload_helpers";
 import prisma from "../src/prisma";
@@ -204,6 +205,10 @@ router.patch("/username", authHelper, async (req: AuthRequest, res) => {
  * /users/{id}:
  *   get:
  *     summary: Get user profile by ID
+ *     description: >
+ *       Returns the full profile (including email, isOnline, provider) for the
+ *       account owner or an accepted friend. For anyone else, only id,
+ *       username, avatarUrl, and game stats are returned.
  *     parameters:
  *       - in: path
  *         name: id
@@ -213,7 +218,7 @@ router.patch("/username", authHelper, async (req: AuthRequest, res) => {
  *         description: The user ID
  *     responses:
  *       200:
- *         description: User profile data
+ *         description: User profile data (fields vary by friendship, see description)
  *         content:
  *           application/json:
  *             schema:
@@ -225,24 +230,36 @@ router.patch("/username", authHelper, async (req: AuthRequest, res) => {
  *                   type: string
  *                 email:
  *                   type: string
+ *                   description: Only present for the account owner or an accepted friend
  *                 avatarUrl:
  *                   type: string
  *                 isOnline:
  *                   type: boolean
+ *                   description: Only present for the account owner or an accepted friend
+ *                 provider:
+ *                   type: string
+ *                   description: Only present for the account owner or an accepted friend
  *                 wins:
  *                   type: integer
  *                 losses:
  *                   type: integer
  *                 totalMatches:
  *                   type: integer
+ *                 winRate:
+ *                   type: integer
+ *       400:
+ *         description: Invalid user ID
+ *       401:
+ *         description: No token provided
  *       404:
  *         description: User not found
  *       500:
  *         description: Server error
  */
-router.get("/:id", async (req, res) => {
+router.get("/:id", authHelper, async (req: AuthRequest<{ id: string }>, res) => {
   try {
     const userId = parseInt(req.params.id);
+    const requesterId = req.userId!;
 
     if (isNaN(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
@@ -274,17 +291,55 @@ router.get("/:id", async (req, res) => {
       user.matchesAsPlayer1.length + user.matchesAsPlayer2.length;
     const losses = totalMatches - wins;
 
-    res.json({
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      avatarUrl: user.avatarUrl,
-      isOnline: user.isOnline,
-      provider: user.provider,
+    const stats = {
       wins,
       losses,
       totalMatches,
       winRate: totalMatches > 0 ? Math.round((wins / totalMatches) * 100) : 0,
+    };
+
+    // full profile for the account owner - no need to check friendship
+    if (requesterId === userId) {
+      return res.json({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        avatarUrl: user.avatarUrl,
+        isOnline: user.isOnline,
+        provider: user.provider,
+        ...stats,
+      });
+    }
+
+    const friendship = await prisma.friendship.findFirst({
+      where: {
+        status: FriendshipStatus.accepted,
+        OR: [
+          { senderId: requesterId, receiverId: userId },
+          { senderId: userId, receiverId: requesterId },
+        ],
+      },
+    });
+
+    // if friends, return full profile, otherwise return limited profile
+    if (friendship) {
+      return res.json({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        avatarUrl: user.avatarUrl,
+        isOnline: user.isOnline,
+        provider: user.provider,
+        ...stats,
+      });
+    }
+
+    // if not friends, return only username, avatar, and game stats
+    res.json({
+      id: user.id,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+      ...stats,
     });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
