@@ -1,4 +1,6 @@
 "use client";
+ import axios from "axios";
+
 
 import {
   createContext,
@@ -51,29 +53,31 @@ export function AuthProvider({
   /**
    * Load current authenticated user
    */
-  const refreshUser = async () => {
-    const token = authService.getToken();
 
-    if (!token) {
-      setUser(null);
-      return;
+const refreshUser = async () => {
+  const token = authService.getToken();
+
+  if (!token) {
+    setUser(null);
+    return;
+  }
+
+  try {
+    const currentUser = await UserService.getMe();
+    setUser(currentUser);
+  } catch (error: unknown) {
+    console.error("Failed to fetch user:", error);
+
+    // If it's a 401, you can log it for debugging,
+    // but don't clear the session.
+    if (axios.isAxiosError(error)) {
+      console.error("Status:", error.response?.status);
     }
 
-    try {
-      const currentUser =
-        await UserService.getMe();
-
-      setUser(currentUser);
-    } catch (error) {
-      console.error(
-        "Failed to fetch user:",
-        error
-      );
-
-      setUser(null);
-      authService.logout();
-    }
-  };
+    // Do nothing.
+    // Keep the token and don't change the current user.
+  }
+};
 
   /**
    * Restore session after page refresh
