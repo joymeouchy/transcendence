@@ -28,6 +28,12 @@ interface ProfilePageTemplateProps {
 	onClose?: () => void;
 
 	isOwnProfile?: boolean;
+
+	isFriend?: boolean;
+
+	onAddFriend?: () => void;
+
+	onRemoveFriend?: () => void;
 }
 
 
@@ -37,6 +43,9 @@ export default function ProfilePageTemplate({
 	loadingFriends,
 	onClose,
 	isOwnProfile = false,
+	isFriend = false,
+	onAddFriend,
+	onRemoveFriend,
 }: ProfilePageTemplateProps) {
 
 
@@ -56,6 +65,10 @@ export default function ProfilePageTemplate({
 	}
 
 
+	const canSeePrivateInfo =
+		isOwnProfile || isFriend;
+
+
 	return (
 		<DesktopLayout>
 
@@ -66,6 +79,7 @@ export default function ProfilePageTemplate({
 
 				<div className={styles.page}>
 
+
 					<aside className={styles.leftPanel}>
 
 						<ProfileHeader
@@ -74,39 +88,46 @@ export default function ProfilePageTemplate({
 						/>
 
 
-						{isOwnProfile && (
-							<div className={styles.groupBox}>
-
-								<div className={styles.groupTitle}>
-									Edit Profile
-								</div>
-
-
-								<AccountActions
-									provider={user.provider}
-									username={user.username}
-								/>
-
-							</div>
-						)}
-
-
 						<div className={styles.groupBox}>
 
 							<div className={styles.groupTitle}>
-								Status
+								Account Actions
 							</div>
 
 
-							<div className={styles.status}>
-								{
-									user.isOnline
-										? "🟢 Online"
-										: "⚫ Offline"
-								}
-							</div>
+							<AccountActions
+								provider={user.provider}
+								username={user.username}
+								isOwnProfile={isOwnProfile}
+								isFriend={isFriend}
+								onAddFriend={onAddFriend}
+								onRemoveFriend={onRemoveFriend}
+							/>
 
 						</div>
+
+
+
+						{
+							canSeePrivateInfo && (
+								<div className={styles.groupBox}>
+
+									<div className={styles.groupTitle}>
+										Status
+									</div>
+
+
+									<div className={styles.status}>
+										{
+											user.isOnline
+												? "🟢 Online"
+												: "⚫ Offline"
+										}
+									</div>
+
+								</div>
+							)
+						}
 
 					</aside>
 
@@ -135,20 +156,24 @@ export default function ProfilePageTemplate({
 
 
 
-							<div className={styles.groupBox}>
+							{
+								canSeePrivateInfo && (
+									<div className={styles.groupBox}>
 
-								<div className={styles.groupTitle}>
-									Account Info
-								</div>
+										<div className={styles.groupTitle}>
+											Account Info
+										</div>
 
 
-								<AccountInfo
-									username={user.username}
-									email={user.email}
-									totalMatches={user.totalMatches}
-								/>
+										<AccountInfo
+											username={user.username}
+											email={user.email ?? ""}
+											totalMatches={user.totalMatches}
+										/>
 
-							</div>
+									</div>
+								)
+							}
 
 
 						</div>
@@ -162,10 +187,22 @@ export default function ProfilePageTemplate({
 							</div>
 
 
-							<FriendsPanel
-								friends={friends}
-								loading={loadingFriends}
-							/>
+							{
+								canSeePrivateInfo ? (
+
+									<FriendsPanel
+										friends={friends}
+										loading={loadingFriends}
+									/>
+
+								) : (
+
+									<div className={styles.status}>
+										Add this user as a friend to see their friends.
+									</div>
+
+								)
+							}
 
 						</div>
 

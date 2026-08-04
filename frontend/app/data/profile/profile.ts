@@ -1,6 +1,5 @@
 export interface UserProfileFields {
   username: string;
-  tagline: string;
 
   wins: number;
   losses: number;

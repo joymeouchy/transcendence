@@ -1,14 +1,26 @@
+// export interface UserProfile {
+//   id: number;
+//   username: string;
+//   email: string;
+//   avatarUrl: string | null;
+//   provider: string;
+//   isOnline: boolean;
+//   wins: number;
+//   losses: number;
+//   totalMatches: number;
+//   winRate: number;
+// }
 export interface UserProfile {
-  id: number;
-  username: string;
-  email: string;
-  avatarUrl: string | null;
-  provider: string;
-  isOnline: boolean;
-  wins: number;
-  losses: number;
-  totalMatches: number;
-  winRate: number;
+	id: number;
+	username: string;
+	email?: string;
+	avatarUrl: string | null;
+	provider?: string;
+	isOnline?: boolean;
+	wins: number;
+	losses: number;
+	totalMatches: number;
+	winRate: number;
 }
 
 export type Friend = {

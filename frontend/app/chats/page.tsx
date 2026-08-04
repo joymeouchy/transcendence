@@ -3,12 +3,12 @@
 import DesktopLayout from "../components/DesktopLayout/DesktopLayout";
 import XPWindow from "../components/ui/XPWindow/XPWindow";
 
-import { UserProfileFields } from "@/app/data/profile/profile";
+import { UserProfile } from "@/types/types.dto";
 
 import "./page.module.scss";
 
 interface ProfilePageTemplateProps {
-  user: UserProfileFields;
+  user: UserProfile;
   actions?: React.ReactNode;
   onClose?: () => void;
 }
