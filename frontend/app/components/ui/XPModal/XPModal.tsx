@@ -13,6 +13,8 @@ type XPModalProps = {
   onClose?: () => void;
 
   className?: string;
+
+  headerButton?: React.ReactNode;
 };
 
 export default function XPModal({
@@ -21,6 +23,7 @@ export default function XPModal({
   isOpen,
   onClose,
   className = "",
+  headerButton,
 }: XPModalProps) {
   if (!isOpen) return null;
 
@@ -37,6 +40,7 @@ export default function XPModal({
           title={title}
           onClose={onClose}
           className={className}
+          headerButton={headerButton}
         >
           {children}
         </XPWindow>
