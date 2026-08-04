@@ -1,39 +1,67 @@
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+.actions {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 20px;
+
+	width: 100%;
+	margin-top: 10px;
 }
 
-.upload {
-  cursor: pointer;
-  font-size: 14px;
+.actions button {
+	width: 90px;
+	height: 30px;
 
-  input {
-    display: block;
-    margin-top: 8px;
-  }
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 20px;
+
+	padding: 20px;
+	min-width: 300px;
+}
+
+.form label {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+
+	font-size: 14px;
+}
+
+.form input {
+	width: auto;
 }
 
 .preview {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 50%;
-  align-self: center;
-}
+	width: 120px;
+	height: 120px;
 
-.error {
-  color: #c62828;
-  font-size: 13px;
+	object-fit: cover;
+
+	border-radius: 4px;
 }
 
 .actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 20px;
 
-  button {
-    cursor: pointer;
-    padding: 6px 14px;
-  }
+	width: 100%;
+	margin-top: 10px;
+}
+
+.actions button {
+	width: 90px;
+	height: 30px;
+
+	cursor: pointer;
+	font-size: 13px;
 }
