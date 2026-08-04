@@ -9,6 +9,10 @@ async function main() {
       leftPaddleColor: "white",
       rightPaddleColor: "white",
       ballColor: "white",
+      backgroundImageUrl:"/pong_classic_bg.png",
+      leftPaddleImageUrl: "/pong_bluepaddle.png",
+      rightPaddleImageUrl: "/pong_redpaddle.png",
+      ballImageUrl: "/pong_neon_ball.png",
       isDefault: true,
     },
     create: {
@@ -17,6 +21,10 @@ async function main() {
       leftPaddleColor: "white",
       rightPaddleColor: "white",
       ballColor: "white",
+      backgroundImageUrl:"/pong_classic_bg.png",
+      leftPaddleImageUrl: "/pong_bluepaddle.png",
+      rightPaddleImageUrl: "/pong_redpaddle.png",
+      ballImageUrl: "/pong_neon_ball.png",
       isDefault: true,
     },
   });
@@ -25,23 +33,42 @@ async function main() {
   await prisma.customization.upsert({
     where: { name: "football" },
     update: {
-      backgroundImageUrl: "/pong_bg_1.png",
-      leftPaddleImageUrl: "/pong_leftpadel_1.png",
-      rightPaddleImageUrl: "/pong_rightpadel_1.png",
-      ballImageUrl: "/pong_ball_1.png",
+      backgroundImageUrl: "/pong_football_bg.png",
+      leftPaddleImageUrl: "/pong_football_leftpaddle.png",
+      rightPaddleImageUrl: "/pong_football_rightpaddle.png",
+      ballImageUrl: "/pong_football_ball.png",
       isDefault: false,
     },
     create: {
       name: "football",
-      backgroundImageUrl: "/pong_bg_1.png",
-      leftPaddleImageUrl: "/pong_leftpadel_1.png",
-      rightPaddleImageUrl: "/pong_rightpadel_1.png",
-      ballImageUrl: "/pong_ball_1.png",
+      backgroundImageUrl: "/pong_football_bg.png",
+      leftPaddleImageUrl: "/pong_football_leftpaddle.png",
+      rightPaddleImageUrl: "/pong_football_rightpaddle.png",
+      ballImageUrl: "/pong_football_ball.png",
       isDefault: false,
     },
   });
 
-  console.log("Seed complete: added/updated classic and football themes");
+  await prisma.customization.upsert({
+    where: { name: "space" },
+    update: {
+      backgroundImageUrl: "/pong_space_bg.png",
+      leftPaddleImageUrl: "/pong_space_leftpaddle.png",
+      rightPaddleImageUrl: "/pong_space_rightpaddle.png",
+      ballImageUrl: "/pong_space_ball.png",
+      isDefault: false,
+    },
+    create: {
+      name: "space",
+      backgroundImageUrl: "/pong_space_bg.png",
+      leftPaddleImageUrl: "/pong_space_leftpaddle.png",
+      rightPaddleImageUrl: "/pong_space_rightpaddle.png",
+      ballImageUrl: "/pong_space_ball.png",
+      isDefault: false,
+    },
+  });
+
+  console.log("Seed complete: added/updated all themes");
 }
 
 main()
