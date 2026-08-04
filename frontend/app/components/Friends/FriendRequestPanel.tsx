@@ -1,14 +1,16 @@
 "use client";
 
-import styles from "./FriendsPageTemplate/FriendsPageTemplate.module.scss"
+import { useState } from "react";
+
+import styles from "./FriendsPageTemplate/FriendsPageTemplate.module.scss";
 
 import { FriendRequest } from "@/types/types.dto";
 
 interface Props {
 	requests: FriendRequest[];
 
-	onAccept?: (id: number) => void;
-	onReject?: (id: number) => void;
+	onAccept?: (id: number) => Promise<void>;
+	onReject?: (id: number) => Promise<void>;
 }
 
 export default function FriendRequestsPanel({
@@ -16,6 +18,30 @@ export default function FriendRequestsPanel({
 	onAccept,
 	onReject,
 }: Props) {
+	const [loadingId, setLoadingId] = useState<number | null>(null);
+
+	async function handleAccept(id: number) {
+		if (loadingId !== null) return;
+
+		try {
+			setLoadingId(id);
+			await onAccept?.(id);
+		} finally {
+			setLoadingId(null);
+		}
+	}
+
+	async function handleReject(id: number) {
+		if (loadingId !== null) return;
+
+		try {
+			setLoadingId(id);
+			await onReject?.(id);
+		} finally {
+			setLoadingId(null);
+		}
+	}
+
 	return (
 		<div className={styles.panel}>
 			<div className={styles.title}>
@@ -28,34 +54,40 @@ export default function FriendRequestsPanel({
 						No requests
 					</div>
 				) : (
-					requests.map((request) => (
-						<div
-							key={request.id}
-							className={styles.friend}
-						>
-							<span>
-								{request.sender.username}
-							</span>
+					requests.map((request) => {
+						const isLoading = loadingId === request.id;
 
-							<div className={styles.actions}>
-								<button
-									onClick={() =>
-										onAccept?.(request.id)
-									}
-								>
-									Accept
-								</button>
+						return (
+							<div
+								key={request.id}
+								className={styles.friend}
+							>
+								<span>
+									{request.sender.username}
+								</span>
 
-								<button
-									onClick={() =>
-										onReject?.(request.id)
-									}
-								>
-									Reject
-								</button>
+								<div className={styles.actions}>
+									<button
+										onClick={() =>
+											handleAccept(request.id)
+										}
+										disabled={loadingId !== null}
+									>
+										{isLoading ? "Loading..." : "Accept"}
+									</button>
+
+									<button
+										onClick={() =>
+											handleReject(request.id)
+										}
+										disabled={loadingId !== null}
+									>
+										{isLoading ? "Loading..." : "Reject"}
+									</button>
+								</div>
 							</div>
-						</div>
-					))
+						);
+					})
 				)}
 			</div>
 		</div>

@@ -27,6 +27,12 @@ export default function UserProfilePage() {
 	const [friends, setFriends] =
 		useState<Friend[]>([]);
 
+	const [isFriend, setIsFriend] =
+		useState(false);
+
+	const [friendshipId, setFriendshipId] =
+		useState<number | null>(null);
+
 	const [loading, setLoading] =
 		useState(true);
 
@@ -37,29 +43,52 @@ export default function UserProfilePage() {
 	useEffect(() => {
 		async function loadProfile() {
 			try {
-				const id =
-					Number(params.id);
+				const id = Number(params.id);
 
-
-				const [profile, friendsData] =
-					await Promise.all([
-						UserService.getById(id),
-						FriendshipService.getFriends(id),
-					]);
+				const [
+					profile,
+					profileFriends,
+				] = await Promise.all([
+					UserService.getById(id),
+					FriendshipService.getFriends(id),
+				]);
 
 
 				setUser(profile);
+				setFriends(profileFriends);
 
-				setFriends(
-					friendsData
-				);
+
+				// Check friendship status with current user
+				if (
+					currentUser &&
+					currentUser.id !== id
+				) {
+					const myFriends =
+						await FriendshipService.getFriends(
+							currentUser.id
+						);
+
+
+					const friendship =
+						myFriends.find(
+							(friend) =>
+								friend.id === id
+						);
+
+
+					if (friendship) {
+						setIsFriend(true);
+						setFriendshipId(
+							friendship.friendshipId
+						);
+					}
+				}
 
 			} catch (error) {
 				console.error(
 					"Failed to load profile:",
 					error
 				);
-
 			} finally {
 				setLoading(false);
 				setLoadingFriends(false);
@@ -71,7 +100,47 @@ export default function UserProfilePage() {
 			loadProfile();
 		}
 
-	}, [params.id]);
+	}, [params.id, currentUser]);
+
+
+	async function handleAddFriend() {
+		if (!currentUser || !user)
+			return;
+
+
+		try {
+			await FriendshipService.sendRequest(
+				currentUser.id,
+				user.id
+			);
+
+		} catch (error) {
+			console.error(
+				"Failed to add friend:",
+				error
+			);
+		}
+	}
+
+
+	async function handleRemoveFriend() {
+	if (!friendshipId) return;
+
+	try {
+		await FriendshipService.rejectRequest(
+			friendshipId
+		);
+
+		setIsFriend(false);
+		setFriendshipId(null);
+
+	} catch (error) {
+		console.error(
+			"Failed to remove friend:",
+			error
+		);
+	}
+}
 
 
 	if (loading) {
@@ -94,6 +163,9 @@ export default function UserProfilePage() {
 			friends={friends}
 			loadingFriends={loadingFriends}
 			isOwnProfile={isOwnProfile}
+			isFriend={isFriend}
+			onAddFriend={handleAddFriend}
+			onRemoveFriend={handleRemoveFriend}
 			onClose={() =>
 				router.push("/home")
 			}
