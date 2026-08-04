@@ -4,22 +4,29 @@ export const gameThemes = {
 	classic: {
 		leftPaddle: "/pong_bluepaddle.png",
 		rightPaddle: "/pong_redpaddle.png",
-		ball: "/pong_earth_ball_og.png",
-		background: "/pong_bg_2.png",
+		ball: "/pong_neon_ball.png",
+		background: "/pong_classic_bg.png",
 	},
 
 	football: {
-		leftPaddle: "/pong_leftpadel_1.png",
-		rightPaddle: "/pong_rightpadel_1.png",
-		ball: "/pong_ball_1.png",
-		background: "/pong_bg_1.png",
+		leftPaddle: "/pong_football_leftpaddle.png",
+		rightPaddle: "/pong_football_rightpaddle.png",
+		ball: "/pong_football_ball.png",
+		background: "/pong_football_bg.png",
 	},
 
+	// space: {
+	// 	leftPaddle: "/pong_space_leftpaddle.png",
+	// 	rightPaddle: "/pong_space_rightpaddle.png",
+	// 	ball: "/pong_space_ball.png",
+	// 	background: "/pong_space_bg.png",
+	// },
+
 	// neon: {
-	// 	leftPaddle: "/game/paddles/neon-left.png",
-	// 	rightPaddle: "/game/paddles/neon-right.png",
-	// 	ball: "/game/balls/neon.png",
-	// 	background: "/game/backgrounds/neon.png",
+	// 	leftPaddle: "/pong_bluepaddle.png",
+	// 	rightPaddle: "/pong_redpaddle.png",
+	// 	ball: "/pong_neon_ball.png",
+	// 	background: "/pong_classic_bg.png",
 	// },
 };
 
