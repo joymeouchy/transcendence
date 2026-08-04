@@ -32,7 +32,7 @@ the server tell two tabs of the same account apart from two different accounts.
 **MATCHMAKING**
 | `waiting` | none | You are in the queue waiting for opponent |
 | `already_waiting` | none | You are already in the queue, OR the account already has a match in queue/in progress (same user tried to queue from a second tab/window) |
-| `match_found` | `{ room: string, players: [string, string] }` | Match found, game starting |
+| `match_found` | `{ room: string, players: [string, string], avatars: { left: string \| null, right: string \| null } }` | Match found, game starting. `players`/`avatars` are both `[left, right]`-ordered pairs; avatar is whatever was in the DB when the socket connected (`null` if unset or not fetched yet) |
 
 **GAMEPLAY**
 | `game_state` | `{ ball, paddles, scores, players, countdownEndsAt: number or null, pendingPowerUp: PendingPowerUp or null, activeEffects: { left, right }, dynamicConfig: { paddleHeights: { left, right }, ballSize } }` | Game state update (60fps). `countdownEndsAt` is set for the ~3s pre-match countdown (ball is held until it passes); `activeEffects[side]` is `{ type: PowerUpType, expiresAt } or null`; `dynamicConfig` reflects live paddle heights / ball size while a power-up effect is active |

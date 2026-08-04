@@ -82,7 +82,7 @@ server.listen(PORT, () => {
 // or /auth/register, so we know the real userId behind a socket instead of
 // trusting whatever the client claims (this is what lets us tell two tabs of
 // the same account apart from two different accounts).
-io.use((socket, next) => {
+io.use(async (socket, next) => {
   const token = socket.handshake.auth?.token;
 
   if (!token) {
@@ -94,12 +94,27 @@ io.use((socket, next) => {
       userId: number;
       username: string;
     };
+
     socket.data.userId = decoded.userId;
     socket.data.username = decoded.username;
+    // it will be fetched from the database next
+    socket.data.avatarUrl = null;
     next();
   } catch (err) {
-    next(new Error("Invalid or expired token"));
+    return next(new Error("Invalid or expired token"));
   }
+
+  const user = await prisma.user
+    .findUnique({
+      where: { id: socket.data.userId },
+      select: { avatarUrl: true },
+    })
+    .catch((err) => {
+      console.error("Failed to fetch avatar on connect:", err);
+      return null;
+    });
+
+  socket.data.avatarUrl = user?.avatarUrl ?? null;
 });
 
 io.on("connection", (socket) => {
@@ -157,6 +172,10 @@ io.on("connection", (socket) => {
       io.to(room).emit("match_found", {
         room,
         players: [waitingPlayer.data.username, socket.data.username],
+        avatars: {
+          left: waitingPlayer.data.avatarUrl,
+          right: socket.data.avatarUrl,
+        },
       });
 
       // start game loop
@@ -213,6 +232,10 @@ io.on("connection", (socket) => {
         io.to(newRoom).emit("match_found", {
           room: newRoom,
           players: [p1Socket.data.username, p2Socket.data.username],
+          avatars: {
+            left: p1Socket.data.avatarUrl,
+            right: p2Socket.data.avatarUrl,
+          },
         });
 
         startGame(io, newRoom, player1, player2, socketToUser);
@@ -252,10 +275,12 @@ io.on("connection", (socket) => {
       onlineUsers.delete(userId);
       socketToUser.delete(socket.id);
 
-      await prisma.user.update({
-        where: { id: userId },
-        data: { isOnline: false },
-      });
+      await prisma.user
+        .update({
+          where: { id: userId },
+          data: { isOnline: false },
+        })
+        .catch((err) => console.error("Failed to mark user offline:", err));
 
       console.log(`User ${userId} is offline`);
     }
