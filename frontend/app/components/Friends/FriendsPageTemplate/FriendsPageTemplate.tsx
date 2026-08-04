@@ -17,9 +17,8 @@ interface Props {
 
 	loading?: boolean;
 
-	onAccept?: (id: number) => void;
-	onReject?: (id: number) => void;
-
+	onAccept?: (id: number) => Promise<void>;
+	onReject?: (id: number) => Promise<void>;
 	onRemoveFriend?: (
 		id: number
 	) => Promise<void>;

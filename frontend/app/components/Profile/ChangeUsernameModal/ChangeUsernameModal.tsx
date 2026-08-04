@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import XPModal from "../../ui/XPModal/XPModal";
 import XPAlert from "../../ui/XPAlert/XPAlert";
@@ -11,136 +11,130 @@ import { useAuth } from "@/context/AuthContext";
 import styles from "./ChangeUsernameModal.module.scss";
 
 type ChangeUsernameModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  currentUsername: string;
+	isOpen: boolean;
+	onClose: () => void;
+	currentUsername: string;
 };
 
 export default function ChangeUsernameModal({
-  isOpen,
-  onClose,
-  currentUsername,
+	isOpen,
+	onClose,
+	currentUsername,
 }: ChangeUsernameModalProps) {
-  const { refreshUser } = useAuth();
+	const { refreshUser } = useAuth();
 
-  const [username, setUsername] =
-    useState(currentUsername);
+	const [username, setUsername] = useState(currentUsername);
 
-  const [error, setError] =
-    useState("");
+	const [error, setError] = useState("");
+	const [loading, setLoading] = useState(false);
+	const [showSuccess, setShowSuccess] = useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
+	// Update input whenever the modal opens or username changes
+	useEffect(() => {
+		if (isOpen) {
+			setUsername(currentUsername);
+			setError("");
+		}
+	}, [isOpen, currentUsername]);
 
-  const [showSuccess, setShowSuccess] =
-    useState(false);
+	const handleClose = () => {
+		setUsername(currentUsername);
+		setError("");
+		setLoading(false);
+		onClose();
+	};
 
-  const resetForm = () => {
-    setUsername(currentUsername);
-    setError("");
-    setLoading(false);
-  };
+	const handleSubmit = async () => {
+		setError("");
 
-  const handleClose = () => {
-    resetForm();
-    onClose();
-  };
+		if (!username.trim()) {
+			setError("Username is required.");
+			return;
+		}
 
-  const handleSubmit = async () => {
-    setError("");
+		if (username.trim() === currentUsername) {
+			setError("Please enter a different username.");
+			return;
+		}
 
-    if (!username.trim()) {
-      setError(
-        "Username is required."
-      );
-      return;
-    }
+		try {
+			setLoading(true);
 
-    if (username === currentUsername) {
-      setError(
-        "Please enter a different username."
-      );
-      return;
-    }
+			await UserService.updateUsername(
+				username.trim()
+			);
 
-    try {
-      setLoading(true);
+			await refreshUser();
 
-      await UserService.updateUsername(
-        username.trim()
-      );
+			onClose();
+			setShowSuccess(true);
 
-      await refreshUser();
+		} catch (err: any) {
+			setError(
+				err?.response?.data?.error ??
+				"Failed to update username."
+			);
+		} finally {
+			setLoading(false);
+		}
+	};
 
-      resetForm();
-      onClose();
+	return (
+		<>
+			<XPModal
+				title="Change Username"
+				isOpen={isOpen}
+				onClose={handleClose}
+			>
+				<div className={styles.form}>
+					<label>
+						Username
+						<input
+							type="text"
+							value={username}
+							onChange={(e) =>
+								setUsername(e.target.value)
+							}
+							disabled={loading}
+						/>
+					</label>
 
-      setShowSuccess(true);
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.error ??
-          "Failed to update username."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+					{error && (
+						<p className={styles.error}>
+							{error}
+						</p>
+					)}
 
-  return (
-    <>
-      <XPModal
-        title="Change Username"
-        isOpen={isOpen}
-        onClose={handleClose}
-      >
-        <div className={styles.form}>
-          <label>
-            Username
-            <input
-              type="text"
-              value={username}
-              onChange={(e) =>
-                setUsername(e.target.value)
-              }
-            />
-          </label>
+					<div className={styles.actions}>
+						<button
+							type="button"
+							onClick={handleClose}
+							disabled={loading}
+						>
+							Cancel
+						</button>
 
-          {error && (
-            <p className={styles.error}>
-              {error}
-            </p>
-          )}
+						<button
+							type="button"
+							onClick={handleSubmit}
+							disabled={loading}
+						>
+							{loading
+								? "Saving..."
+								: "Save"}
+						</button>
+					</div>
+				</div>
+			</XPModal>
 
-          <div className={styles.actions}>
-            <button
-              type="button"
-              onClick={handleClose}
-              disabled={loading}
-            >
-              Cancel
-            </button>
-
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={loading}
-            >
-              {loading
-                ? "Saving..."
-                : "Save"}
-            </button>
-          </div>
-        </div>
-      </XPModal>
-
-      <XPAlert
-        isOpen={showSuccess}
-        title="Success"
-        message="Username updated successfully."
-        onClose={() =>
-          setShowSuccess(false)
-        }
-      />
-    </>
-  );
+			<XPAlert
+				isOpen={showSuccess}
+				title="Success"
+				message="Username updated successfully."
+				onClose={() =>
+					setShowSuccess(false)
+				}
+			/>
+		</>
+	);
 }
