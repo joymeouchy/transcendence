@@ -1,11 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import GameCanvas from "../components/game/GameCanvas";
 import GameModals from "../components/game/GameModals/GameModals";
 
 import useGameSocket from "../components/game/GameModals/UseGameSockets";
+import PlayerInfo from "../components/game/playerInfo/playerInfo";
 
 import "./page.scss";
 
@@ -20,26 +22,61 @@ export default function GamePage() {
 
 	const game = useGameSocket();
 
+	const [theme, setTheme] =
+		useState<CustomizationTheme | null>(null);
+
+
 	const handleCustomize = () => {
 		game.setModalState("customization");
 	};
 
+
 	const handleSaveTheme = (
-		theme: CustomizationTheme
+		newTheme: CustomizationTheme
 	) => {
-		console.log("Selected theme:", theme);
+		console.log(
+			"Selected theme:",
+			newTheme
+		);
+
+		setTheme(newTheme);
 
 		game.setModalState("select");
 	};
+
 
 	return (
 		<div className="game-page">
 
 			<div className="game-container">
-				<GameCanvas />
+
+				<PlayerInfo
+					side="left"
+					username={
+						game.currentUser
+					}
+					avatar="/default-avatar.png"
+				/>
+
+
+				<GameCanvas
+					theme={theme}
+				/>
+
+
+				<PlayerInfo
+					side="right"
+					username={
+						game.opponentName
+					}
+					avatar="/default-avatar.png"
+				/>
+
 			</div>
 
+
 			<GameModals
+
 				opponentDisconnected={
 					game.opponentDisconnected
 				}
@@ -48,7 +85,9 @@ export default function GamePage() {
 					game.findAnotherPlayer
 				}
 
-				room={game.room}
+				room={
+					game.room
+				}
 
 				waitingRematch={
 					game.waitingRematch

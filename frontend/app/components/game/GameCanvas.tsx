@@ -14,14 +14,20 @@ import {
 } from "@/services/Customization.services";
 
 
+type Props = {
+  theme: CustomizationTheme | null;
+};
 
-export default function GameCanvas() {
+export default function GameCanvas({
+  theme,
+}: Props) {
+// export default function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const gameState = useRef<GameStateSend | null>(null);
   const roomRef = useRef<string | null>(null);
 
-  const theme = useRef<CustomizationTheme | null>(null);
+  // const theme = useRef<CustomizationTheme | null>(null);
 
   const backgroundImg = useRef<HTMLImageElement | null>(null);
   const leftPaddleImg = useRef<HTMLImageElement | null>(null);
@@ -41,53 +47,48 @@ export default function GameCanvas() {
     return `http://localhost:3001${path}`;
   };
 
-  useEffect(() => {
-    const loadTheme = async () => {
-      try {
-        const userTheme =
-          await customizationService.getMyTheme();
+ useEffect(() => {
+  if (!theme)
+    return;
 
-        theme.current = userTheme;
+  backgroundImg.current = new Image();
+  leftPaddleImg.current = new Image();
+  rightPaddleImg.current = new Image();
+  ballImg.current = new Image();
 
-        backgroundImg.current = new Image();
-        leftPaddleImg.current = new Image();
-        rightPaddleImg.current = new Image();
-        ballImg.current = new Image();
 
-        backgroundImg.current.src =
-          getAssetUrl(
-            userTheme.backgroundImageUrl ??
-            gameThemes.classic.background
-          );
+  backgroundImg.current.onload = () => {
+  backgroundImg.current = backgroundImg.current;
+};
 
-        leftPaddleImg.current.src =
-          getAssetUrl(
-            userTheme.leftPaddleImageUrl ??
-            gameThemes.classic.leftPaddle
-          );
+backgroundImg.current.src =
+  getAssetUrl(
+    theme.backgroundImageUrl ??
+    gameThemes.classic.background
+  );
 
-        rightPaddleImg.current.src =
-          getAssetUrl(
-            userTheme.rightPaddleImageUrl ??
-            gameThemes.classic.rightPaddle
-          );
 
-        ballImg.current.src =
-          getAssetUrl(
-            userTheme.ballImageUrl ??
-            gameThemes.classic.ball
-          );
+  leftPaddleImg.current.src =
+    getAssetUrl(
+      theme.leftPaddleImageUrl ??
+      gameThemes.classic.leftPaddle
+    );
 
-      } catch (error) {
-        console.error(
-          "Failed to load game customization",
-          error
-        );
-      }
-    };
 
-    loadTheme();
-  }, []);
+  rightPaddleImg.current.src =
+    getAssetUrl(
+      theme.rightPaddleImageUrl ??
+      gameThemes.classic.rightPaddle
+    );
+
+
+  ballImg.current.src =
+    getAssetUrl(
+      theme.ballImageUrl ??
+      gameThemes.classic.ball
+    );
+
+}, [theme]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -308,7 +309,7 @@ if (state.pendingPowerUp) {
       );
     };
 
-  });
+   }, []);
 
   useEffect(() => {
     const handleKeyDown = (
