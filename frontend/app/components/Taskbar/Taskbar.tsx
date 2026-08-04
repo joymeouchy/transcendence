@@ -22,7 +22,10 @@ export default function Taskbar() {
 
       <TaskbarClock />
 
-      <StartMenu open={open} />
+      <StartMenu
+        open={open}
+        onClose={() => setOpen(false)}
+      />
 
     </div>
   );

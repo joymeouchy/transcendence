@@ -6,17 +6,21 @@ import {
   achievementsItem,
   termsOfServicesItem,
   privacyPolicyItem,
+  friendshipsItem,
+  messagingItem,
 } from "./navigationItemsFields";
 
 export const startMenuItemsLeft = [
   homeItem,
   gameItem,
+  friendshipsItem,
+  messagingItem,
   customizationItem,
   ];
 
 export const startMenuItemsRight = [
   profileItem,
-  achievementsItem,
+  // achievementsItem,
   termsOfServicesItem,
   privacyPolicyItem,
 ];

@@ -1,5 +1,3 @@
-// XPWindow.tsx
-
 import "./XPWindow.scss";
 
 type XPWindowProps = {
@@ -7,6 +5,7 @@ type XPWindowProps = {
   children: React.ReactNode;
   className?: string;
   onClose?: () => void;
+  headerButton?: React.ReactNode;
 };
 
 export default function XPWindow({
@@ -14,19 +13,26 @@ export default function XPWindow({
   children,
   className = "",
   onClose,
+  headerButton,
 }: XPWindowProps) {
   return (
     <div className={`xp-window-outline ${className}`}>
       <div className="xp-window">
         <div className="xp-titlebar">
-          <span className="xp-title">{title}</span>
+          <span className="xp-title">
+            {title}
+          </span>
 
-          <button
-            className="xp-close-btn"
-            onClick={onClose}
-          >
-            ✕
-          </button>
+          <div className="xp-title-actions">
+            {headerButton}
+
+            <button
+              className="xp-close-btn"
+              onClick={onClose}
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         <div className="xp-content">
