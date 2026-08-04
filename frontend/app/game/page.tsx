@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import GameCanvas from "../components/game/GameCanvas";
 import GameModals from "../components/game/GameModals/GameModals";
@@ -13,6 +13,7 @@ import "./page.scss";
 
 import {
 	CustomizationTheme,
+	customizationService,
 } from "@/services/Customization.services";
 
 
@@ -26,6 +27,37 @@ export default function GamePage() {
 		useState<CustomizationTheme | null>(null);
 
 
+	/*
+		Load user's saved theme
+		(or backend default theme)
+	*/
+	useEffect(() => {
+		const loadTheme = async () => {
+			try {
+				const currentTheme =
+					await customizationService.getMyTheme();
+
+				console.log(
+					"Loaded theme:",
+					currentTheme
+				);
+
+				setTheme(currentTheme);
+
+			} catch (error) {
+				console.error(
+					"Failed to load theme:",
+					error
+				);
+			}
+		};
+
+		loadTheme();
+
+	}, []);
+
+
+
 	const handleCustomize = () => {
 		game.setModalState("customization");
 	};
@@ -34,6 +66,7 @@ export default function GamePage() {
 	const handleSaveTheme = (
 		newTheme: CustomizationTheme
 	) => {
+
 		console.log(
 			"Selected theme:",
 			newTheme
@@ -43,6 +76,7 @@ export default function GamePage() {
 
 		game.setModalState("select");
 	};
+
 
 
 	return (
@@ -59,9 +93,13 @@ export default function GamePage() {
 				/>
 
 
-				<GameCanvas
-					theme={theme}
-				/>
+				{
+					theme && (
+						<GameCanvas
+							theme={theme}
+						/>
+					)
+				}
 
 
 				<PlayerInfo
@@ -73,6 +111,7 @@ export default function GamePage() {
 				/>
 
 			</div>
+
 
 
 			<GameModals

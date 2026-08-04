@@ -48,6 +48,7 @@ export default function GameCanvas({
   };
 
  useEffect(() => {
+  console.log("theme chosen is:", theme?.name);
   if (!theme)
     return;
 
