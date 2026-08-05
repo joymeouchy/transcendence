@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { socket } from "@/lib/socket";
 import { useAuth } from "@/context/AuthContext";
@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { MatchmakingStatus } from "./MatchMakingModal/MatchmakingModal";
 import { GameStateSend } from "@/types/game_types";
 import { images } from "@/lib/images";
+import { playSound, sounds } from "@/lib/sounds";
 
 type ModalState =
 	| "select"
@@ -47,6 +48,11 @@ export default function useGameSocket() {
 
 	const [opponentAvatar, setOpponentAvatar] =
 		useState(images.defaultUserIcon);
+
+	const previousScore = useRef({
+		left: 0,
+		right: 0,
+	});
 
 
 	const [room, setRoom] = useState("");
@@ -183,12 +189,31 @@ export default function useGameSocket() {
 			setActiveEffects(
 				state.activeEffects
 			);
+
+			if (
+				state.scores.left !== previousScore.current.left ||
+				state.scores.right !== previousScore.current.right
+			) {
+				playSound(sounds.score);
+			}
+
+			previousScore.current = state.scores;
+		};
+
+		const handlePaddleHit = (data: {
+			side: "left" | "right";
+		}) => {
+			if (data.side === "left") {
+				playSound(sounds.leftpaddlehit);
+			} else {
+				playSound(sounds.rightpaddlehit);
+			}
 		};
 
 		socket.on(
-	"game_state",
-	handleGameState
-);
+			"game_state",
+			handleGameState
+		);
 
 		socket.on(
 			"connect",
@@ -230,15 +255,20 @@ export default function useGameSocket() {
 			"power_up_activated",
 			handlePowerUpActivated
 		);
+		socket.on(
+			"paddle_hit",
+			handlePaddleHit
+		);
+
 		return () => {
 			socket.off(
 				"connect",
 				handleConnect
 			);
 			socket.off(
-	"game_state",
-	handleGameState
-);
+				"game_state",
+				handleGameState
+			);
 			socket.off(
 				"match_found",
 				handleMatchFound
@@ -274,6 +304,10 @@ export default function useGameSocket() {
 			socket.off(
 				"power_up_activated",
 				handlePowerUpActivated
+			);
+			socket.off(
+				"paddle_hit",
+				handlePaddleHit
 			);
 		};
 	}, [user]);
