@@ -1,5 +1,5 @@
 "use client";
- import axios from "axios";
+import axios from "axios";
 
 
 import {
@@ -54,37 +54,30 @@ export function AuthProvider({
    * Load current authenticated user
    */
 
-const refreshUser = async () => {
-  const token = authService.getToken();
-
-  if (!token) {
-    setUser(null);
-    return;
-  }
-
+  const refreshUser = async () => {
   try {
-    const currentUser = await UserService.getMe();
-    setUser(currentUser);
-  } catch (error: unknown) {
-    console.error("Failed to fetch user:", error);
+    const token = authService.getToken();
 
-    // If it's a 401, you can log it for debugging,
-    // but don't clear the session.
-    if (axios.isAxiosError(error)) {
-      console.error("Status:", error.response?.status);
+    if (!token) {
+      setUser(null);
+      return;
     }
 
-    // Do nothing.
-    // Keep the token and don't change the current user.
+    const currentUser = await UserService.getMe();
+    setUser(currentUser);
+
+  } catch (error) {
+    console.error("Failed to fetch user:", error);
+    setUser(null);
   }
 };
 
-  /**
-   * Restore session after page refresh
-   */
-  useEffect(() => {
-  let mounted = true;
 
+/**
+ * Restore session after page refresh
+ */
+useEffect(() => {
+  let mounted = true;
   async function restoreSession() {
     try {
       await refreshUser();
@@ -94,73 +87,62 @@ const refreshUser = async () => {
       }
     }
   }
-
   restoreSession();
-
   return () => {
     mounted = false;
   };
 }, []);
 
-  /**
-   * Login
-   */
-  const login = async (
-    email: string,
-    password: string
-  ) => {
-    await authService.login({
-      email,
-      password,
-    });
+const login = async (
+  email: string,
+  password: string
+) => {
+  const response = await authService.login({
+    email,
+    password,
+  });
+  const currentUser = await UserService.getMe();
+  setUser(currentUser);
+};
+/**
+ * Register
+ */
+const register = async (
+  username: string,
+  email: string,
+  password: string
+) => {
+  await authService.register({
+    username,
+    email,
+    password,
+  });
 
-    await refreshUser();
-  };
+  await refreshUser();
+};
 
-  /**
-   * Register
-   */
-  const register = async (
-    username: string,
-    email: string,
-    password: string
-  ) => {
-    await authService.register({
-      username,
-      email,
-      password,
-    });
+/**
+ * Logout
+ */
+const logout = () => {
+  authService.logout();
+  setUser(null);
+};
 
-    await refreshUser();
-  };
-
-  /**
-   * Logout
-   */
-  const logout = () => {
-    authService.logout();
-
-    // Clear React state
-    setUser(null);
-
-    // Force clean app state
-    window.location.href = "/login";
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        register,
-        logout,
-        refreshUser,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+return (
+  <AuthContext.Provider
+    value={{
+      user,
+      loading,
+      login,
+      register,
+      logout,
+      refreshUser,
+    }}
+  >
+    {children}
+  </AuthContext.Provider>
+);
 }
 
 

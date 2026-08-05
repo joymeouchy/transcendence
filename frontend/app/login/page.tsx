@@ -7,6 +7,7 @@ import "./page.scss";
 import { authService } from "@/services/auth.services";
 import { useRouter } from "next/navigation";
 import { isAuthenticated } from "@/lib/auth";
+import { useAuth } from "@/context/AuthContext";
 
 import { loginFields } from "../data/auth/loginFields";
 
@@ -28,55 +29,41 @@ export default function LoginPage() {
 
   const router = useRouter();
 
+  const { login } = useAuth();
+
   useEffect(() => {
     if (isAuthenticated()) {
       router.replace("/home");
     }
   }, []);
 
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
-    e.preventDefault();
+const handleSubmit = async (
+  e: React.FormEvent<HTMLFormElement>
+) => {
+  e.preventDefault();
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    try {
-      const response = await authService.login({
-        email: formData.email,
-        password: formData.password,
-      });
-
-      console.log(
-        "Login success:",
-        response
-      );
-
-      router.push("/home");
-
-    } catch (err: any) {
-      console.error(err);
-
-      setAlertMessage(
-        err.response?.data?.error ||
-        "Login failed"
-      );
-
-    } finally {
-      setIsLoading(false);
-    }
-
-    console.log(
-      "Email:",
-      formData.email
-    );
-
-    console.log(
-      "Password:",
+  try {
+    await login(
+      formData.email,
       formData.password
     );
-  };
 
+    router.push("/home");
+
+  } catch (err: any) {
+    console.error(err);
+
+    setAlertMessage(
+      err.response?.data?.error ||
+      "Login failed"
+    );
+
+  } finally {
+    setIsLoading(false);
+  }
+};
   return (
     <AuthLayout>
       <AuthPanel>
