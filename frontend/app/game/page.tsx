@@ -45,12 +45,6 @@ export default function GamePage() {
 			try {
 				const currentTheme =
 					await customizationService.getMyTheme();
-
-				console.log(
-					"Loaded theme:",
-					currentTheme
-				);
-
 				setTheme(currentTheme);
 
 			} catch (error) {
@@ -75,26 +69,19 @@ export default function GamePage() {
 	const handleSaveTheme = (
 		newTheme: CustomizationTheme
 	) => {
-
-		console.log(
-			"Selected theme:",
-			newTheme
-		);
-
 		setTheme(newTheme);
-
 		game.setModalState("select");
 	};
 
-const playerEffect =
-	game.playerSide === "left"
-		? game.activeEffects.left
-		: game.activeEffects.right;
+	const playerEffect =
+		game.playerSide === "left"
+			? game.activeEffects.left
+			: game.activeEffects.right;
 
-const opponentEffect =
-	game.playerSide === "left"
-		? game.activeEffects.right
-		: game.activeEffects.left;
+	const opponentEffect =
+		game.playerSide === "left"
+			? game.activeEffects.right
+			: game.activeEffects.left;
 
 	return (
 		<div className="game-page">

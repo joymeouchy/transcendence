@@ -127,3 +127,13 @@
 .friend:hover {
   background: #dce6f7;
 }
+
+.friend {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+
+	text-decoration: none;
+	color: inherit;
+	cursor: pointer;
+}
