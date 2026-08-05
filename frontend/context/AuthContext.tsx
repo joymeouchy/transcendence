@@ -13,6 +13,7 @@ import { authService } from "../services/auth.services";
 import { UserService } from "../services/user.services";
 
 import { UserProfile } from "@/types/types.dto";
+import { playSound, sounds } from "@/lib/sounds";
 
 type AuthContextType = {
   user: UserProfile | null;
@@ -103,6 +104,7 @@ const login = async (
   });
   const currentUser = await UserService.getMe();
   setUser(currentUser);
+  playSound(sounds.startup);
 };
 /**
  * Register
