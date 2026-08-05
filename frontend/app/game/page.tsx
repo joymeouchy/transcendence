@@ -8,6 +8,7 @@ import GameModals from "../components/game/GameModals/GameModals";
 
 import useGameSocket from "../components/game/GameModals/UseGameSockets";
 import PlayerInfo from "../components/game/playerInfo/playerInfo";
+import { images } from "@/lib/images";
 
 import "./page.scss";
 
@@ -26,11 +27,19 @@ export default function GamePage() {
 	const [theme, setTheme] =
 		useState<CustomizationTheme | null>(null);
 
-
-	/*
-		Load user's saved theme
-		(or backend default theme)
-	*/
+	const [activeEffects, setActiveEffects] = useState<{
+		left: {
+			type: string;
+			expiresAt: number;
+		} | null;
+		right: {
+			type: string;
+			expiresAt: number;
+		} | null;
+	}>({
+		left: null,
+		right: null,
+	});
 	useEffect(() => {
 		const loadTheme = async () => {
 			try {
@@ -77,7 +86,15 @@ export default function GamePage() {
 		game.setModalState("select");
 	};
 
+const playerEffect =
+	game.playerSide === "left"
+		? game.activeEffects.left
+		: game.activeEffects.right;
 
+const opponentEffect =
+	game.playerSide === "left"
+		? game.activeEffects.right
+		: game.activeEffects.left;
 
 	return (
 		<div className="game-page">
@@ -85,37 +102,24 @@ export default function GamePage() {
 			<div className="game-container">
 
 				<PlayerInfo
-					side="left"
-					username={
-						game.currentUser
-					}
-					avatar="/default-avatar.png"
+					side={game.playerSide}
+					username={game.currentUser}
+					avatar={game.playerAvatar}
+					effect={playerEffect}
 				/>
 
-
-				{
-					theme && (
-						<GameCanvas
-							theme={theme}
-						/>
-					)
-				}
-
+				{<GameCanvas theme={theme} />}
 
 				<PlayerInfo
-					side="right"
-					username={
-						game.opponentName
-					}
-					avatar="/default-avatar.png"
+					side={game.playerSide === "left" ? "right" : "left"}
+					username={game.opponentName}
+					avatar={game.opponentAvatar}
+					effect={opponentEffect}
 				/>
 
 			</div>
 
-
-
 			<GameModals
-
 				opponentDisconnected={
 					game.opponentDisconnected
 				}
