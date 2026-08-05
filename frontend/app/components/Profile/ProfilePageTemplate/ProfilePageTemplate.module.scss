@@ -1,12 +1,12 @@
 .page {
-  display: flex;
-  gap: 16px;
+	display: flex;
+	gap: 16px;
 
-  min-width: 900px;
+	width: 100%;
+	height: 70vh;
 
-  height: 70vh;
+	box-sizing: border-box;
 }
-
 /* LEFT SIDEBAR */
 .leftPanel {
   width: 260px;
@@ -107,3 +107,47 @@
   gap: 12px;
 }
 
+
+@media (max-width: 900px) {
+
+	.page {
+		flex-direction: column;
+		height: auto;
+	}
+
+
+	.leftPanel {
+		width: 100%;
+	}
+
+
+	.rightPanel {
+		width: 100%;
+	}
+
+
+	.topRow {
+		grid-template-columns: 1fr;
+	}
+
+}
+
+
+
+@media (max-width: 600px) {
+
+	.page {
+		gap: 10px;
+	}
+
+
+	.groupBox {
+		padding: 8px;
+	}
+
+
+	.groupTitle {
+		font-size: 11px;
+	}
+
+}
