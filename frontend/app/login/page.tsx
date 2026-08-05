@@ -15,6 +15,9 @@ import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
 import XPAlert from "../components/ui/XPAlert/XPAlert";
 
+import { playSound, sounds} from "@/lib/sounds";
+
+
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
@@ -49,7 +52,7 @@ const handleSubmit = async (
       formData.email,
       formData.password
     );
-
+  playSound(sounds.startup);
     router.push("/home");
 
   } catch (err: any) {
