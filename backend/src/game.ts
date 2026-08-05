@@ -353,6 +353,7 @@ async function updateGame(io: Server, room: string) {
     ball.vx *= -1;
     ball.x = config.leftPaddleOffset + config.paddleWidth;
     scaleBallSpeed(game, BALL_SPEEDUP_FACTOR);
+    io.to(room).emit("paddle_hit", { side: "left" });
   }
 
   // Right paddle collision
@@ -372,6 +373,7 @@ async function updateGame(io: Server, room: string) {
       config.paddleWidth -
       game.ballSize;
     scaleBallSpeed(game, BALL_SPEEDUP_FACTOR);
+    io.to(room).emit("paddle_hit", { side: "right" });
   }
 
   // Left player misses → right scores
