@@ -55,44 +55,47 @@
 }
 
 @media (max-width: 900px) {
-  .player-info {
-    position: static;
-    transform: none;
+	.player-info {
+		position: absolute;
+		transform: none;
 
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+		flex-direction: row;
+		align-items: center;
+		gap: 8px;
 
-    gap: 12px;
-    margin: 8px 0;
+		min-width: auto;
 
-    .active-power-up {
-      margin-left: auto;
-      text-align: right;
-    }
+		img {
+			width: 50px;
+			height: 50px;
+		}
 
-    img {
-      width: 55px;
-      height: 55px;
-    }
+		span {
+			max-width: 100px;
+			min-height: unset;
+		}
 
-    span {
-      max-width: 120px;
-    }
+		.active-power-up {
+			font-size: 12px;
+			min-height: unset;
+			text-align: left;
+		}
 
-    &.left {
-      align-self: flex-start;
-    }
+		&.left {
+			left: 5px;
+			top: -65px;
+		}
 
-    &.right {
-      align-self: flex-end;
-      flex-direction: row-reverse;
+		&.right {
+			right: 5px;
+			bottom: -65px;
+			top: auto;
 
-      .active-power-up {
-        margin-left: 0;
-        margin-right: auto;
-        text-align: left;
-      }
-    }
-  }
+			flex-direction: row-reverse;
+
+			.active-power-up {
+				text-align: right;
+			}
+		}
+	}
 }

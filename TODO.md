@@ -1,6 +1,6 @@
 **what joy needs:**
 
---the get user profile api requires a bearer token and now it returns diff values for the profile depending on friendship (if not friends return only username, avatar, and game stats)
+<!-- --the get user profile api requires a bearer token and now it returns diff values for the profile depending on friendship (if not friends return only username, avatar, and game stats) -->
 <!-- --update the "game_over" socket to read `winnerSocketId`, `winnerId`, `winnerUsername` for both the normal win and the disconnect game_over paths and to display the winner username -->
 
 <!-- --for GameCanvas.tsx u should use the values from shared/game_types.ts (pongConfig) instead of hardcoding them (canvas width/height, paddle offsets/width), so it doesn't get out of sync ma3 backend -->
@@ -13,16 +13,16 @@
 
 --isOnline is only being checked from the game page, need to check where socket.connect and disconnect are called and move them somewhere that reacts to user logging in
 
---link forget/reset/change password buttons to their api (add for each their own page)
+<!-- --link forget/reset/change password buttons to their api (add for each their own page) -->
 
 --need handling errors from apis
 
 <!-- --add customizations to the game -->
 
 --check why the image (pfp) is changing
---remove the underline under change password/username and add hover effect so it changes color when the cursor touches the buttons (same for friend list)
+<!-- --remove the underline under change password/username and add hover effect so it changes color when the cursor touches the buttons (same for friend list) -->
 
---add usernames in gameplay
+<!-- --add usernames in gameplay -->
 
 <!-- --when logged in with google, make sure the "change password" is inactive (it's handled in backend so it returns an error if they try to change pass for google, u can check it in swagger) -->
 <!-- --link update username -->
