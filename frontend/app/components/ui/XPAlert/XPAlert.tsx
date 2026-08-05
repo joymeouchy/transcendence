@@ -37,7 +37,10 @@ export default function XPAlert({
 					{message}
 				</div>
 
-				<div className={styles.actions}>
+				<div
+					className={`${styles.actions} ${!showCancel ? styles.center : ""
+						}`}
+				>
 					<button
 						className={styles.button}
 						onClick={handleConfirm}

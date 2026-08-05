@@ -162,6 +162,7 @@ export default function RegisterPage() {
 				onClose={() =>
 					setAlertMessage(null)
 				}
+
 			/>
 		</AuthLayout>
 	);
