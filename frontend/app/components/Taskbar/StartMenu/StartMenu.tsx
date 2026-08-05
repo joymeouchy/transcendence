@@ -9,6 +9,7 @@ import { tokenStorage } from "@/lib/token";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { playSound, sounds } from "@/lib/sounds";
 
 import XPAlert from "../../ui/XPAlert/XPAlert";
 
@@ -56,6 +57,7 @@ export default function StartMenu({
   };
 
   const confirmSignOut = () => {
+    playSound(sounds.shutdown);
     tokenStorage.remove();
     router.push("/login");
   };
