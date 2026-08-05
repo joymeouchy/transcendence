@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 
 import FriendsPageTemplate from "../components/Friends/FriendsPageTemplate/FriendsPageTemplate";
 
-import { UserService } from "@/services/user.services";
 import { FriendshipService } from "@/services/friendships.service";
 
 import {
@@ -13,37 +12,37 @@ import {
 	PendingRequest,
 } from "@/services/friendships.service";
 
+import { useAuth } from "@/context/AuthContext";
+
 export default function FriendsPage() {
 	const router = useRouter();
 
-	const [userId, setUserId] = useState<number | null>(null);
+	const { user } = useAuth();
 
 	const [friends, setFriends] = useState<Friend[]>([]);
 	const [requests, setRequests] = useState<PendingRequest[]>([]);
-
 	const [loading, setLoading] = useState(true);
 
-
 	useEffect(() => {
+		if (!user) return;
+
+		const userId = user.id;
+
 		async function loadPage() {
 			try {
-				const user = await UserService.getMe();
-
-				setUserId(user.id);
-
-				const [
-					friendsData,
-					requestsData,
-				] = await Promise.all([
-					FriendshipService.getFriends(user.id),
-					FriendshipService.getPendingRequests(user.id),
-				]);
+				const [friendsData, requestsData] =
+					await Promise.all([
+						FriendshipService.getFriends(userId),
+						FriendshipService.getPendingRequests(
+							userId
+						),
+					]);
 
 				setFriends(friendsData);
 				setRequests(requestsData);
 			} catch (error) {
 				console.error(
-					"Failed to load friends:",
+					"Failed to load friends page:",
 					error
 				);
 			} finally {
@@ -52,19 +51,21 @@ export default function FriendsPage() {
 		}
 
 		loadPage();
-	}, []);
+	}, [user]);
 
 
 	async function refreshFriends() {
-		if (userId === null) return;
+		if (!user) return;
 
 		try {
 			const [
 				friendsData,
 				requestsData,
 			] = await Promise.all([
-				FriendshipService.getFriends(userId),
-				FriendshipService.getPendingRequests(userId),
+				FriendshipService.getFriends(user.id),
+				FriendshipService.getPendingRequests(
+					user.id
+				),
 			]);
 
 			setFriends(friendsData);
@@ -98,8 +99,7 @@ export default function FriendsPage() {
 
 			setRequests((prev) =>
 				prev.filter(
-					(request) =>
-						request.id !== id
+					(request) => request.id !== id
 				)
 			);
 		} catch (error) {
@@ -137,11 +137,11 @@ export default function FriendsPage() {
 	async function handleAddFriend(
 		receiverId: number
 	) {
-		if (userId === null) return;
+		if (!user) return;
 
 		try {
 			await FriendshipService.sendRequest(
-				userId,
+				user.id,
 				receiverId
 			);
 
