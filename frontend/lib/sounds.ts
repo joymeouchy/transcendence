@@ -12,5 +12,5 @@ export const sounds = {
   notif: "/frontend/public/sounds/Windows Information Bar.wav",
   leftpaddlehit: "/sounds/retro-bit-hit-sfx.wav",
   rightpaddlehit: "/sounds/retro-pong-hit-sfx.wav",
-  score: "frontend/public/sounds/retro-buzzer-hit-sfx.wav",
+  score: "/sounds/retro-buzzer-hit-sfx.wav",
 }
