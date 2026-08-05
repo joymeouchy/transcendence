@@ -24,6 +24,8 @@ export default function RegisterPage() {
 		confirmPassword: "",
 	});
 
+	const [loading, setLoading] = useState(false);
+
 	const [alertMessage, setAlertMessage] =
 		useState<string | null>(null);
 
@@ -41,71 +43,46 @@ export default function RegisterPage() {
 	) => {
 		e.preventDefault();
 
-		if (
-			formData.password !==
-			formData.confirmPassword
-		) {
-			setAlertTitle(
-				"Password Error"
-			);
-
-			setAlertMessage(
-				"Passwords do not match"
-			);
-
+		if (formData.password !== formData.confirmPassword) {
+			setAlertTitle("Password Error");
+			setAlertMessage("Passwords do not match");
 			return;
 		}
 
 		try {
-			const response =
-				await authService.register({
-					username: formData.username,
-					email: formData.email,
-					password: formData.password,
-				});
+			setLoading(true);
 
-			console.log(
-				"Register success:",
-				response
-			);
+			const response = await authService.register({
+				username: formData.username,
+				email: formData.email,
+				password: formData.password,
+			});
 
-			setAlertTitle(
-				"Success"
-			);
+			console.log("Register success:", response);
 
-			setAlertMessage(
-				"Registration successful"
-			);
+			setAlertTitle("Success");
+			setAlertMessage("Registration successful");
 
 			setTimeout(() => {
 				router.replace("/home");
 			}, 1000);
 
 		} catch (err) {
-			console.error(
-				"Register error:",
-				err
-			);
+			console.error("Register error:", err);
 
 			if (axios.isAxiosError(err)) {
-				setAlertTitle(
-					"Registration Failed"
-				);
-
+				setAlertTitle("Registration Failed");
 				setAlertMessage(
 					err.response?.data?.error ||
 					err.response?.data?.message ||
 					"Registration failed"
 				);
 			} else {
-				setAlertTitle(
-					"Registration Failed"
-				);
-
-				setAlertMessage(
-					"Something went wrong"
-				);
+				setAlertTitle("Registration Failed");
+				setAlertMessage("Something went wrong");
 			}
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -134,7 +111,7 @@ export default function RegisterPage() {
 								placeholder={field.placeholder}
 								value={
 									formData[
-										field.key as keyof typeof formData
+									field.key as keyof typeof formData
 									]
 								}
 								onChange={(e) =>
@@ -154,14 +131,19 @@ export default function RegisterPage() {
 					<button
 						type="submit"
 						className="xp-submit"
+						disabled={loading}
 					>
-						Register
+						{loading ? "Registering..." : "Register"}
 					</button>
+
 				</form>
 
 				<Link
-					href="/login"
-					className="xp-link"
+					href={loading ? "#" : "/login"}
+					className={`xp-link ${loading ? "disabled" : ""}`}
+					onClick={(e) => {
+						if (loading) e.preventDefault();
+					}}
 				>
 					Already a user? Login
 				</Link>

@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pong",
-  description: "Created by Rawan and Joy",
+  title: "Pong XP",
+  description: "Created by Rawan Dennaoui",
 };
 
 
