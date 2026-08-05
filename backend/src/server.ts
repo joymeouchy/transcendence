@@ -120,6 +120,20 @@ io.use(async (socket, next) => {
   next();
 });
 
+// socket.data.avatarUrl is only set once, when the socket connects, so a
+// player who uploads a new avatar mid-session (without reconnecting) would
+// otherwise keep showing the old one in-game. Look it up fresh instead.
+async function getCurrentAvatarUrl(userId: number): Promise<string | null> {
+  const user = await prisma.user
+    .findUnique({ where: { id: userId }, select: { avatarUrl: true } })
+    .catch((err) => {
+      console.error("Failed to fetch current avatar:", err);
+      return null;
+    });
+
+  return user?.avatarUrl ?? null;
+}
+
 io.on("connection", (socket) => {
   const userId = socket.data.userId as number;
   console.log("Client connected:", socket.id, "userId:", userId);
@@ -141,7 +155,7 @@ io.on("connection", (socket) => {
     }
   }
 
-  socket.on("join_queue", () => {
+  socket.on("join_queue", async () => {
     console.log(socket.id, "wants to play");
 
     if (waitingPlayer === null) {
@@ -164,29 +178,41 @@ io.on("connection", (socket) => {
       }
 
       const room = `match-${matchId++}`;
+      const matchedWaitingPlayer = waitingPlayer;
+      const matchedSocket = socket;
+
+      // reset the queue before the avatar lookup below awaits, otherwise a
+      // join_queue firing in the meantime could match against this player again
+      waitingPlayer = null;
 
       // join both players
-      socket.join(room);
-      waitingPlayer.join(room);
+      matchedSocket.join(room);
+      matchedWaitingPlayer.join(room);
 
       console.log("Match created:", room);
+
+      const [leftAvatar, rightAvatar] = await Promise.all([
+        waitingUserId
+          ? getCurrentAvatarUrl(waitingUserId)
+          : matchedWaitingPlayer.data.avatarUrl,
+        joiningUserId
+          ? getCurrentAvatarUrl(joiningUserId)
+          : matchedSocket.data.avatarUrl,
+      ]);
 
       // notify both players
       io.to(room).emit("match_found", {
         room,
-        players: [waitingPlayer.data.username, socket.data.username],
+        players: [matchedWaitingPlayer.data.username, matchedSocket.data.username],
         avatars: {
-          left: waitingPlayer.data.avatarUrl,
-          right: socket.data.avatarUrl,
+          left: leftAvatar,
+          right: rightAvatar,
         },
       });
 
       // start game loop
-      startGame(io, room, waitingPlayer.id, socket.id, socketToUser);
+      startGame(io, room, matchedWaitingPlayer.id, matchedSocket.id, socketToUser);
       console.log("Game started in room:", room);
-
-      // reset queue
-      waitingPlayer = null;
     }
   });
   // handle paddle movement
@@ -197,7 +223,7 @@ io.on("connection", (socket) => {
     },
   );
 
-  socket.on("request_rematch", (data: { room: string } | undefined) => {
+  socket.on("request_rematch", async (data: { room: string } | undefined) => {
     if (!data?.room) {
       console.warn("request_rematch received without room:", data);
       return;
@@ -232,12 +258,20 @@ io.on("connection", (socket) => {
         p1Socket.join(newRoom);
         p2Socket.join(newRoom);
 
+        const p1UserId = socketToUser.get(p1Socket.id);
+        const p2UserId = socketToUser.get(p2Socket.id);
+
+        const [leftAvatar, rightAvatar] = await Promise.all([
+          p1UserId ? getCurrentAvatarUrl(p1UserId) : p1Socket.data.avatarUrl,
+          p2UserId ? getCurrentAvatarUrl(p2UserId) : p2Socket.data.avatarUrl,
+        ]);
+
         io.to(newRoom).emit("match_found", {
           room: newRoom,
           players: [p1Socket.data.username, p2Socket.data.username],
           avatars: {
-            left: p1Socket.data.avatarUrl,
-            right: p2Socket.data.avatarUrl,
+            left: leftAvatar,
+            right: rightAvatar,
           },
         });
 
