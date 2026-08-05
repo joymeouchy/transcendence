@@ -89,24 +89,25 @@ io.use(async (socket, next) => {
     return next(new Error("No token provided"));
   }
 
+  let decoded: { userId: number; username: string };
+
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as {
+    decoded = jwt.verify(token, JWT_SECRET) as {
       userId: number;
       username: string;
     };
-
-    socket.data.userId = decoded.userId;
-    socket.data.username = decoded.username;
-    // it will be fetched from the database next
-    socket.data.avatarUrl = null;
-    next();
   } catch (err) {
     return next(new Error("Invalid or expired token"));
   }
 
+  socket.data.userId = decoded.userId;
+  socket.data.username = decoded.username;
+
+  // fetched before next() so match_found emissions can rely on it being
+  // populated as soon as the connection is established
   const user = await prisma.user
     .findUnique({
-      where: { id: socket.data.userId },
+      where: { id: decoded.userId },
       select: { avatarUrl: true },
     })
     .catch((err) => {
@@ -115,6 +116,8 @@ io.use(async (socket, next) => {
     });
 
   socket.data.avatarUrl = user?.avatarUrl ?? null;
+
+  next();
 });
 
 io.on("connection", (socket) => {
