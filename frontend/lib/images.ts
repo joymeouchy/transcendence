@@ -1,5 +1,3 @@
-import { achievementsItem, privacyPolicyItem, termsOfServicesItem } from "@/app/data/navigationItems/navigationItemsFields";
-
 export const images = {
 
 	user: "/user.png",
@@ -26,10 +24,4 @@ export const images = {
 	messaging: "/msn.png",
 
 	friendships: "/friendships.ico",
-	// profile: "/profile.png",
-	// settings: "/settings.png",
-
-	// computer: "/computer.png",
-	// internet: "/internet.png",
-	// recycleBin: "/bin.png",
 };
