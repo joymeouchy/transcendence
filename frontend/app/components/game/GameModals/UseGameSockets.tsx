@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 
 import { MatchmakingStatus } from "./MatchMakingModal/MatchmakingModal";
 import { GameStateSend } from "@/types/game_types";
+import { images } from "@/lib/images";
 
 type ModalState =
 	| "select"
@@ -38,16 +39,14 @@ export default function useGameSocket() {
 	const [scoreRight, setScoreRight] =
 		useState(0);
 
-	// const [currentUser, setCurrentUser] =
-	// 	useState("");
 	const [playerSide, setPlayerSide] =
 		useState<"left" | "right">("left");
 
 	const [playerAvatar, setPlayerAvatar] =
-		useState("/defaultIcon.png");
+		useState(images.defaultUserIcon);
 
 	const [opponentAvatar, setOpponentAvatar] =
-		useState("/defaultIcon.png");
+		useState(images.defaultUserIcon);
 
 
 	const [room, setRoom] = useState("");
@@ -96,14 +95,14 @@ export default function useGameSocket() {
 				setPlayerSide("left");
 				setOpponentName(rightPlayer);
 
-				setPlayerAvatar(data.avatars.left ?? "/defaultIcon.png");
-				setOpponentAvatar(data.avatars.right ?? "/defaultIcon.png");
+				setPlayerAvatar(data.avatars.left ?? images.defaultUserIcon);
+				setOpponentAvatar(data.avatars.right ?? images.defaultUserIcon);
 			} else {
 				setPlayerSide("right");
 				setOpponentName(leftPlayer);
 
-				setPlayerAvatar(data.avatars.right ?? "/defaultIcon.png");
-				setOpponentAvatar(data.avatars.left ?? "/defaultIcon.png");
+				setPlayerAvatar(data.avatars.right ?? images.defaultUserIcon);
+				setOpponentAvatar(data.avatars.left ?? images.defaultUserIcon);
 			}
 
 			setMatchmakingStatus("found");

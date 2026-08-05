@@ -119,13 +119,7 @@ export default function LoginPage() {
               />
             </div>
           ))}
-          
-          <Link
-            href="/forgot-password"
-            className="xp-link"
-          >
-            Forgot password?
-          </Link>
+
 
           <button
             type="submit"
@@ -150,6 +144,13 @@ export default function LoginPage() {
               : "Log In with Google instead"}
           </button>
         </form>
+
+        <Link
+          href="/forgot-password"
+          className="xp-link"
+        >
+          Forgot password?
+        </Link>
 
         <Link
           href="/register"

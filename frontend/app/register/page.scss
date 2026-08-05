@@ -128,3 +128,14 @@
 .login-link:hover {
   text-decoration: underline;
 }
+
+.xp-submit:disabled {
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.xp-link.disabled {
+	pointer-events: none;
+	opacity: 0.6;
+	cursor: not-allowed;
+}

@@ -27,36 +27,57 @@
 
 	.game-container {
 		flex-direction: column;
-		gap: 12px;
+		gap: 0;
 	}
 
-
 	.player-info {
-		position: static;
-
+		position: absolute;
 		transform: none;
 
+		display: flex;
 		flex-direction: row;
+		align-items: center;
+
+		gap: 8px;
 
 		width: auto;
 
-		gap: 12px;
+		img {
+			width: 50px;
+			height: 50px;
+		}
+
+		span {
+			max-width: 100px;
+			white-space: nowrap;
+		}
+
+		.active-power-up {
+			position: static;
+			font-size: 12px;
+			min-height: unset;
+			margin: 0;
+		}
 	}
 
 
-	.player-info.left,
+	.player-info.left {
+		top: -40px;
+		left: 0;
+	}
+
+
 	.player-info.right {
-		left: auto;
-		right: auto;
-	}
+		bottom: -90px;
+		right: 0;
 
+		flex-direction: row-reverse;
 
-	.player-info .active-power-up {
-		position: absolute;
-		top: 90px;
+		.active-power-up {
+			text-align: right;
+		}
 	}
 }
-
 
 .scoreboard {
   width: min(90vw, 900px);
