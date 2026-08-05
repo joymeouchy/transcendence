@@ -36,6 +36,7 @@ the server tell two tabs of the same account apart from two different accounts.
 
 **GAMEPLAY**
 | `game_state` | `{ ball, paddles, scores, players, countdownEndsAt: number or null, pendingPowerUp: PendingPowerUp or null, activeEffects: { left, right }, dynamicConfig: { paddleHeights: { left, right }, ballSize } }` | Game state update (60fps). `countdownEndsAt` is set for the ~3s pre-match countdown (ball is held until it passes); `activeEffects[side]` is `{ type: PowerUpType, expiresAt } or null`; `dynamicConfig` reflects live paddle heights / ball size while a power-up effect is active |
+| `paddle_hit` | `{ side: "left" or "right" }` | Ball just bounced off the named side's paddle (used for sound effects) |
 
 **POWER-UPS**
 | `power_up_incoming` | `PendingPowerUp` = `{ type: PowerUpType, side: "left" or "right", applyAt: number }` | A power-up has been chosen and will self-activate at `applyAt` (~2s warning, no need to touch anything to trigger it) |
