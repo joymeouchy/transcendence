@@ -2,23 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+
+import { FriendshipService } from "@/services/friendships.service";
+import { Friend, PendingRequest, } from "@/services/friendships.service";
 
 import FriendsPageTemplate from "../components/Friends/FriendsPageTemplate/FriendsPageTemplate";
 
-import { FriendshipService } from "@/services/friendships.service";
-
-import {
-	Friend,
-	PendingRequest,
-} from "@/services/friendships.service";
-
-import { useAuth } from "@/context/AuthContext";
-
 export default function FriendsPage() {
 	const router = useRouter();
-
 	const { user } = useAuth();
-
 	const [friends, setFriends] = useState<Friend[]>([]);
 	const [requests, setRequests] = useState<PendingRequest[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -53,7 +46,6 @@ export default function FriendsPage() {
 		loadPage();
 	}, [user]);
 
-
 	async function refreshFriends() {
 		if (!user) return;
 
@@ -78,7 +70,6 @@ export default function FriendsPage() {
 		}
 	}
 
-
 	async function handleAccept(id: number) {
 		try {
 			await FriendshipService.acceptRequest(id);
@@ -91,7 +82,6 @@ export default function FriendsPage() {
 			);
 		}
 	}
-
 
 	async function handleReject(id: number) {
 		try {
@@ -109,7 +99,6 @@ export default function FriendsPage() {
 			);
 		}
 	}
-
 
 	async function handleRemoveFriend(
 		friendshipId: number
@@ -133,7 +122,6 @@ export default function FriendsPage() {
 		}
 	}
 
-
 	async function handleAddFriend(
 		receiverId: number
 	) {
@@ -153,7 +141,6 @@ export default function FriendsPage() {
 			);
 		}
 	}
-
 
 	return (
 		<FriendsPageTemplate

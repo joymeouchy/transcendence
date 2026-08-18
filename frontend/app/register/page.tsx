@@ -1,18 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import axios from "axios";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.services";
 import { isAuthenticated } from "@/lib/auth";
+import { registerFields } from "../data/auth/registerFields";
 
 import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
 import XPAlert from "../components/ui/XPAlert/XPAlert";
-
-import { registerFields } from "../data/auth/registerFields";
 
 export default function RegisterPage() {
 	const router = useRouter();
@@ -59,10 +58,8 @@ export default function RegisterPage() {
 			});
 
 			console.log("Register success:", response);
-
 			setAlertTitle("Success");
 			setAlertMessage("Registration successful");
-
 			setTimeout(() => {
 				router.replace("/home");
 			}, 1000);
@@ -105,7 +102,6 @@ export default function RegisterPage() {
 							<label className="xp-label">
 								{field.label}
 							</label>
-
 							<input
 								type={field.type}
 								placeholder={field.placeholder}
@@ -127,7 +123,6 @@ export default function RegisterPage() {
 							/>
 						</div>
 					))}
-
 					<button
 						type="submit"
 						className="xp-submit"
@@ -135,9 +130,7 @@ export default function RegisterPage() {
 					>
 						{loading ? "Registering..." : "Register"}
 					</button>
-
 				</form>
-
 				<Link
 					href={loading ? "#" : "/login"}
 					className={`xp-link ${loading ? "disabled" : ""}`}
@@ -148,7 +141,6 @@ export default function RegisterPage() {
 					Already a user? Login
 				</Link>
 			</AuthPanel>
-
 			<XPAlert
 				isOpen={
 					alertMessage !== null
@@ -162,7 +154,6 @@ export default function RegisterPage() {
 				onClose={() =>
 					setAlertMessage(null)
 				}
-
 			/>
 		</AuthLayout>
 	);

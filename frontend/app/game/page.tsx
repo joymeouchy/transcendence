@@ -2,21 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { CustomizationTheme, customizationService, } from "@/services/Customization.services";
 
 import GameCanvas from "../components/game/GameCanvas";
 import GameModals from "../components/game/GameModals/GameModals";
-
 import useGameSocket from "../components/game/GameModals/UseGameSockets";
 import PlayerInfo from "../components/game/playerInfo/playerInfo";
-import { images } from "@/lib/images";
 
 import "./page.scss";
-
-import {
-	CustomizationTheme,
-	customizationService,
-} from "@/services/Customization.services";
-
 
 export default function GamePage() {
 
@@ -59,12 +52,9 @@ export default function GamePage() {
 
 	}, []);
 
-
-
 	const handleCustomize = () => {
 		game.setModalState("customization");
 	};
-
 
 	const handleSaveTheme = (
 		newTheme: CustomizationTheme

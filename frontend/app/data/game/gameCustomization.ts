@@ -1,5 +1,3 @@
-// app/data/gameCustomization.ts
-
 export const gameThemes = {
 	classic: {
 		leftPaddle: "/pong_bluepaddle.png",
