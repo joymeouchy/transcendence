@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { Friend } from "@/types/types.dto";
 
-import styles from "./FriendsPageTemplate/FriendsPageTemplate.module.scss"
+import styles from "./FriendListPanel.module.scss"
 
 interface Props {
 	friends: Friend[];
@@ -57,29 +57,21 @@ export default function FriendsListPanel({
 						>
 							<div className={styles.user}>
 								<span
-									className={`${styles.dot} ${
-										friend.isOnline
+									className={`${styles.dot} ${friend.isOnline
 											? styles.online
 											: styles.offline
-									}`}
+										}`}
 								/>
 
 								{friend.username}
 							</div>
 
 							<button
-								disabled={
-									removingFriendId ===
-									friend.friendshipId
-								}
-								onClick={() =>
-									handleRemoveFriend(
-										friend.friendshipId
-									)
-								}
+								className={styles.friendButton}
+								disabled={removingFriendId === friend.friendshipId}
+								onClick={() => handleRemoveFriend(friend.friendshipId)}
 							>
-								{removingFriendId ===
-								friend.friendshipId
+								{removingFriendId === friend.friendshipId
 									? "Removing..."
 									: "Remove"}
 							</button>

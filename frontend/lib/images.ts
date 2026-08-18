@@ -15,7 +15,7 @@ export const images = {
 
 	achievements: "/star.ico",
 
-	termsOfServices: "/termsofservices.ico",
+	termsOfService: "/termsofservices.ico",
 
 	privacyPolicy: "/privacypolicy.ico",
 
