@@ -1,5 +1,5 @@
 .page {
-	width: 550px;
+	width: 600px;
 
 	display: flex;
 	gap: 10px;
@@ -7,254 +7,21 @@
 	align-items: stretch;
 }
 
-
 .leftColumn {
-	width: 200px;
+	width: 240px;
 
 	display: flex;
 	flex-direction: column;
-
 	gap: 10px;
 
-	height: 260px; // controls the total height
+	height: 260px;
 }
-
 
 .friendsPanel {
 	flex: 1;
-
 	height: 260px;
 
 	display: flex;
-}
-
-
-.panel {
-	flex: 1;
-
-	border: 1px solid #7f9db9;
-
-	background: #ece9d8;
-
-	box-shadow:
-		inset 1px 1px 0 #ffffff,
-		inset -1px -1px 0 #c0c0c0;
-
-	display: flex;
-	flex-direction: column;
-}
-
-
-.list {
-	flex: 1;
-
-	background: white;
-
-	border: 1px solid #7f9db9;
-
-	overflow-y: auto;
-}
-/* RIGHT SIDE */
-.friendsPanel {
-	flex: 1;
-
-	display: flex;
-}
-
-
-.panel {
-	flex: 1;
-
-	border: 1px solid #7f9db9;
-
-	background: #ece9d8;
-
-	box-shadow:
-		inset 1px 1px 0 #ffffff,
-		inset -1px -1px 0 #c0c0c0;
-
-	display: flex;
-	flex-direction: column;
-
-	color: #000;
-}
-
-
-.title {
-	padding: 4px 8px;
-
-	font-size: 12px;
-	font-weight: bold;
-
-	color: white;
-
-	background: linear-gradient(
-		to bottom,
-		#3d95ff,
-		#1e6fd9
-	);
-}
-
-
-/* ADD FRIEND */
-/* ADD FRIEND */
-.addFriend {
-	position: relative;
-}
-
-
-.searchBox {
-	display: flex;
-
-	gap: 4px;
-
-	input {
-		flex: 1;
-
-		height: 22px;
-
-		font-size: 12px;
-
-		padding: 2px 5px;
-
-		border: 1px solid #7f9db9;
-	}
-
-	button {
-		height: 22px;
-
-		padding: 2px 8px;
-
-		font-size: 12px;
-
-		background: #d4d0c8;
-
-		border: 1px solid #7f9db9;
-
-		cursor: pointer;
-	}
-}
-
-
-.searchResults {
-	position: absolute;
-
-	top: 28px;
-	left: 0;
-
-	width: 100%;
-
-	background: white;
-
-	border: 1px solid #7f9db9;
-
-	z-index: 20;
-}
-
-
-.searchItem {
-	display: flex;
-
-	align-items: center;
-
-	gap: 8px;
-
-	padding: 5px 8px;
-
-	font-size: 12px;
-
-	cursor: pointer;
-
-	color: black;
-
-
-	&:hover {
-		background: #316ac5;
-		color: white;
-	}
-}
-
-/* LIST */
-.list {
-	flex: 1;
-
-	background: white;
-
-	border: 1px solid #7f9db9;
-
-	overflow-y: auto;
-}
-
-
-.friend {
-	padding: 6px 8px;
-
-	display: flex;
-
-	justify-content: space-between;
-
-	align-items: center;
-
-	font-size: 12px;
-
-	color: black;
-
-	border-bottom: 1px solid #eee;
-}
-
-
-.user {
-	display: flex;
-
-	align-items: center;
-
-	gap: 6px;
-}
-
-
-.dot {
-	width: 8px;
-	height: 8px;
-
-	border-radius: 50%;
-}
-
-
-.online {
-	background: #00c853;
-}
-
-
-.offline {
-	background: #9e9e9e;
-}
-
-
-.actions {
-	display: flex;
-
-	gap: 4px;
-
-	button {
-		font-size: 11px;
-
-		padding: 3px 6px;
-
-		background: #d4d0c8;
-
-		border: 1px solid #7f9db9;
-
-		cursor: pointer;
-	}
-}
-
-
-.empty {
-	padding: 10px;
-
-	text-align: center;
-
-	color: black;
 }
 
 @media (max-width: 700px) {
@@ -265,12 +32,10 @@
 		max-width: 100%;
 	}
 
-
 	.leftColumn {
 		width: 100%;
 		height: auto;
 	}
-
 
 	.friendsPanel {
 		width: 100%;
@@ -278,43 +43,13 @@
 	}
 }
 
-
 @media (max-width: 450px) {
 	.page {
 		gap: 8px;
 	}
 
-
 	.leftColumn,
 	.friendsPanel {
 		height: 230px;
-	}
-
-
-	.searchBox {
-		flex-direction: column;
-
-
-		button {
-			width: 100%;
-		}
-	}
-
-
-	.friend {
-		flex-direction: column;
-
-		align-items: flex-start;
-
-		gap: 6px;
-	}
-
-
-	.actions {
-		width: 100%;
-
-		button {
-			flex: 1;
-		}
 	}
 }

@@ -1,22 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-
 import ProfilePageTemplate from "@/app/components/Profile/ProfilePageTemplate/ProfilePageTemplate";
 
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { UserService } from "@/services/user.services";
-import {
-	Friend,
-	FriendshipService,
-} from "@/services/friendships.service";
-
+import { Friend, FriendshipService, } from "@/services/friendships.service";
 import { useAuth } from "@/context/AuthContext";
 import { UserProfile } from "@/types/types.dto";
 
 
 export default function UserProfilePage() {
 	const params = useParams();
+	
 	const router = useRouter();
 
 	const { user: currentUser } = useAuth();
@@ -39,12 +35,10 @@ export default function UserProfilePage() {
 	const [loadingFriends, setLoadingFriends] =
 		useState(true);
 
-
 	useEffect(() => {
 		async function loadProfile() {
 			try {
 				const id = Number(params.id);
-
 				const [
 					profile,
 					profileFriends,
@@ -52,13 +46,8 @@ export default function UserProfilePage() {
 					UserService.getById(id),
 					FriendshipService.getFriends(id),
 				]);
-
-
 				setUser(profile);
 				setFriends(profileFriends);
-
-
-				// Check friendship status with current user
 				if (
 					currentUser &&
 					currentUser.id !== id
@@ -68,14 +57,11 @@ export default function UserProfilePage() {
 							currentUser.id
 						);
 
-
 					const friendship =
 						myFriends.find(
 							(friend) =>
 								friend.id === id
 						);
-
-
 					if (friendship) {
 						setIsFriend(true);
 						setFriendshipId(
@@ -83,7 +69,6 @@ export default function UserProfilePage() {
 						);
 					}
 				}
-
 			} catch (error) {
 				console.error(
 					"Failed to load profile:",
@@ -94,26 +79,20 @@ export default function UserProfilePage() {
 				setLoadingFriends(false);
 			}
 		}
-
-
 		if (params.id) {
 			loadProfile();
 		}
-
 	}, [params.id, currentUser]);
-
 
 	async function handleAddFriend() {
 		if (!currentUser || !user)
 			return;
-
 
 		try {
 			await FriendshipService.sendRequest(
 				currentUser.id,
 				user.id
 			);
-
 		} catch (error) {
 			console.error(
 				"Failed to add friend:",
@@ -122,27 +101,23 @@ export default function UserProfilePage() {
 		}
 	}
 
-
 	async function handleRemoveFriend() {
-	if (!friendshipId) return;
+		if (!friendshipId) return;
 
-	try {
-		await FriendshipService.rejectRequest(
-			friendshipId
-		);
+		try {
+			await FriendshipService.rejectRequest(
+				friendshipId
+			);
+			setIsFriend(false);
+			setFriendshipId(null);
 
-		setIsFriend(false);
-		setFriendshipId(null);
-
-	} catch (error) {
-		console.error(
-			"Failed to remove friend:",
-			error
-		);
+		} catch (error) {
+			console.error(
+				"Failed to remove friend:",
+				error
+			);
+		}
 	}
-}
-
-
 	if (loading) {
 		return (
 			<ProfilePageTemplate
@@ -151,12 +126,8 @@ export default function UserProfilePage() {
 			/>
 		);
 	}
-
-
 	const isOwnProfile =
 		currentUser?.id === user?.id;
-
-
 	return (
 		<ProfilePageTemplate
 			user={user ?? undefined}

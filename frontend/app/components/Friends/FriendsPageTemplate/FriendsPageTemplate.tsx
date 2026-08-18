@@ -3,9 +3,9 @@
 import DesktopLayout from "../../DesktopLayout/DesktopLayout";
 import XPWindow from "../../ui/XPWindow/XPWindow";
 
-import AddFriendPanel from "../AddFriendsPanel";
-import FriendRequestsPanel from "../FriendRequestPanel";
-import FriendsListPanel from "../FriendListPanel";
+import AddFriendPanel from "../AddFriendsPanel/AddFriendsPanel";
+import FriendRequestsPanel from "../FriendRequestPanel/FriendRequestPanel";
+import FriendsListPanel from "../FriendListPanel/FriendListPanel";
 
 import { FriendRequest, Friend } from "@/types/types.dto";
 

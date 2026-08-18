@@ -19,7 +19,6 @@ export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] =
     useState(false);
 
-
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
@@ -44,27 +43,20 @@ export default function ForgotPasswordPage() {
     }
   };
 
-
   return (
     <AuthLayout>
       <AuthPanel>
-
         <form
           onSubmit={handleSubmit}
           className="xp-form"
         >
-
           <h3 className="xp-title">
             Forgot Password
           </h3>
-
-
           <div className="xp-field">
-
             <label className="xp-label">
               Email
             </label>
-
             <input
               type="email"
               placeholder="Enter your email"
@@ -76,10 +68,7 @@ export default function ForgotPasswordPage() {
               required
               disabled={isLoading}
             />
-
           </div>
-
-
           <button
             type="submit"
             className="xp-submit"
@@ -89,21 +78,14 @@ export default function ForgotPasswordPage() {
               ? "Sending..."
               : "Send Reset Link"}
           </button>
-
-
         </form>
-
-
         <Link
           href="/login"
           className="xp-link"
         >
           Back to login
         </Link>
-
-
       </AuthPanel>
-
 
       <XPAlert
         isOpen={
@@ -116,8 +98,6 @@ export default function ForgotPasswordPage() {
           setAlertMessage(null)
         }
       />
-
-
     </AuthLayout>
   );
 }

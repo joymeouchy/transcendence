@@ -49,7 +49,7 @@ export const privacyPolicyItem = {
 };
 
 export const termsOfServicesItem = {
-  image: images.termsOfServices,
-  label: "Terms Of Services",
-  href: "/termsOfServices",
+  image: images.termsOfService,
+  label: "Terms Of Service",
+  href: "/termsOfService",
 };

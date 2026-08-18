@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { UserService, UserSearchResult } from "@/services/user.services";
 
-import styles from "./FriendsPageTemplate/FriendsPageTemplate.module.scss"
+import styles from "./AddFriendsPanel.module.scss"
 
 interface Props {
 	onAddFriend?: (receiverId: number) => Promise<void>;
@@ -71,7 +71,7 @@ export default function AddFriendPanel({
 					onClick={handleAddFriend}
 					disabled={!selectedUser || loadingMessage !== null}
 				>
-					{loadingMessage ? "Please wait..." : "Add"}
+					{loadingMessage ? "Please Wait..." : "Add"}
 				</button>
 			</div>
 

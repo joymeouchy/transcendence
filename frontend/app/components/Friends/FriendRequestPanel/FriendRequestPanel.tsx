@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import styles from "./FriendsPageTemplate/FriendsPageTemplate.module.scss";
+import styles from "./FriendRequestPanel.module.scss";
 
 import { FriendRequest } from "@/types/types.dto";
 
@@ -66,30 +66,26 @@ export default function FriendRequestsPanel({
 									{request.sender.username}
 								</span>
 
-								<div className={styles.actions}>
-									<button
-										onClick={() =>
-											handleAccept(request.id)
-										}
-										disabled={loadingId !== null}
-									>
-										{isLoading ? "Loading..." : "Accept"}
-									</button>
+								<button
+									className={styles.friendButton}
+									onClick={() => handleAccept(request.id)}
+									disabled={loadingId !== null}
+								>
+									{isLoading ? "Loading..." : "Accept"}
+								</button>
 
-									<button
-										onClick={() =>
-											handleReject(request.id)
-										}
-										disabled={loadingId !== null}
-									>
-										{isLoading ? "Loading..." : "Reject"}
-									</button>
-								</div>
+								<button
+									className={styles.friendButton}
+									onClick={() => handleReject(request.id)}
+									disabled={loadingId !== null}
+								>
+									{isLoading ? "Loading..." : "Reject"}
+								</button>
 							</div>
 						);
 					})
 				)}
 			</div>
-		</div>
+		</div >
 	);
 }

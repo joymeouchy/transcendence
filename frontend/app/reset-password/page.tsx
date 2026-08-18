@@ -13,9 +13,6 @@ import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
 import XPAlert from "../components/ui/XPAlert/XPAlert";
 
-// import "../login/page.scss";
-
-
 export default function ResetPasswordPage() {
 
   const router = useRouter();
@@ -25,7 +22,6 @@ export default function ResetPasswordPage() {
 
   const token =
     searchParams.get("token");
-
 
   const [password, setPassword] =
     useState("");
@@ -39,90 +35,60 @@ export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] =
     useState(false);
 
-
-
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
-
     e.preventDefault();
-
-
     if (!token) {
       setAlertMessage(
         "Invalid reset link"
       );
       return;
     }
-
-
     if (password !== confirmPassword) {
       setAlertMessage(
         "Passwords do not match"
       );
       return;
     }
-
-
     setIsLoading(true);
 
-
     try {
-
       const res =
         await authService.resetPassword(
           token,
           password
         );
-
-
       setAlertMessage(
         res.message
       );
-
-
       setTimeout(() => {
         router.push("/login");
       }, 1500);
-
-
     } catch (err: any) {
-
       setAlertMessage(
         err.response?.data?.error ||
         "Invalid or expired reset link"
       );
-
     } finally {
-
       setIsLoading(false);
-
     }
-
   };
-
 
   return (
     <AuthLayout>
-
       <AuthPanel>
-
         <form
           onSubmit={handleSubmit}
           className="xp-form"
         >
-
           <h3 className="xp-title">
             Reset Password
           </h3>
-
-
           <div className="xp-field">
-
             <label className="xp-label">
               New Password
             </label>
-
             <input
               type="password"
               placeholder="New password"
@@ -134,16 +100,11 @@ export default function ResetPasswordPage() {
               required
               disabled={isLoading}
             />
-
           </div>
-
-
           <div className="xp-field">
-
             <label className="xp-label">
               Confirm Password
             </label>
-
             <input
               type="password"
               placeholder="Confirm password"
@@ -157,10 +118,7 @@ export default function ResetPasswordPage() {
               required
               disabled={isLoading}
             />
-
           </div>
-
-
           <button
             type="submit"
             className="xp-submit"
@@ -170,34 +128,21 @@ export default function ResetPasswordPage() {
               ? "Resetting..."
               : "Reset Password"}
           </button>
-
-
         </form>
-
-
         <Link
           href="/login"
           className="xp-link"
         >
           Back to login
         </Link>
-
-
       </AuthPanel>
-
-
       <XPAlert
-        isOpen={
-          alertMessage !== null
-        }
-        message={
-          alertMessage ?? ""
-        }
+        isOpen={alertMessage !== null}
+        message={alertMessage ?? ""}
         onClose={() =>
           setAlertMessage(null)
         }
       />
-
     </AuthLayout>
   );
 }
