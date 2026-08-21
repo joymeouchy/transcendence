@@ -1,0 +1,53 @@
+.row {
+	display: flex;
+
+	width: 100%;
+
+	margin-bottom: 8px;
+}
+
+.mine {
+	justify-content: flex-end;
+}
+
+.theirs {
+	justify-content: flex-start;
+}
+
+.bubble {
+	max-width: 70%;
+
+	padding: 5px 8px;
+
+	border: 1px solid #9a9a9a;
+
+	background: #f1f1f1;
+
+	box-sizing: border-box;
+}
+
+.mine .bubble {
+	background: #dceeff;
+	border-color: #7f9db9;
+}
+
+.content {
+	font-size: 12px;
+	line-height: 16px;
+
+	color: #000;
+
+	overflow-wrap: break-word;
+	word-break: break-word;
+}
+
+.time {
+	margin-top: 3px;
+
+	font-size: 9px;
+	line-height: 10px;
+
+	color: #777;
+
+	text-align: right;
+}

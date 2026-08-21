@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { Friend } from "@/types/types.dto";
 
-import styles from "./FriendListPanel.module.scss"
+import styles from "./FriendListPanel.module.scss";
 
 interface Props {
 	friends: Friend[];
@@ -12,11 +12,19 @@ interface Props {
 	onRemoveFriend?: (
 		friendshipId: number
 	) => Promise<void>;
+
+	onSelectFriend?: (
+		friend: Friend
+	) => void;
+
+	selectedFriendId?: number;
 }
 
 export default function FriendsListPanel({
 	friends,
 	onRemoveFriend,
+	onSelectFriend,
+	selectedFriendId,
 }: Props) {
 	const [removingFriendId, setRemovingFriendId] =
 		useState<number | null>(null);
@@ -53,28 +61,48 @@ export default function FriendsListPanel({
 					friends.map((friend) => (
 						<div
 							key={friend.friendshipId}
-							className={styles.friend}
+							className={`${styles.friend} ${
+								selectedFriendId === friend.id
+									? styles.selected
+									: ""
+							}`}
+							onClick={() =>
+								onSelectFriend?.(friend)
+							}
 						>
 							<div className={styles.user}>
 								<span
-									className={`${styles.dot} ${friend.isOnline
+									className={`${styles.dot} ${
+										friend.isOnline
 											? styles.online
 											: styles.offline
-										}`}
+									}`}
 								/>
 
 								{friend.username}
 							</div>
 
-							<button
-								className={styles.friendButton}
-								disabled={removingFriendId === friend.friendshipId}
-								onClick={() => handleRemoveFriend(friend.friendshipId)}
-							>
-								{removingFriendId === friend.friendshipId
-									? "Removing..."
-									: "Remove"}
-							</button>
+							{onRemoveFriend && (
+								<button
+									className={styles.friendButton}
+									disabled={
+										removingFriendId ===
+										friend.friendshipId
+									}
+									onClick={(e) => {
+										e.stopPropagation();
+
+										handleRemoveFriend(
+											friend.friendshipId
+										);
+									}}
+								>
+									{removingFriendId ===
+									friend.friendshipId
+										? "Removing..."
+										: "Remove"}
+								</button>
+							)}
 						</div>
 					))
 				)}

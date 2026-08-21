@@ -1,0 +1,87 @@
+.input {
+	display: flex;
+	align-items: flex-end;
+	gap: 6px;
+
+	padding: 7px;
+
+	background: #ece9d8;
+	border-top: 1px solid #808080;
+}
+
+.input textarea {
+	flex: 1;
+
+	min-height: 22px;
+	max-height: 100px;
+
+	padding: 3px 5px;
+
+	resize: none;
+	overflow-y: auto;
+
+	border: 1px solid #7f9db9;
+	outline: none;
+
+	background: #ffffff;
+
+	font-family: inherit;
+	font-size: 12px;
+	line-height: 16px;
+
+	box-sizing: border-box;
+}
+
+.input textarea:focus {
+	border-color: #316ac5;
+}
+
+.input textarea::placeholder {
+	color: #808080;
+}
+
+.input button {
+	align-self: flex-end;
+
+	min-width: 55px;
+	height: 22px;
+
+	padding: 2px 10px;
+
+	border: 1px solid #003c74;
+
+	background: linear-gradient(
+		to bottom,
+		#ffffff 0%,
+		#ece9d8 45%,
+		#d4d0c8 100%
+	);
+
+	color: #000;
+
+	font-family: inherit;
+	font-size: 11px;
+
+	cursor: pointer;
+}
+
+.input button:hover:not(:disabled) {
+	background: linear-gradient(
+		to bottom,
+		#ffffff 0%,
+		#e5e5e5 45%,
+		#d4d0c8 100%
+	);
+}
+
+.input button:active:not(:disabled) {
+	padding-top: 3px;
+	padding-bottom: 1px;
+}
+
+.input button:disabled {
+	color: #808080;
+	border-color: #a0a0a0;
+
+	cursor: default;
+}

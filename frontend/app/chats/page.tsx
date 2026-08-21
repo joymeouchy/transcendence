@@ -1,29 +1,61 @@
 "use client";
 
-import DesktopLayout from "../components/DesktopLayout/DesktopLayout";
-import XPWindow from "../components/ui/XPWindow/XPWindow";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
-import { UserProfile } from "@/types/types.dto";
+import {
+	Friend,
+	FriendshipService,
+} from "@/services/friendships.service";
 
-import "./page.module.scss";
+import ChatsPageTemplate from "../components/chat/ChatsPageTemplate/ChatsPageTemplate";
 
-interface ProfilePageTemplateProps {
-  user: UserProfile;
-  actions?: React.ReactNode;
-  onClose?: () => void;
-}
+export default function ChatsPage() {
+	const router = useRouter();
+	const { user } = useAuth();
 
-export default function chatsPage({
-  user,
-  actions,
-  onClose,
-}: ProfilePageTemplateProps) {
+	const [friends, setFriends] = useState<Friend[]>([]);
+	const [loading, setLoading] = useState(true);
 
-  return (
-    <DesktopLayout>
-      <XPWindow title="MSN" onClose={onClose}>
-        <div className="hi"></div>
-      </XPWindow>
-    </DesktopLayout>
-  );
+	useEffect(() => {
+		if (!user) return;
+
+		const userId = user.id;
+
+		async function loadFriends() {
+			try {
+				const friendsData =
+					await FriendshipService.getFriends(
+						userId
+					);
+
+				setFriends(friendsData);
+			} catch (error) {
+				console.error(
+					"Failed to load friends:",
+					error
+				);
+			} finally {
+				setLoading(false);
+			}
+		}
+
+		loadFriends();
+	}, [user]);
+
+	if (!user) {
+		return null;
+	}
+
+	return (
+		<ChatsPageTemplate
+			user={user}
+			friends={friends}
+			loading={loading}
+			onClose={() =>
+				router.push("/home")
+			}
+		/>
+	);
 }
