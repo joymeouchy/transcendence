@@ -1,0 +1,42 @@
+.page {
+	display: flex;
+
+	width: 750px;
+	height: 500px;
+}
+
+.friendsPanel {
+	width: 250px;
+
+	flex-shrink: 0;
+
+	border-right: 1px solid #808080;
+}
+
+.chatPanel {
+	flex: 1;
+
+	min-width: 0;
+}
+
+.empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	height: 100%;
+
+	color: #666;
+	font-size: 12px;
+}
+
+.loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	width: 750px;
+	height: 500px;
+
+	font-size: 13px;
+}
