@@ -24,7 +24,8 @@ export default function MatchSelectModal({
   onCustomize,
   onReturnHome,
 }: Props) {
-  const [showRules, setShowRules] = useState(false);
+  const [showRules, setShowRules] =
+    useState(false);
 
   return (
     <>
@@ -35,7 +36,9 @@ export default function MatchSelectModal({
         headerButton={
           <button
             className="xp-header-icon-btn"
-            onClick={() => setShowRules(true)}
+            onClick={() =>
+              setShowRules(true)
+            }
           >
             <img
               src="/info_icon.png"
@@ -52,33 +55,38 @@ export default function MatchSelectModal({
             </p>
 
             <span>
-              Choose a game mode to start playing.
+              Choose a game mode to
+              start playing.
             </span>
           </div>
 
-
           <div className="mode-buttons">
 
-            <button onClick={onStartOnline}>
+            <button
+              onClick={onStartOnline}
+            >
               🎮 Play Online
             </button>
 
-
-            <button onClick={onPlayFriend}>
+            <button
+              onClick={onPlayFriend}
+            >
               👥 Play Friend
             </button>
 
-
-            <button onClick={onCustomize}>
+            <button
+              onClick={onCustomize}
+            >
               🎨 Customize Game
             </button>
 
           </div>
 
-
           <div className="return-button">
 
-            <button onClick={onReturnHome}>
+            <button
+              onClick={onReturnHome}
+            >
               🏠 Return to Homepage
             </button>
 
@@ -87,10 +95,11 @@ export default function MatchSelectModal({
         </div>
       </XPModal>
 
-
       <RulesModal
         isOpen={showRules}
-        onClose={() => setShowRules(false)}
+        onClose={() =>
+          setShowRules(false)
+        }
       />
     </>
   );

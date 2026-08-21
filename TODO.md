@@ -5,6 +5,7 @@
 --need handling errors from apis
 
 
+
 **what rawan needs:**
 --need to recheck isOnline
 --implement chat system
@@ -19,7 +20,7 @@
 --match history
 --customize wallpaper
 --invite friend in game
---add stuff in privacy policy and terms of services
+<!-- --add stuff in privacy policy and terms of services -->
 --readme
 --save pics online
 
