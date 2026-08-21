@@ -97,98 +97,29 @@ export default function GamePage() {
 			</div>
 
 			<GameModals
-				opponentDisconnected={
-					game.opponentDisconnected
-				}
-
-				onFindAnother={
-					game.findAnotherPlayer
-				}
-
-				room={
-					game.room
-				}
-
-				waitingRematch={
-					game.waitingRematch
-				}
-
-				rematchRequested={
-					game.rematchRequested
-				}
-
-				rematchDeclined={
-					game.rematchDeclined
-				}
-
-				onRematch={
-					game.requestRematch
-				}
-
-				onAcceptRematch={
-					game.acceptRematch
-				}
-
-				onDeclineRematch={
-					game.declineRematch
-				}
-
-				modalState={
-					game.modalState
-				}
-
-				matchmakingStatus={
-					game.matchmakingStatus
-				}
-
-				opponentName={
-					game.opponentName
-				}
-
-				winner={
-					game.winner
-				}
-
-				currentUser={
-					game.currentUser
-				}
-
-				scoreLeft={
-					game.scoreLeft
-				}
-
-				scoreRight={
-					game.scoreRight
-				}
-
-				onStartOnline={
-					game.joinQueue
-				}
-
-				onPlayFriend={
-					game.playFriend
-				}
-
-				onCancel={
-					game.cancelMatchmaking
-				}
-
-				onReset={
-					game.resetGame
-				}
-
-				onCustomize={
-					handleCustomize
-				}
-
-				onSaveTheme={
-					handleSaveTheme
-				}
-
-				onBackToSelect={
-					game.backToSelect
-				}
-
+				opponentDisconnected={game.opponentDisconnected}
+				onFindAnother={game.findAnotherPlayer}
+				room={game.room}
+				waitingRematch={game.waitingRematch}
+				rematchRequested={game.rematchRequested}
+				rematchDeclined={game.rematchDeclined}
+				onRematch={game.requestRematch}
+				onAcceptRematch={game.acceptRematch}
+				onDeclineRematch={game.declineRematch}
+				modalState={game.modalState}
+				matchmakingStatus={game.matchmakingStatus}
+				opponentName={game.opponentName}
+				winner={game.winner}
+				currentUser={game.currentUser}
+				scoreLeft={game.scoreLeft}
+				scoreRight={game.scoreRight}
+				onStartOnline={game.joinQueue}
+				onPlayFriend={game.playFriend}
+				onCancel={game.cancelMatchmaking}
+				onReset={game.resetGame}
+				onCustomize={handleCustomize}
+				onSaveTheme={handleSaveTheme}
+				onBackToSelect={game.backToSelect}
 				onExit={() => {
 					game.resetGame();
 					router.push("/home");
