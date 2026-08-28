@@ -108,6 +108,70 @@ router.get("/me", authHelper, async (req: AuthRequest, res) => {
 
 /**
  * @swagger
+ * /users/me/matches:
+ *   get:
+ *     summary: Get the current authenticated user's match history
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bearer token, e.g. "Bearer <token>"
+ *     responses:
+ *       200:
+ *         description: List of the user's past matches, most recent first
+ *       401:
+ *         description: No token provided
+ *       500:
+ *         description: Server error
+ */
+router.get("/me/matches", authHelper, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.userId!;
+
+    const matches = await prisma.match.findMany({
+      where: {
+        OR: [{ player1Id: userId }, { player2Id: userId }],
+      },
+      orderBy: { createdAt: "desc" },
+      include: {
+        player1: { select: { id: true, username: true, avatarUrl: true } },
+        player2: { select: { id: true, username: true, avatarUrl: true } },
+      },
+    });
+
+    const history = matches.map((match) => {
+      const isPlayer1 = match.player1Id === userId;
+      const opponent = isPlayer1 ? match.player2 : match.player1;
+      const myScore = isPlayer1 ? match.player1Score : match.player2Score;
+      const opponentScore = isPlayer1 ? match.player2Score : match.player1Score;
+      const result =
+        match.winnerId === null
+          ? "draw"
+          : match.winnerId === userId
+            ? "win"
+            : "loss";
+
+      return {
+        id: match.id,
+        createdAt: match.createdAt,
+        opponent,
+        myScore,
+        opponentScore,
+        result,
+      };
+    });
+
+    res.json(history);
+  } catch (err) {
+    console.error("GET /me/matches error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+/**
+ * @swagger
  * /users/search:
  *   get:
  *     summary: Search users by username
