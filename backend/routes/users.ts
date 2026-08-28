@@ -121,6 +121,34 @@ router.get("/me", authHelper, async (req: AuthRequest, res) => {
  *     responses:
  *       200:
  *         description: List of the user's past matches, most recent first
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   createdAt:
+ *                     type: string
+ *                   result:
+ *                     type: string
+ *                     enum: [win, loss, draw]
+ *                   myScore:
+ *                     type: integer
+ *                   opponentScore:
+ *                     type: integer
+ *                   opponent:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       username:
+ *                         type: string
+ *                       avatarUrl:
+ *                         type: string
+ *                         nullable: true
  *       401:
  *         description: No token provided
  *       500:
