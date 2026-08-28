@@ -11,7 +11,7 @@ export const images = {
 
 	windowsDefaultWallpaper: "/windows_wallpaper.jpg",
 
-	customization: "/paint.webp",
+	customization: "/customize.png",
 
 	achievements: "/star.ico",
 
@@ -24,4 +24,11 @@ export const images = {
 	messaging: "/msn.png",
 
 	friendships: "/friendships.ico",
+
+	marvin: "/marvin.png",
+
+	stats: "/stats.png",
+
+	deepthought: "/DeepThought.png",
+
 };

@@ -1,0 +1,22 @@
+.floating-icons {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+
+	pointer-events: none;
+}
+
+.floating-icon-position {
+	position: absolute;
+	pointer-events: auto;
+}
+
+.marvin {
+	top: 75%;
+	left: 82%;
+}
+
+.deep-thought {
+	top: 15%;
+	left: 60%;
+}

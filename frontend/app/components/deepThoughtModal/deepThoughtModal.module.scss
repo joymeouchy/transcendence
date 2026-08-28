@@ -1,0 +1,153 @@
+.modal {
+	width: 420px;
+}
+
+.content {
+	padding: var(--xp-space-lg);
+	font-family: Tahoma, sans-serif;
+	color: #000;
+}
+
+.heading {
+	margin-bottom: var(--xp-space-md);
+
+	font-size: 18px;
+	font-weight: bold;
+
+	text-align: center;
+}
+
+.description {
+	margin-bottom: var(--xp-space-lg);
+
+	text-align: center;
+	font-size: 13px;
+}
+
+.questions {
+	display: flex;
+	flex-direction: column;
+	gap: var(--xp-space-md);
+}
+
+.questionButton {
+	width: 100%;
+
+	padding: 10px 12px;
+
+	background: #eeeeee;
+	border: 1px solid #777;
+	border-radius: 2px;
+
+	font-family: Tahoma, sans-serif;
+	font-size: 12px;
+	text-align: left;
+
+	cursor: pointer;
+
+	&:hover {
+		background: #e0e0e0;
+	}
+
+	&:active {
+		background: #d0d0d0;
+	}
+}
+
+.calculating {
+	text-align: center;
+}
+
+.progressContainer {
+	width: 100%;
+	height: 20px;
+
+	margin-top: var(--xp-space-lg);
+
+	padding: 2px;
+
+	background: #fff;
+	border: 1px solid #777;
+
+	box-sizing: border-box;
+}
+
+.progressBar {
+	height: 100%;
+
+	background: #316ac5;
+
+	transition: width 0.075s linear;
+}
+
+.progressText {
+	margin-top: 8px;
+
+	font-family: "Courier New", monospace;
+	font-size: 13px;
+}
+
+.estimatedTime {
+	margin-top: var(--xp-space-lg);
+
+	font-size: 12px;
+	line-height: 1.5;
+
+	strong {
+		font-size: 13px;
+	}
+}
+
+.result {
+	text-align: center;
+}
+
+.answer {
+	margin: 20px 0;
+
+	font-size: 64px;
+	font-weight: bold;
+
+	color: #000080;
+}
+
+.error {
+	text-align: center;
+}
+
+.errorTitle {
+	margin-bottom: var(--xp-space-md);
+
+	color: #c00000;
+
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.error p {
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.button {
+	margin-top: var(--xp-space-lg);
+
+	min-width: 80px;
+	padding: 5px 18px;
+
+	background: #eeeeee;
+	border: 1px solid #666;
+
+	font-family: Tahoma, sans-serif;
+	font-size: 12px;
+
+	cursor: pointer;
+
+	&:hover {
+		background: #e0e0e0;
+	}
+
+	&:active {
+		background: #ccc;
+	}
+}
