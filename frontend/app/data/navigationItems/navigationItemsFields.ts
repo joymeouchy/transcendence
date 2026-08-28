@@ -53,3 +53,21 @@ export const termsOfServicesItem = {
   label: "Terms Of Service",
   href: "/termsOfService",
 };
+
+export const gameStatsItem = {
+  image: images.stats,
+  label: "Match History",
+  href: "/matchhistory",
+};
+
+export const marvinItem = {
+  image: images.marvin,
+  label: "Marvin",
+  position: "marvin",
+};
+
+export const deepThoughtItem = {
+  image: images.deepthought,
+  label: "Deep Thought",
+  position: "deep-thought",
+};

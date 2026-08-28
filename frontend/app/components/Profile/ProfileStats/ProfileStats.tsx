@@ -1,4 +1,3 @@
-import StatsCard from "./../StatsCard/StatsCard";
 import styles from "./ProfileStats.module.scss";
 
 
