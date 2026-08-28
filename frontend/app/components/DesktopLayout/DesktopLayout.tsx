@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 
 import Sidebar from "@/app/components/Sidebar/Sidebar";
 import Taskbar from "@/app/components/Taskbar/Taskbar";
+import FloatingIcons from "../FloatingDesktopItem/FloatingIcons";
 
 import { images } from "@/lib/images";
 
@@ -29,6 +30,7 @@ export default function DesktopLayout({
         {children}
       </main>
 
+      <FloatingIcons/>
       <Taskbar />
     </div>
   );
