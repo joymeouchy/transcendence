@@ -9,7 +9,7 @@
 **what rawan needs:**
 --need to recheck isOnline
 --implement chat system
---invite friends to join game
+--invite friends to join game socket
 
 
 
@@ -29,6 +29,5 @@ issues incountered:
 in friends page if you try to add someone you already sent a friend request to, it returns "request failed error 400"
 
 
- photo sources:
- https://www.deviantart.com/windowsaesthetics/art/Windows-HD-User-Account-Picture-Pack-843341713
- 
+photo sources:
+https://www.deviantart.com/windowsaesthetics/art/Windows-HD-User-Account-Picture-Pack-843341713
