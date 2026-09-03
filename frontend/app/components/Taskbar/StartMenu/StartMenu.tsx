@@ -70,12 +70,6 @@ export default function StartMenu({
           ref={menuRef}
         >
           <div className="xp-start-menu-top">
-            <img
-              src="/defaultIcon.png"
-              alt="User"
-            />
-
-            <span>j n</span>
           </div>
 
           <div className="xp-start-menu-body">

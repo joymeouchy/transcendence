@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 
 import Sidebar from "@/app/components/Sidebar/Sidebar";
 import Taskbar from "@/app/components/Taskbar/Taskbar";
-import FloatingIcons from "../FloatingDesktopItem/FloatingIcons";
+import FloatingIcons from "../FloatingIcons/FloatingIcons";
 
 import { images } from "@/lib/images";
 
@@ -21,7 +21,7 @@ export default function DesktopLayout({
     <div
       className="xp-desktop"
       style={{
-        backgroundImage: `url(${images.windowsDefaultWallpaper})`,
+        backgroundImage: `url(${images.windowsOneCatWallpaper})`,
       }}
     >
       <Sidebar />

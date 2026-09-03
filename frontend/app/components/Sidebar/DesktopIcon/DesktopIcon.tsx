@@ -1,28 +1,41 @@
-import Link from "next/link";
 import "./DesktopIcon.scss";
+import Link from "next/link";
 
 type DesktopIconProps = {
-  image: string;
-  label: string;
-  href: string;
+	image: string;
+	label: string;
+	href?: string;
+	onClick?: () => void;
 };
 
 export default function DesktopIcon({
-  image,
-  label,
-  href,
+	image,
+	label,
+	href,
+	onClick,
 }: DesktopIconProps) {
-  return (
-    <Link
-      href={href}
-      className="xp-icon"
-    >
-      <img
-        src={image}
-        alt={label}
-      />
+	const content = (
+		<>
+			<img src={image} alt={label} />
+			<span>{label}</span>
+		</>
+	);
 
-      <span>{label}</span>
-    </Link>
-  );
+	if (href) {
+		return (
+			<Link href={href} className="xp-icon">
+				{content}
+			</Link>
+		);
+	}
+
+	return (
+		<button
+			className="xp-icon"
+			onClick={onClick}
+			type="button"
+		>
+			{content}
+		</button>
+	);
 }
