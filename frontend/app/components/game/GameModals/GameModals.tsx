@@ -82,10 +82,10 @@ export default function GameModals({
 		setShowFriendSelect(true);
 	};
 
-const handleSelectFriend = (friend: Friend) => {
-	setShowFriendSelect(false);
-	onPlayFriend(friend.username);
-};
+	const handleSelectFriend = (friend: Friend) => {
+		setShowFriendSelect(false);
+		onPlayFriend(friend.username);
+	};
 
 	return (
 		<>
@@ -100,18 +100,18 @@ const handleSelectFriend = (friend: Friend) => {
 				onReturnHome={onExit}
 			/>
 
-<FriendSelectModal
-	isOpen={
-		modalState === "select" &&
-		showFriendSelect
-	}
-	onClose={() =>
-		setShowFriendSelect(false)
-	}
-	onSelectFriend={
-		handleSelectFriend
-	}
-/>
+			<FriendSelectModal
+				isOpen={
+					modalState === "select" &&
+					showFriendSelect
+				}
+				onClose={() =>
+					setShowFriendSelect(false)
+				}
+				onSelectFriend={
+					handleSelectFriend
+				}
+			/>
 
 			<CustomizationModal
 				isOpen={modalState === "customization"}

@@ -9,6 +9,9 @@ import FriendsPanel from "../FriendsPanel/FriendsPanel";
 import DesktopLayout from "../../DesktopLayout/DesktopLayout";
 import XPWindow from "../../ui/XPWindow/XPWindow";
 
+import { useRouter } from "next/navigation";
+
+
 import {
 	Friend,
 } from "@/services/friendships.service";
@@ -47,6 +50,7 @@ export default function ProfilePageTemplate({
 	onAddFriend,
 	onRemoveFriend,
 }: ProfilePageTemplateProps) {
+	const router = useRouter();
 
 
 	if (!user) {
@@ -145,12 +149,18 @@ export default function ProfilePageTemplate({
 									Game Statistics
 								</div>
 
-
 								<ProfileStats
 									wins={user.wins}
 									losses={user.losses}
 									winRate={user.winRate}
 								/>
+
+								<button
+									className={styles.statsButton}
+									onClick={() => router.push("/matchhistory")}
+								>
+									View Full Stats
+								</button>
 
 							</div>
 

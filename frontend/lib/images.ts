@@ -8,9 +8,6 @@ export const images = {
 
 	registerIcon: "/chess.jpg",
 	loginIcon: "/beach.jpg",
-
-	windowsDefaultWallpaper: "/windows_wallpaper.jpg",
-
 	customization: "/customize.png",
 
 	achievements: "/star.ico",
@@ -30,5 +27,14 @@ export const images = {
 	stats: "/stats.png",
 
 	deepthought: "/DeepThought.png",
+
+	windowsOneCatWallpaper: "/wallpapers/catXP.jpg",
+	windowsDontPanicWallpaper: "/wallpapers/dontpanic.jpg",
+	windowsFourCatsWallpaper: "/wallpapers/pspspsXP.jpg",
+	windowsRevacholWallpaper: "/wallpapers/revachol.png",
+	windowsStoneHengeWallpaper: "/wallpapers/Stonehenge.jpg",
+	windowsTulipsWallpaper: "/wallpapers/Tulips.jpg",
+	windowsDefaultWallpaper: "/wallpapers/windows_wallpaper.jpg",
+
 
 };

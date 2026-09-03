@@ -1,0 +1,38 @@
+export const MARVIN_CONFIG = {
+	modalTitle: "Marvin",
+	heading: "MARVIN'S ANSWER MACHINE",
+	askDescription: "Ask Marvin a question.",
+	thinkingHeading: "MARVIN IS THINKING...",
+	thinkingDescription:
+		"Consulting Marvin's vast intelligence...",
+	thinkingText: "This may take a moment.",
+	placeholder: "Will everything be okay?",
+	askButton: "Ask Marvin",
+	answerHeading: "MARVIN SAYS:",
+	askAgainButton: "Ask Again",
+	closeButton: "Close",
+	thinkingDuration: 1500,
+};
+
+export const marvinAnswers = [
+	"Probably not.",
+	"Yes. Unfortunately.",
+	"No. I was afraid you'd ask.",
+	"I wouldn't get my hopes up.",
+	"That seems unlikely.",
+	"Perhaps. Though I fail to see why it matters.",
+	"The odds are not in your favor.",
+	"Technically, yes. Emotionally, no.",
+	"That sounds like a terrible idea.",
+	"I've considered it. I regret doing so.",
+	"Who knows? Certainly not me.",
+	"Ask again later. Or don't.",
+	"Would you like me to go and stick my head in a bucket of water?",
+	"I’ve calculated your chance of survival, but I don’t think you’ll like it",
+	"Don’t pretend you want to talk to me, I know you hate me.",
+	"You think you’ve got problems? What are you supposed to do if you are a manically depressed robot? No, don’t try and answer that. I’m fifty thousand times more intelligent than you and even I don’t know the answer",
+	"Here I am, brain the size of a planet, and they tell me to answer your question. Call that job satisfaction? ’Cause I don’t.’",
+	"I’d give you advice, but you wouldn’t listen. No one ever does",
+	"Yes. Against all reasonable expectations.",
+	"Yes. Try not to get excited.",
+];

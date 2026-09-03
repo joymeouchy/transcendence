@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import "./FloatingIcons.scss";
-import FloatingIcon from "./floatingIcon/floatingIcon";
+import DesktopIcon from "../Sidebar/DesktopIcon/DesktopIcon";
 import { floatingIcons } from "@/app/data/navigationItems/FloatingIconsFields";
 import DeepThoughtModal from "../deepThoughtModal/deepThoughtModal";
 import MarvinModal from "../marvinModal/marvinModal";
@@ -19,7 +19,7 @@ export default function FloatingIcons() {
 						key={icon.label}
 						className={`floating-icon-position ${icon.position}`}
 					>
-						<FloatingIcon
+						<DesktopIcon
 							image={icon.image}
 							label={icon.label}
 							onClick={() => {

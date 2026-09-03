@@ -4,23 +4,30 @@
 
 --need handling errors from apis
 
+--fix match history width when no matches vs when there is
+
+--add button to remove profile picture
+
+--connect customization for background to backend
+
+--user disconnect
+
+
 
 
 **what rawan needs:**
 --need to recheck isOnline
 --implement chat system
 --invite friends to join game socket
+--add table for customized wallpapers
 
 
 
 --chat
 --isOnline
 --user disconnect
-<!-- --edit add friend button -->
---match history
 --customize wallpaper
 --invite friend in game
-<!-- --add stuff in privacy policy and terms of services -->
 --readme
 --save pics online
 
