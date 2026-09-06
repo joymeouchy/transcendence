@@ -45,6 +45,12 @@ export default function AccountActions({
             </button>
 
             <button
+              onClick={() => setShowPicture(true)}
+            >
+              Reset Profile Picture to Default
+            </button>
+
+            <button
               onClick={() => setShowUsername(true)}
             >
               Change Username
