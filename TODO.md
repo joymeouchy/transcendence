@@ -1,18 +1,10 @@
 **what joy needs:**
-
---isOnline is only being checked from the game page, need to check where socket.connect and disconnect are called and move them somewhere that reacts to user logging in
-
 --need handling errors from apis
-
 --fix match history width when no matches vs when there is
-
 --add button to remove profile picture
-
 --connect customization for background to backend
-
 --user disconnect
-
-
+--automatically log out user after 7 days of log in orif token expired? if doable
 
 
 **what rawan needs:**
