@@ -22,7 +22,10 @@ export interface CustomizationTheme {
 	isDefault: boolean;
 }
 
-
+export interface UpdateWallpaperResponse {
+	message: string;
+	preferredWallpaper: string;
+}
 
 export const customizationService = {
 
@@ -63,4 +66,18 @@ export const customizationService = {
 		return response.data.theme;
 	},
 
+	async updateWallpaper(
+		wallpaper: string
+	): Promise<UpdateWallpaperResponse> {
+
+		const response =
+			await api.patch(
+				"/customization/me/wallpaper",
+				{
+					wallpaper,
+				}
+			);
+
+		return response.data;
+	},
 };

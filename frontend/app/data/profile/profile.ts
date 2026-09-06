@@ -12,4 +12,6 @@ export interface UserProfileFields {
 
   avatarUrl?: string;
   id?: string;
+
+  preferredWallpaper: string; 
 }

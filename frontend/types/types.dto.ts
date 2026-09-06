@@ -1,15 +1,3 @@
-// export interface UserProfile {
-//   id: number;
-//   username: string;
-//   email: string;
-//   avatarUrl: string | null;
-//   provider: string;
-//   isOnline: boolean;
-//   wins: number;
-//   losses: number;
-//   totalMatches: number;
-//   winRate: number;
-// }
 export interface UserProfile {
 	id: number;
 	username: string;
@@ -21,6 +9,7 @@ export interface UserProfile {
 	losses: number;
 	totalMatches: number;
 	winRate: number;
+	preferredWallpaper: string;
 }
 
 export type Friend = {
