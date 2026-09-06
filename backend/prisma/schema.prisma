@@ -51,6 +51,7 @@ model User {
   messagesReceived Message[] @relation("MessageReceiver")
 
   preferredTheme String @default("classic")
+  preferredWallpaper String @default("classic")
 }
 
 model Match {
