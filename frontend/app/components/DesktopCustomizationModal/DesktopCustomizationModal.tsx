@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
+
 import XPModal from "../ui/XPModal/XPModal";
 import {
 	desktopThemes,
 	DesktopTheme,
 } from "./desktopCustomization";
+import { customizationService } from "@/services/Customization.services";
+import { useAuth } from "@/context/AuthContext";
+
 import "./DesktopCustomizationModal.scss";
 
 type Props = {
@@ -17,14 +21,29 @@ export default function DesktopCustomizationModal({
 	isOpen,
 	onClose,
 }: Props) {
+	const { refreshUser } = useAuth();
+
 	const [selectedTheme, setSelectedTheme] =
 		useState<DesktopTheme>(desktopThemes[0]);
 
-	const handleSave = () => {
-		console.log("Selected theme:", selectedTheme);
+	const [isSaving, setIsSaving] = useState(false);
 
-		// We'll apply the theme here later
-		onClose();
+	const handleSave = async () => {
+		try {
+			setIsSaving(true);
+
+			await customizationService.updateWallpaper(
+				selectedTheme.id
+			);
+
+			await refreshUser();
+
+			onClose();
+		} catch (error) {
+			console.error("Failed to update wallpaper:", error);
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
 	return (
@@ -38,12 +57,12 @@ export default function DesktopCustomizationModal({
 					{desktopThemes.map((theme) => (
 						<button
 							key={theme.id}
-							className={`theme-card ${
-								selectedTheme.id === theme.id
+							className={`theme-card ${selectedTheme.id === theme.id
 									? "selected"
 									: ""
-							}`}
+								}`}
 							onClick={() => setSelectedTheme(theme)}
+							disabled={isSaving}
 						>
 							<div className="theme-preview">
 								<img
@@ -59,11 +78,17 @@ export default function DesktopCustomizationModal({
 				</div>
 
 				<div className="customization_actions">
-					<button onClick={handleSave}>
-						Save
+					<button
+						onClick={handleSave}
+						disabled={isSaving}
+					>
+						{isSaving ? "Saving..." : "Save"}
 					</button>
 
-					<button onClick={onClose}>
+					<button
+						onClick={onClose}
+						disabled={isSaving}
+					>
 						Cancel
 					</button>
 				</div>

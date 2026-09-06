@@ -2,7 +2,6 @@
 --need handling errors from apis
 --fix match history width when no matches vs when there is
 --add button to remove profile picture
---connect customization for background to backend
 --user disconnect
 --automatically log out user after 7 days of log in orif token expired? if doable
 
@@ -11,14 +10,12 @@
 --need to recheck isOnline
 --implement chat system
 --invite friends to join game socket
---add an api to update/save user preferred wallpaper
 --recheck how it's storing user new pfp
 
 
 --chat
 --isOnline
 --user disconnect
---customize wallpaper
 --invite friend in game
 --readme
 --save pics online
