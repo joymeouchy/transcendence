@@ -19,8 +19,8 @@
 --need to recheck isOnline
 --implement chat system
 --invite friends to join game socket
---add table for customized wallpapers
-
+--add an api to update/save user preferred wallpaper
+--recheck how it's storing user new pfp
 
 
 --chat
