@@ -256,4 +256,59 @@ router.patch("/me", authHelper, async (req: AuthRequest, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /customization/me/wallpaper:
+ *   patch:
+ *     summary: Update the current authenticated user's preferred desktop wallpaper
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bearer token, e.g. "Bearer <token>"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - wallpaper
+ *             properties:
+ *               wallpaper:
+ *                 type: string
+ *                 example: classic
+ *     responses:
+ *       200:
+ *         description: Wallpaper updated
+ *       400:
+ *         description: Wallpaper is required
+ *       401:
+ *         description: No token provided
+ *       500:
+ *         description: Server error
+ */
+router.patch("/me/wallpaper", authHelper, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.userId!;
+    const { wallpaper } = req.body;
+
+    if (!wallpaper) {
+      return res.status(400).json({ error: "Wallpaper is required" });
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { preferredWallpaper: wallpaper },
+    });
+
+    res.json({ message: "Wallpaper updated", preferredWallpaper: updated.preferredWallpaper });
+  } catch (err) {
+    console.error("PATCH /me/wallpaper error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 export default router;
