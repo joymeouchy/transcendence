@@ -22,6 +22,11 @@ the server tell two tabs of the same account apart from two different accounts.
 | `request_rematch` | `{ room: string }` | Request a rematch |
 | `decline_rematch` | `{ room: string }` | Decline a rematch |
 
+**INVITES**
+| `invite_friend` | `{ friendId: number }` | Invite a specific friend to play. Fails with `invite_error` if you're already in a game, the friend is offline, or you already have a pending invite to them |
+| `cancel_invite` | `{ friendId: number }` | Cancel an invite you sent before the friend responds |
+| `invite_response` | `{ fromUserId: number, accepted: boolean }` | Accept or decline an invite you received from `fromUserId` |
+
 **MESSAGES**
 <!-- | `send_message` | `{ fromUserId: number, toUserId: number, content: string }` | Send a chat message | -->
 
@@ -53,6 +58,13 @@ the server tell two tabs of the same account apart from two different accounts.
 | `rematch_accepted` | none | Opponent accepted your rematch request - `match_found` follows right after |
 | `rematch_declined` | none | Opponent declined rematch |
 | `rematch_failed` | none | Both players requested a rematch, but the other one disconnected before the new match could start |
+
+**INVITES**
+| `invite_received` | `{ fromUserId: number, fromUsername: string, fromAvatarUrl: string \| null }` | A friend invited you to play |
+| `invite_cancelled` | `{ fromUserId: number }` | The invite from `fromUserId` was cancelled (they cancelled it, timed out, or disconnected) |
+| `invite_declined` | `{ friendId: number }` | `friendId` declined your invite (or disconnected before responding) |
+| `invite_timeout` | `{ friendId: number }` | `friendId` didn't respond within 30s |
+| `invite_error` | `{ message: string }` | Your `invite_friend` request couldn't be sent (see `message`) |
 
 **MESSAGES**
 <!-- | `receive_message` | `{ id, createdAt, content, senderId, receiverId, sender }` | Incoming chat message |
