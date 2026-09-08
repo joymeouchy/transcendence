@@ -28,7 +28,7 @@ export const images = {
 
 	deepthought: "/DeepThought.png",
 
-	windowsOneCatWallpaper: "/wallpapers/catXP.jpg",
+	windowsOneCatWallpaper: "/wallpapers/catXP2.jpg",
 	windowsDontPanicWallpaper: "/wallpapers/dontpanic.jpg",
 	windowsFourCatsWallpaper: "/wallpapers/pspspsXP.jpg",
 	windowsRevacholWallpaper: "/wallpapers/revachol.png",
