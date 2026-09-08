@@ -3,37 +3,42 @@
 	align-items: flex-end;
 	gap: 6px;
 
+	flex-shrink: 0;
+
+	width: 100%;
 	padding: 7px;
 
-	background: #ece9d8;
-	border-top: 1px solid #808080;
+	background: #eaf4fb;
+	border-top: 1px solid #8a9aaa;
+
+	box-sizing: border-box;
 }
 
 .input textarea {
 	flex: 1;
-
+	min-width: 0;
 	min-height: 22px;
 	max-height: 100px;
 
-	padding: 3px 5px;
+	padding: 4px 6px;
 
 	resize: none;
 	overflow-y: auto;
 
+	background: white;
 	border: 1px solid #7f9db9;
+	border-radius: 2px;
 	outline: none;
 
-	background: #ffffff;
-
-	font-family: inherit;
-	font-size: 12px;
-	line-height: 16px;
+	font-family: var(--xp-font-main);
+	font-size: 11px;
+	line-height: 15px;
 
 	box-sizing: border-box;
 }
 
 .input textarea:focus {
-	border-color: #316ac5;
+	border-color: var(--xp-blue);
 }
 
 .input textarea::placeholder {
@@ -41,47 +46,36 @@
 }
 
 .input button {
-	align-self: flex-end;
+	flex-shrink: 0;
 
 	min-width: 55px;
-	height: 22px;
+	height: 24px;
+	padding: 3px 10px;
 
-	padding: 2px 10px;
+	background: #eaf4fb;
+	border: 1px solid #7f9db9;
+	border-radius: var(--xp-radius-sm);
 
-	border: 1px solid #003c74;
-
-	background: linear-gradient(
-		to bottom,
-		#ffffff 0%,
-		#ece9d8 45%,
-		#d4d0c8 100%
-	);
-
-	color: #000;
-
-	font-family: inherit;
+	color: #1f3f5c;
+	font-family: var(--xp-font-main);
 	font-size: 11px;
 
+	white-space: nowrap;
 	cursor: pointer;
+
+	box-sizing: border-box;
 }
 
 .input button:hover:not(:disabled) {
-	background: linear-gradient(
-		to bottom,
-		#ffffff 0%,
-		#e5e5e5 45%,
-		#d4d0c8 100%
-	);
+	background: #dceeff;
 }
 
 .input button:active:not(:disabled) {
-	padding-top: 3px;
-	padding-bottom: 1px;
+	background: #c9e3f7;
 }
 
 .input button:disabled {
 	color: #808080;
-	border-color: #a0a0a0;
-
 	cursor: default;
+	opacity: 0.7;
 }

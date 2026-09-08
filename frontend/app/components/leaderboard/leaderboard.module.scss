@@ -1,0 +1,40 @@
+.leaderboard {
+	width: 100%;
+	display: grid;
+	grid-template-columns: 280px minmax(0, 1fr);
+	gap: var(--xp-space-md);
+
+	min-width: 0;
+	box-sizing: border-box;
+}
+
+.leftColumn {
+	display: flex;
+	flex-direction: column;
+	gap: var(--xp-space-md);
+
+	min-width: 0;
+}
+
+.table {
+	min-width: 0;
+	width: 100%;
+}
+
+/* Narrow windows */
+@media (max-width: 750px) {
+	.leaderboard {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Very narrow windows */
+@media (max-width: 480px) {
+	.leaderboard {
+		gap: var(--xp-space-sm);
+	}
+
+	.leftColumn {
+		gap: var(--xp-space-sm);
+	}
+}

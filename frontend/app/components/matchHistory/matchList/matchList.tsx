@@ -1,6 +1,6 @@
 import { MatchHistory } from "@/services/user.services";
 
-import { MatchFilter } from "@/app/matchhistory/page";
+import { MatchFilter } from "../matchHistory";
 
 import styles from "./matchList.module.scss";
 
