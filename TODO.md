@@ -3,7 +3,8 @@
 --fix match history width when no matches vs when there is
 --add button to remove profile picture
 --user disconnect
---automatically log out user after 7 days of log in orif token expired? if doable
+--add leaderboard
+
 
 
 **what rawan needs:**

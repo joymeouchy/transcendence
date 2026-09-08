@@ -58,6 +58,30 @@ export default function ChatsPageTemplate({
 		content: "Sure 😂 I'm ready.",
 		createdAt: "2026-08-22T20:33:00",
 	},
+		{
+		id: 5,
+		senderId: user.id,
+		content: "Sure 😂 I'm ready.",
+		createdAt: "2026-08-22T20:33:00",
+	},
+		{
+		id: 6,
+		senderId: user.id,
+		content: "Sure 😂 I'm ready.",
+		createdAt: "2026-08-22T20:33:00",
+	},
+		{
+		id: 7,
+		senderId: user.id,
+		content: "Sure 😂 I'm ready.",
+		createdAt: "2026-08-22T20:33:00",
+	},
+		{
+		id: 8,
+		senderId: user.id,
+		content: "Sure 😂 I'm ready.",
+		createdAt: "2026-08-22T20:33:00",
+	},
 ];
 
 	useEffect(() => {
