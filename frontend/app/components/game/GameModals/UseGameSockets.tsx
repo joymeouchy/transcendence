@@ -76,7 +76,6 @@ export default function useGameSocket() {
 			applyAt: number;
 		} | null>(null);
 	useEffect(() => {
-		socket.connect();
 		const handleConnect = () => {
 			console.log(
 				"Socket connected:",
