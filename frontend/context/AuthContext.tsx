@@ -14,6 +14,7 @@ import { UserService } from "../services/user.services";
 
 import { UserProfile } from "@/types/types.dto";
 import { playSound, sounds } from "@/lib/sounds";
+import { socket } from "@/lib/socket";
 
 type AuthContextType = {
   user: UserProfile | null;
@@ -93,6 +94,19 @@ useEffect(() => {
     mounted = false;
   };
 }, []);
+
+/**
+ * Keep the socket connection in sync with auth state, so
+ * isOnline and live features work app-wide instead of only on
+ * pages that happen to open the socket themselves.
+ */
+useEffect(() => {
+  if (user) {
+    socket.connect();
+  } else {
+    socket.disconnect();
+  }
+}, [user]);
 
 const login = async (
   email: string,
