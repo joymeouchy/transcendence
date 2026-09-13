@@ -3,20 +3,17 @@
 --fix match history width when no matches vs when there is
 --add button to remove profile picture
 --user disconnect
+--listen to `online_changed` where isOnline is used
 
 
 
 **what rawan needs:**
---need to recheck isOnline
+--~~need to recheck isOnline~~
 --implement chat system
---invite friends to join game socket
+--~~invite friends to join game socket~~
 --recheck how it's storing user new pfp
 
 
---chat
---isOnline
---user disconnect
---invite friend in game
 --readme
 --save pics online
 

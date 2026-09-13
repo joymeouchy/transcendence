@@ -48,6 +48,9 @@ the server tell two tabs of the same account apart from two different accounts.
 | `player_disconnected` | none | Opponent disconnected, grace period started |
 | `player_reconnected` | none | Opponent reconnected, game resumed |
 
+**ONLINE**
+| `online_changed` | `{ userId: number, isOnline: boolean }` | Broadcast to every connected client whenever a user's online status actually flips (first tab connecting, or last tab disconnecting) - not sent on every connect/disconnect, only on a real transition |
+
 **REMATCH**
 | `rematch_requested` | none | Opponent wants a rematch |
 | `rematch_accepted` | none | Opponent accepted your rematch request - `match_found` follows right after |
