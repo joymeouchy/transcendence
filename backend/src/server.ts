@@ -22,6 +22,7 @@ import passport from "./OAuth";
 import userRoutes from "../routes/users";
 import friendshipRoutes from "../routes/friendships";
 import customizationRoutes from "../routes/customization";
+import { onlineUsers } from "./online";
 
 import prisma from "../src/prisma";
 import swaggerUi from "swagger-ui-express";
@@ -45,7 +46,6 @@ const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 let waitingPlayer: any = null;
 let matchId = 0;
 const socketToUser = new Map<string, number>(); // socketId → userId
-const onlineUsers = new Map<number, string>(); // userId → socketId
 const rematches = new Map<string, string[]>(); // room → [socketIds who want rematch]
 
 const app = express();
@@ -77,6 +77,15 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+// in-memory socket tracking (onlineUsers/socketToUser) always starts empty on
+// boot, so no one is actually connected yet - clear out any isOnline flags
+// left over from before the last restart/crash
+prisma.user
+  .updateMany({ where: { isOnline: true }, data: { isOnline: false } })
+  .catch((err) =>
+    console.error("Failed to reset online status on startup:", err),
+  );
 
 // Authenticate the socket connection using the same JWT issued by /auth/login
 // or /auth/register, so we know the real userId behind a socket instead of
@@ -139,11 +148,24 @@ io.on("connection", (socket) => {
   console.log("Client connected:", socket.id, "userId:", userId);
 
   socketToUser.set(socket.id, userId);
-  onlineUsers.set(userId, socket.id);
 
-  prisma.user
-    .update({ where: { id: userId }, data: { isOnline: true } })
-    .catch((err) => console.error("Failed to mark user online:", err));
+  // track every socket per user so a second tab/device doesn't get knocked
+  // offline when the first one disconnects
+  let userSockets = onlineUsers.get(userId);
+  if (!userSockets) {
+    userSockets = new Set();
+    onlineUsers.set(userId, userSockets);
+  }
+  const wasOffline = userSockets.size === 0;
+  userSockets.add(socket.id);
+
+  if (wasOffline) {
+    prisma.user
+      .update({ where: { id: userId }, data: { isOnline: true } })
+      .catch((err) => console.error("Failed to mark user online:", err));
+
+    io.emit("online_changed", { userId, isOnline: true });
+  }
 
   if (socket.recovered) {
     const room = findRoomBySocket(socket.id);
@@ -203,7 +225,10 @@ io.on("connection", (socket) => {
       // notify both players
       io.to(room).emit("match_found", {
         room,
-        players: [matchedWaitingPlayer.data.username, matchedSocket.data.username],
+        players: [
+          matchedWaitingPlayer.data.username,
+          matchedSocket.data.username,
+        ],
         avatars: {
           left: leftAvatar,
           right: rightAvatar,
@@ -211,7 +236,13 @@ io.on("connection", (socket) => {
       });
 
       // start game loop
-      startGame(io, room, matchedWaitingPlayer.id, matchedSocket.id, socketToUser);
+      startGame(
+        io,
+        room,
+        matchedWaitingPlayer.id,
+        matchedSocket.id,
+        socketToUser,
+      );
       console.log("Game started in room:", room);
     }
   });
@@ -309,17 +340,26 @@ io.on("connection", (socket) => {
   socket.on("disconnect", async () => {
     const userId = socketToUser.get(socket.id);
     if (userId) {
-      onlineUsers.delete(userId);
       socketToUser.delete(socket.id);
 
-      await prisma.user
-        .update({
-          where: { id: userId },
-          data: { isOnline: false },
-        })
-        .catch((err) => console.error("Failed to mark user offline:", err));
+      const userSockets = onlineUsers.get(userId);
+      userSockets?.delete(socket.id);
 
-      console.log(`User ${userId} is offline`);
+      // only mark offline once every socket/tab for this user has disconnected
+      if (!userSockets || userSockets.size === 0) {
+        onlineUsers.delete(userId);
+
+        await prisma.user
+          .update({
+            where: { id: userId },
+            data: { isOnline: false },
+          })
+          .catch((err) => console.error("Failed to mark user offline:", err));
+
+        io.emit("online_changed", { userId, isOnline: false });
+
+        console.log(`User ${userId} is offline`);
+      }
     }
     console.log("Disconnected:", socket.id);
 
