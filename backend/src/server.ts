@@ -78,15 +78,6 @@ server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-// in-memory socket tracking (onlineUsers/socketToUser) always starts empty on
-// boot, so no one is actually connected yet - clear out any isOnline flags
-// left over from before the last restart/crash
-prisma.user
-  .updateMany({ where: { isOnline: true }, data: { isOnline: false } })
-  .catch((err) =>
-    console.error("Failed to reset online status on startup:", err),
-  );
-
 // Authenticate the socket connection using the same JWT issued by /auth/login
 // or /auth/register, so we know the real userId behind a socket instead of
 // trusting whatever the client claims (this is what lets us tell two tabs of
@@ -160,10 +151,6 @@ io.on("connection", (socket) => {
   userSockets.add(socket.id);
 
   if (wasOffline) {
-    prisma.user
-      .update({ where: { id: userId }, data: { isOnline: true } })
-      .catch((err) => console.error("Failed to mark user online:", err));
-
     io.emit("online_changed", { userId, isOnline: true });
   }
 
@@ -337,7 +324,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("disconnect", async () => {
+  socket.on("disconnect", () => {
     const userId = socketToUser.get(socket.id);
     if (userId) {
       socketToUser.delete(socket.id);
@@ -345,32 +332,14 @@ io.on("connection", (socket) => {
       const userSockets = onlineUsers.get(userId);
       userSockets?.delete(socket.id);
 
-      // only mark offline once every socket/tab for this user has disconnected
+      // only mark offline once every socket/tab for this user has disconnected.
+      // No DB write and no await here - this stays fully synchronous so a
+      // reconnect can't interleave between the Set mutation and the emit
+      // (that gap is what let a stale disconnect race a newer connect before).
       if (!userSockets || userSockets.size === 0) {
         onlineUsers.delete(userId);
-
-        await prisma.user
-          .update({
-            where: { id: userId },
-            data: { isOnline: false },
-          })
-          .catch((err) => console.error("Failed to mark user offline:", err));
-
-        // a newer connection may have arrived while the update above was in flight
-        // if so, the user is actually online again. Without this check, this stale
-        // disconnect would still emit online_changed: false right after the
-        // reconnect's online_changed: true, incorrectly flipping the frontend back
-        // to offline for someone who's actually still connected.
-        if (onlineUsers.has(userId)) {
-          prisma.user
-            .update({ where: { id: userId }, data: { isOnline: true } })
-            .catch((err) =>
-              console.error("Failed to re-mark user online:", err),
-            );
-        } else {
-          io.emit("online_changed", { userId, isOnline: false });
-          console.log(`User ${userId} is offline`);
-        }
+        io.emit("online_changed", { userId, isOnline: false });
+        console.log(`User ${userId} is offline`);
       }
     }
     console.log("Disconnected:", socket.id);
