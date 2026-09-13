@@ -12,6 +12,7 @@
 --implement chat system
 --~~invite friends to join game socket~~
 --recheck how it's storing user new pfp
+--if online sockets works from both sides, remove isOnline attribute from db
 
 
 --readme
