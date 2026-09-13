@@ -356,9 +356,21 @@ io.on("connection", (socket) => {
           })
           .catch((err) => console.error("Failed to mark user offline:", err));
 
-        io.emit("online_changed", { userId, isOnline: false });
-
-        console.log(`User ${userId} is offline`);
+        // a newer connection may have arrived while the update above was in flight
+        // if so, the user is actually online again. Without this check, this stale
+        // disconnect would still emit online_changed: false right after the
+        // reconnect's online_changed: true, incorrectly flipping the frontend back
+        // to offline for someone who's actually still connected.
+        if (onlineUsers.has(userId)) {
+          prisma.user
+            .update({ where: { id: userId }, data: { isOnline: true } })
+            .catch((err) =>
+              console.error("Failed to re-mark user online:", err),
+            );
+        } else {
+          io.emit("online_changed", { userId, isOnline: false });
+          console.log(`User ${userId} is offline`);
+        }
       }
     }
     console.log("Disconnected:", socket.id);
