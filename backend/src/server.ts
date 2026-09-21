@@ -22,7 +22,9 @@ import passport from "./OAuth";
 import userRoutes from "../routes/users";
 import friendshipRoutes from "../routes/friendships";
 import customizationRoutes from "../routes/customization";
+import messageRoutes from "../routes/messages";
 import { onlineUsers } from "./online";
+import { setIo } from "./io";
 
 import prisma from "../src/prisma";
 import swaggerUi from "swagger-ui-express";
@@ -61,6 +63,7 @@ app.use("/users", userRoutes);
 app.use(passport.initialize());
 app.use("/friendships", friendshipRoutes);
 app.use("/customization", customizationRoutes);
+app.use("/messages", messageRoutes);
 
 const server = http.createServer(app);
 
@@ -71,12 +74,34 @@ const io = new Server(server, {
   connectionStateRecovery: {},
 });
 
+setIo(io);
+
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+// Cleanup old messages every 24 hours, keeping only the last 7 days of messages.
+const MESSAGE_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
+const MESSAGE_CLEANUP_INTERVAL_MS = 24 * 60 * 60 * 1000;
+
+async function cleanupOldMessages() {
+  try {
+    const { count } = await prisma.message.deleteMany({
+      where: { createdAt: { lt: new Date(Date.now() - MESSAGE_RETENTION_MS) } },
+    });
+    if (count > 0) {
+      console.log(`Cleaned up ${count} message(s) older than 7 days`);
+    }
+  } catch (err) {
+    console.error("Failed to clean up old messages:", err);
+  }
+}
+
+cleanupOldMessages();
+setInterval(cleanupOldMessages, MESSAGE_CLEANUP_INTERVAL_MS);
 
 // Authenticate the socket connection using the same JWT issued by /auth/login
 // or /auth/register, so we know the real userId behind a socket instead of
