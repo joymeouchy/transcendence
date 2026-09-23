@@ -154,6 +154,19 @@ router.get("/:friendId", authHelper, async (req: AuthRequest<{ friendId: string 
     const limit = Math.min(parseInt(req.query.limit as string) || 30, 100);
     const before = parseInt(req.query.before as string);
 
+    const friendship = await prisma.friendship.findFirst({
+      where: {
+        status: FriendshipStatus.accepted,
+        OR: [
+          { senderId: userId, receiverId: friendId },
+          { senderId: friendId, receiverId: userId },
+        ],
+      },
+    });
+    if (!friendship) {
+      return res.status(403).json({ error: "You can only message friends" });
+    }
+
     const messages = await prisma.message.findMany({
       where: {
         OR: [
