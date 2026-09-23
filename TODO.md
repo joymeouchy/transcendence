@@ -4,7 +4,7 @@
 --add button to remove profile picture
 --user disconnect
 --listen to `online_changed` where isOnline is used
-
+--add emojis to chat
 
 
 **what rawan needs:**

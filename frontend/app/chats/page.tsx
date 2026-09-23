@@ -44,13 +44,10 @@ export default function ChatsPage() {
 		loadFriends();
 	}, [user]);
 
-	if (!user) {
-		return null;
-	}
 
 	return (
 		<ChatsPageTemplate
-			user={user}
+			user={user ?? undefined}
 			friends={friends}
 			loading={loading}
 			onClose={() =>
