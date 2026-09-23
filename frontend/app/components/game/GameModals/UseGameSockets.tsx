@@ -9,6 +9,8 @@ import { MatchmakingStatus } from "./MatchMakingModal/MatchmakingModal";
 import { GameStateSend } from "@/types/game_types";
 import { images } from "@/lib/images";
 import { playSound, sounds } from "@/lib/sounds";
+import { Friend } from "@/services/friendships.service";
+import FriendInviteModal from "./MatchMakingModal/FriendInviteModal";
 
 type ModalState =
 	| "select"
@@ -48,12 +50,16 @@ export default function useGameSocket() {
 
 	const [opponentAvatar, setOpponentAvatar] =
 		useState(images.defaultUserIcon);
-
+	const [invitedFriendId, setInvitedFriendId] =
+		useState<number | null>(null);
 	const previousScore = useRef({
 		left: 0,
 		right: 0,
 	});
 
+	const [inviteResult, setInviteResult] = useState<
+	"timeout" | "rejected" | null
+>(null);
 
 	const [room, setRoom] = useState("");
 
@@ -75,6 +81,18 @@ export default function useGameSocket() {
 			side: "left" | "right";
 			applyAt: number;
 		} | null>(null);
+
+
+	const [incomingInvite, setIncomingInvite] = useState<{
+		fromUserId: number;
+		fromUsername: string;
+		fromAvatarUrl: string | null;
+	} | null>(null);
+
+	const [inviteError, setInviteError] = useState("");
+
+	const [inviteWaiting, setInviteWaiting] = useState(false);
+
 	useEffect(() => {
 		socket.connect();
 		const handleConnect = () => {
@@ -210,6 +228,64 @@ export default function useGameSocket() {
 			}
 		};
 
+		const handleInviteReceived = (data: {
+			fromUserId: number;
+			fromUsername: string;
+			fromAvatarUrl: string | null;
+		}) => {
+			console.log("Friend invite received:", data);
+
+			setIncomingInvite(data);
+		};
+
+		const handleInviteDeclined = (data: {
+			fromUserId: number;
+		}) => {
+			console.log("Invite declined:", data);
+
+			setInviteWaiting(false);
+			setInvitedFriendId(null);
+			setOpponentName("");
+			setMatchmakingStatus("inviteRejected");
+			setModalState("matchmaking");
+		};
+
+		const handleInviteTimeout = (data: {
+			friendId: number;
+		}) => {
+			console.log("Invite timed out:", data);
+
+			setInviteWaiting(false);
+			setInvitedFriendId(null);
+			setOpponentName("");
+			setMatchmakingStatus("inviteTimeout");
+			setModalState("matchmaking");
+		};
+
+		const handleInviteCancelled = (data: {
+    fromUserId: number;
+}) => {
+    console.log("Invite cancelled:", data);
+
+    setIncomingInvite((current) => {
+        if (current?.fromUserId === data.fromUserId) {
+            return null;
+        }
+
+        return current;
+    });
+};
+		
+	
+const handleInviteError = (data: {
+    message: string;
+}) => {
+    console.error("Invite error:", data.message);
+
+    setInviteWaiting(false);
+    setInviteError(data.message);
+    setModalState("select");
+};
 		socket.on(
 			"game_state",
 			handleGameState
@@ -258,6 +334,30 @@ export default function useGameSocket() {
 		socket.on(
 			"paddle_hit",
 			handlePaddleHit
+		);
+		socket.on(
+			"invite_received",
+			handleInviteReceived
+		);
+
+		socket.on(
+			"invite_declined",
+			handleInviteDeclined
+		);
+
+		socket.on(
+			"invite_timeout",
+			handleInviteTimeout
+		);
+
+		socket.on(
+			"invite_cancelled",
+			handleInviteCancelled
+		);
+
+		socket.on(
+			"invite_error",
+			handleInviteError
 		);
 
 		return () => {
@@ -309,6 +409,30 @@ export default function useGameSocket() {
 				"paddle_hit",
 				handlePaddleHit
 			);
+			socket.off(
+				"invite_received",
+				handleInviteReceived
+			);
+
+			socket.off(
+				"invite_declined",
+				handleInviteDeclined
+			);
+
+			socket.off(
+				"invite_timeout",
+				handleInviteTimeout
+			);
+
+			socket.off(
+				"invite_cancelled",
+				handleInviteCancelled
+			);
+
+			socket.off(
+				"invite_error",
+				handleInviteError
+			);
 		};
 	}, [user]);
 
@@ -317,7 +441,10 @@ export default function useGameSocket() {
 			left: null,
 			right: null,
 		});
-
+function closeInviteResult() {
+    setInviteResult(null);
+    setModalState("select");
+}
 	function joinQueue() {
 		if (!socket.connected) {
 			console.warn(
@@ -335,15 +462,53 @@ export default function useGameSocket() {
 			"matchmaking"
 		);
 	}
+	function inviteFriend(friend: Friend) {
+		if (!socket.connected) {
+			console.warn("Socket not connected");
+			return;
+		}
 
-	function playFriend() {
-		setMatchmakingStatus(
-			"waitingFriend"
-		);
-		setModalState(
-			"matchmaking"
-		);
+		setInviteError("");
+		setInvitedFriendId(friend.id);
+		setInviteWaiting(true);
+
+		setOpponentName(friend.username);
+		setMatchmakingStatus("waitingFriend");
+		setModalState("matchmaking");
+
+		socket.emit("invite_friend", {
+			friendId: friend.id,
+		});
 	}
+	function cancelInvite() {
+		if (!socket.connected || invitedFriendId === null) return;
+
+		socket.emit("cancel_invite", {
+			friendId: invitedFriendId,
+		});
+
+		setInvitedFriendId(null);
+		setInviteWaiting(false);
+		setModalState("select");
+	}
+
+	function respondToInvite(
+    fromUserId: number,
+    accepted: boolean
+) {
+    if (!socket.connected) return;
+
+    socket.emit("invite_response", {
+        fromUserId,
+        accepted,
+    });
+
+    setIncomingInvite(null);
+
+    if (!accepted) {
+        setModalState("select");
+    }
+}
 
 	function cancelMatchmaking() {
 		if (socket.connected) {
@@ -445,7 +610,6 @@ export default function useGameSocket() {
 		setModalState,
 		joinQueue,
 		findAnotherPlayer,
-		playFriend,
 		cancelMatchmaking,
 		backToSelect,
 		resetGame,
@@ -455,5 +619,13 @@ export default function useGameSocket() {
 		playerAvatar,
 		opponentAvatar,
 		activeEffects,
+		incomingInvite,
+		inviteError,
+		inviteWaiting,
+		inviteFriend,
+		cancelInvite,
+		respondToInvite,
+		inviteResult,
+closeInviteResult,
 	};
 }
