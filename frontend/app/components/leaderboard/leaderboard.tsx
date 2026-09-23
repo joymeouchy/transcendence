@@ -25,7 +25,7 @@ export default function Leaderboard({
 				/>
 				<MyStats
 			players={players}
-			currentUserId={15}
+					currentUserId={currentUserId}
 		/>
 			</div>
 
