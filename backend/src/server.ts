@@ -22,6 +22,9 @@ import passport from "./OAuth";
 import userRoutes from "../routes/users";
 import friendshipRoutes from "../routes/friendships";
 import customizationRoutes from "../routes/customization";
+import messageRoutes from "../routes/messages";
+import { onlineUsers } from "./online";
+import { setIo } from "./io";
 
 import prisma from "../src/prisma";
 import swaggerUi from "swagger-ui-express";
@@ -45,7 +48,6 @@ const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 let waitingPlayer: any = null;
 let matchId = 0;
 const socketToUser = new Map<string, number>(); // socketId → userId
-const onlineUsers = new Map<number, Set<string>>(); // userId → connected socketIds
 const rematches = new Map<string, string[]>(); // room → [socketIds who want rematch]
 // "inviterId:inviteeId" → the pending friend invite between them
 const pendingInvites = new Map<string, { inviterSocketId: string; timeout: NodeJS.Timeout }>();
@@ -64,6 +66,7 @@ app.use("/users", userRoutes);
 app.use(passport.initialize());
 app.use("/friendships", friendshipRoutes);
 app.use("/customization", customizationRoutes);
+app.use("/messages", messageRoutes);
 
 const server = http.createServer(app);
 
@@ -74,6 +77,8 @@ const io = new Server(server, {
   connectionStateRecovery: {},
 });
 
+setIo(io);
+
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -81,12 +86,25 @@ server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-// in-memory socket tracking (onlineUsers/socketToUser) always starts empty on
-// boot, so no one is actually connected yet - clear out any isOnline flags
-// left over from before the last restart/crash
-prisma.user
-  .updateMany({ where: { isOnline: true }, data: { isOnline: false } })
-  .catch((err) => console.error("Failed to reset online status on startup:", err));
+// Cleanup old messages every 24 hours, keeping only the last 7 days of messages.
+const MESSAGE_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
+const MESSAGE_CLEANUP_INTERVAL_MS = 24 * 60 * 60 * 1000;
+
+async function cleanupOldMessages() {
+  try {
+    const { count } = await prisma.message.deleteMany({
+      where: { createdAt: { lt: new Date(Date.now() - MESSAGE_RETENTION_MS) } },
+    });
+    if (count > 0) {
+      console.log(`Cleaned up ${count} message(s) older than 7 days`);
+    }
+  } catch (err) {
+    console.error("Failed to clean up old messages:", err);
+  }
+}
+
+cleanupOldMessages();
+setInterval(cleanupOldMessages, MESSAGE_CLEANUP_INTERVAL_MS);
 
 // Authenticate the socket connection using the same JWT issued by /auth/login
 // or /auth/register, so we know the real userId behind a socket instead of
@@ -161,9 +179,7 @@ io.on("connection", (socket) => {
   userSockets.add(socket.id);
 
   if (wasOffline) {
-    prisma.user
-      .update({ where: { id: userId }, data: { isOnline: true } })
-      .catch((err) => console.error("Failed to mark user online:", err));
+    io.emit("online_changed", { userId, isOnline: true });
   }
 
   if (socket.recovered) {
@@ -224,7 +240,10 @@ io.on("connection", (socket) => {
       // notify both players
       io.to(room).emit("match_found", {
         room,
-        players: [matchedWaitingPlayer.data.username, matchedSocket.data.username],
+        players: [
+          matchedWaitingPlayer.data.username,
+          matchedSocket.data.username,
+        ],
         avatars: {
           left: leftAvatar,
           right: rightAvatar,
@@ -232,7 +251,13 @@ io.on("connection", (socket) => {
       });
 
       // start game loop
-      startGame(io, room, matchedWaitingPlayer.id, matchedSocket.id, socketToUser);
+      startGame(
+        io,
+        room,
+        matchedWaitingPlayer.id,
+        matchedSocket.id,
+        socketToUser,
+      );
       console.log("Game started in room:", room);
     }
   });
@@ -477,6 +502,15 @@ io.on("connection", (socket) => {
             .get(pending.inviterSocketId)
             ?.emit("invite_declined", { friendId: userId });
         }
+      }
+      // only mark offline once every socket/tab for this user has disconnected.
+      // No DB write and no await here - this stays fully synchronous so a
+      // reconnect can't interleave between the Set mutation and the emit
+      // (that gap is what let a stale disconnect race a newer connect before).
+      if (!userSockets || userSockets.size === 0) {
+        onlineUsers.delete(userId);
+        io.emit("online_changed", { userId, isOnline: false });
+        console.log(`User ${userId} is offline`);
       }
     }
     console.log("Disconnected:", socket.id);

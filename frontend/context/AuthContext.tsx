@@ -8,16 +8,19 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useOnlineSocket } from "@/services/useOnlineSocket";
 
 import { authService } from "../services/auth.services";
 import { UserService } from "../services/user.services";
 
 import { UserProfile } from "@/types/types.dto";
 import { playSound, sounds } from "@/lib/sounds";
+import { socket } from "@/lib/socket";
 
 type AuthContextType = {
   user: UserProfile | null;
   loading: boolean;
+  onlineUsers: Record<number, boolean>;
 
   login: (
     email: string,
@@ -50,6 +53,7 @@ export function AuthProvider({
 
   const [loading, setLoading] =
     useState(true);
+  const { onlineUsers } = useOnlineSocket();
 
   /**
    * Load current authenticated user
@@ -94,6 +98,40 @@ useEffect(() => {
   };
 }, []);
 
+/**
+ * Keep the socket connection in sync with auth state, so
+ * isOnline and live features work app-wide instead of only on
+ * pages that happen to open the socket themselves.
+ */
+useEffect(() => {
+  if (user) {
+    socket.connect();
+  } else {
+    socket.disconnect();
+  }
+}, [user]);
+
+useEffect(() => {
+	if (!user) return;
+
+	const liveStatus = onlineUsers[user.id];
+
+	if (liveStatus === undefined) return;
+
+	setUser((currentUser) => {
+		if (!currentUser) return currentUser;
+
+		if (currentUser.isOnline === liveStatus) {
+			return currentUser;
+		}
+
+		return {
+			...currentUser,
+			isOnline: liveStatus,
+		};
+	});
+}, [onlineUsers, user?.id]);
+
 const login = async (
   email: string,
   password: string
@@ -136,6 +174,7 @@ return (
     value={{
       user,
       loading,
+      onlineUsers,
       login,
       register,
       logout,

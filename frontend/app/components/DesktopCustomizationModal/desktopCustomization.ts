@@ -15,7 +15,7 @@ export const desktopThemes: DesktopTheme[] = [
 	{
 		id: "1cat",
 		name: "Cat",
-		background: images.windowsOneCatWallpaper,
+		background: images.windowsOneCatLeftWallpaper,
 	},
 	{
 		id: "dontpanic",
@@ -41,5 +41,25 @@ export const desktopThemes: DesktopTheme[] = [
 		id: "tulips",
 		name: "Tulips",
 		background: images.windowsTulipsWallpaper,
+	},
+	{
+		id: "1cat2",
+		name: "Cat",
+		background: images.windowsOneCatRightWallpaper,
+	},
+	{
+		id: "dog",
+		name: "Dog",
+		background: images.windowsDogWallpaper,
+	},
+	{
+		id: "anime1",
+		name: "Lucky Star",
+		background: images.windowsAnime1Wallpaper,
+	},
+	{
+		id: "anime2",
+		name: "Eepy",
+		background: images.windowsAnime2Wallpaper,
 	},
 ];

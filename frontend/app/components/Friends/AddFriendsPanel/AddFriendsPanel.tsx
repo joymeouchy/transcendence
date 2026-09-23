@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { UserService, UserSearchResult } from "@/services/user.services";
 
-import styles from "./AddFriendsPanel.module.scss"
+import styles from "./AddFriendsPanel.module.scss";
 
 interface Props {
 	onAddFriend?: (receiverId: number) => Promise<void>;

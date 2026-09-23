@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { FriendshipStatus } from "../generated/prisma/client";
 import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
 import { avatarUpload, AVATAR_UPLOAD_DIR } from "../src/helpers/upload_helpers";
+import { isUserOnline } from "../src/online";
 import prisma from "../src/prisma";
 
 const router = Router();
@@ -67,7 +68,6 @@ router.get("/me", authHelper, async (req: AuthRequest, res) => {
         username: true,
         email: true,
         avatarUrl: true,
-        isOnline: true,
         provider: true,
         preferredTheme: true,
         preferredWallpaper: true,
@@ -93,7 +93,7 @@ router.get("/me", authHelper, async (req: AuthRequest, res) => {
       username: user.username,
       email: user.email,
       avatarUrl: user.avatarUrl,
-      isOnline: user.isOnline,
+      isOnline: isUserOnline(user.id),
       provider: user.provider,
       preferredTheme: user.preferredTheme,
       preferredWallpaper: user.preferredWallpaper,
@@ -241,12 +241,13 @@ router.get("/search", authHelper, async (req: AuthRequest, res) => {
         id: true,
         username: true,
         avatarUrl: true,
-        isOnline: true,
       },
       take: 10, // limit to 10 results
     });
 
-    res.json(users);
+    res.json(
+      users.map((u) => ({ ...u, isOnline: isUserOnline(u.id) })),
+    );
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
@@ -367,7 +368,6 @@ router.get("/:id", authHelper, async (req: AuthRequest<{ id: string }>, res) => 
         email: true,
         avatarUrl: true,
         provider: true,
-        isOnline: true,
         matchesAsPlayer1: { select: { id: true } },
         matchesAsPlayer2: { select: { id: true } },
       },
@@ -399,7 +399,7 @@ router.get("/:id", authHelper, async (req: AuthRequest<{ id: string }>, res) => 
         username: user.username,
         email: user.email,
         avatarUrl: user.avatarUrl,
-        isOnline: user.isOnline,
+        isOnline: isUserOnline(user.id),
         provider: user.provider,
         ...stats,
       });
@@ -422,7 +422,7 @@ router.get("/:id", authHelper, async (req: AuthRequest<{ id: string }>, res) => 
         username: user.username,
         email: user.email,
         avatarUrl: user.avatarUrl,
-        isOnline: user.isOnline,
+        isOnline: isUserOnline(user.id),
         provider: user.provider,
         ...stats,
       });
