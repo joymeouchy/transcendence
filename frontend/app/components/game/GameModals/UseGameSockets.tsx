@@ -94,7 +94,6 @@ export default function useGameSocket() {
 	const [inviteWaiting, setInviteWaiting] = useState(false);
 
 	useEffect(() => {
-		socket.connect();
 		const handleConnect = () => {
 			console.log(
 				"Socket connected:",
