@@ -3,20 +3,18 @@
 --fix match history width when no matches vs when there is
 --add button to remove profile picture
 --user disconnect
---automatically log out user after 7 days of log in orif token expired? if doable
+--listen to `online_changed` where isOnline is used
+--add emojis to chat
 
 
 **what rawan needs:**
---need to recheck isOnline
+--~~need to recheck isOnline~~
 --implement chat system
---invite friends to join game socket
+--~~invite friends to join game socket~~
 --recheck how it's storing user new pfp
+--if online sockets works from both sides, remove isOnline attribute from db
 
 
---chat
---isOnline
---user disconnect
---invite friend in game
 --readme
 --save pics online
 

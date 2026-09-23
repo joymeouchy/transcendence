@@ -11,12 +11,12 @@ import ChatPanel from "../../chat/ChatPanel/ChatPanel";
 import { Friend, UserProfile } from "@/types/types.dto";
 
 import styles from "./ChatsPageTemplate.module.scss";
-import {
-	Message,
-} from "../MessageList/MessageList";
+import { Message } from "@/types/messages";
+import { MessagesService } from "@/services/messages.services";
+import useMessageSocket from "../UseMessagesSocket";
 
 interface Props {
-	user: UserProfile;
+	user?: UserProfile;
 	friends: Friend[];
 
 	loading?: boolean;
@@ -33,32 +33,12 @@ export default function ChatsPageTemplate({
 	const [selectedFriend, setSelectedFriend] =
 		useState<Friend | null>(null);
 
-	const messages: Message[] = [
-	{
-		id: 1,
-		senderId: 20,
-		content: "Hey! 👋",
-		createdAt: "2026-08-22T20:30:00",
-	},
-	{
-		id: 2,
-		senderId: user.id,
-		content: "Hey! What's up?",
-		createdAt: "2026-08-22T20:31:00",
-	},
-	{
-		id: 3,
-		senderId: 20,
-		content: "Wanna play some Pong?",
-		createdAt: "2026-08-22T20:32:00",
-	},
-	{
-		id: 4,
-		senderId: user.id,
-		content: "Sure 😂 I'm ready.",
-		createdAt: "2026-08-22T20:33:00",
-	},
-];
+	const [messages, setMessages] = useState<Message[]>([]);
+	const [messagesLoading, setMessagesLoading] =
+		useState(false);
+	const [unreadCounts, setUnreadCounts] =
+		useState<Record<number, number>>({});
+	const { receivedMessage } = useMessageSocket();
 
 	useEffect(() => {
 		if (
@@ -68,6 +48,67 @@ export default function ChatsPageTemplate({
 			setSelectedFriend(friends[0]);
 		}
 	}, [friends, selectedFriend]);
+	useEffect(() => {
+		if (!selectedFriend) return;
+
+		const friendId = selectedFriend.id;
+
+		async function loadMessages() {
+			setMessagesLoading(true);
+
+			try {
+				const messagesData =
+					await MessagesService.getMessages(
+						friendId
+					);
+
+				setMessages(messagesData);
+			} catch (error) {
+				console.error(
+					"Failed to load messages:",
+					error
+				);
+				setMessages([]);
+			} finally {
+				setMessagesLoading(false);
+			}
+		}
+
+		loadMessages();
+	}, [selectedFriend]);
+
+	useEffect(() => {
+		if (!receivedMessage) return;
+
+		if (
+			selectedFriend &&
+			receivedMessage.senderId ===
+			selectedFriend.id
+		) {
+			setMessages((prev) => [
+				...prev,
+				receivedMessage,
+			]);
+
+			return;
+		}
+
+		setUnreadCounts((prev) => ({
+			...prev,
+			[receivedMessage.senderId]:
+				(prev[receivedMessage.senderId] || 0) + 1,
+		}));
+	}, [receivedMessage, selectedFriend]);
+
+	function handleSelectFriend(friend: Friend) {
+		setSelectedFriend(friend);
+
+		setUnreadCounts((prev) => {
+			const updated = { ...prev };
+			delete updated[friend.id];
+			return updated;
+		});
+	}
 
 	if (loading) {
 		return (
@@ -77,13 +118,47 @@ export default function ChatsPageTemplate({
 					onClose={onClose}
 				>
 					<div className={styles.loading}>
-						Loading friends list...
+						Loading chats...
 					</div>
 				</XPWindow>
 			</DesktopLayout>
 		);
 	}
+	async function handleSendMessage(content: string) {
+		if (!user) return;
+		if (!selectedFriend) return;
 
+		const tempMessage: Message = {
+			id: Date.now(),
+			senderId: user.id,
+			receiverId: selectedFriend.id,
+			content,
+			createdAt: new Date().toISOString(),
+		};
+		setMessages((prev) => [
+			...prev,
+			tempMessage,
+		]);
+
+		try {
+			await MessagesService.sendMessage(
+				selectedFriend.id,
+				content
+			);
+		} catch (error) {
+			console.error(
+				"Failed to send message:",
+				error
+			);
+
+			setMessages((prev) =>
+				prev.filter(
+					(message) =>
+						message.id !== tempMessage.id
+				)
+			);
+		}
+	}
 	return (
 		<DesktopLayout>
 			<XPWindow
@@ -98,8 +173,9 @@ export default function ChatsPageTemplate({
 								selectedFriend?.id
 							}
 							onSelectFriend={
-								setSelectedFriend
+								handleSelectFriend
 							}
+							unreadCounts={unreadCounts}
 						/>
 					</div>
 
@@ -107,8 +183,10 @@ export default function ChatsPageTemplate({
 						{selectedFriend ? (
 							<ChatPanel
 								user={selectedFriend}
-								currentUserId={user.id}
+								currentUserId={user?.id ?? 0}
 								messages={messages}
+								messagesLoading={messagesLoading}
+								onSendMessage={handleSendMessage}
 							/>
 						) : (
 							<div className={styles.empty}>

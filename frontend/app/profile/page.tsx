@@ -48,13 +48,9 @@ export default function ProfilePage() {
 	return (
 		<ProfilePageTemplate
 			user={user ?? undefined}
-
 			friends={friends}
-
 			loadingFriends={loadingFriends}
-
 			isOwnProfile={true}
-
 			onClose={() =>
 				router.push("/home")
 			}

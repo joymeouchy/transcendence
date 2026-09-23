@@ -1,5 +1,15 @@
 .infoGrid {
 	display: flex;
 	flex-direction: column;
-	gap: 8px;
+	gap: 6px;
+
+	font-family: var(--xp-font-main);
+	font-size: 12px;
+}
+
+@media (max-width: 600px) {
+	.infoGrid {
+		gap: 5px;
+		font-size: 11px;
+	}
 }

@@ -55,8 +55,8 @@ export const termsOfServicesItem = {
 
 export const gameStatsItem = {
   image: images.stats,
-  label: "Match History",
-  href: "/matchhistory",
+  label: "Game Stats",
+  href: "/gameStats",
 };
 
 export const marvinItem = {

@@ -13,6 +13,7 @@ export default function AuthLayout({
       <div className="xp-login-center">
         <div className="xp-branding">
           <div className="xp-logo-text">
+            42Beirut <br />
             <span>Pong XP</span>
           </div>
         </div>

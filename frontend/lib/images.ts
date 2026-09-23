@@ -28,13 +28,15 @@ export const images = {
 
 	deepthought: "/DeepThought.png",
 
-	windowsOneCatWallpaper: "/wallpapers/catXP.jpg",
+	windowsOneCatLeftWallpaper: "/wallpapers/catXP.jpg",
+	windowsOneCatRightWallpaper: "/wallpapers/catXP2.jpg",
+	windowsDogWallpaper: "/wallpapers/dogXP.jpg",
+	windowsAnime1Wallpaper: "/wallpapers/animeXP.jpg",
+	windowsAnime2Wallpaper: "/wallpapers/animeXP2.jpg",
 	windowsDontPanicWallpaper: "/wallpapers/dontpanic.jpg",
 	windowsFourCatsWallpaper: "/wallpapers/pspspsXP.jpg",
 	windowsRevacholWallpaper: "/wallpapers/revachol.png",
 	windowsStoneHengeWallpaper: "/wallpapers/Stonehenge.jpg",
 	windowsTulipsWallpaper: "/wallpapers/Tulips.jpg",
 	windowsDefaultWallpaper: "/wallpapers/windows_wallpaper.jpg",
-
-
 };

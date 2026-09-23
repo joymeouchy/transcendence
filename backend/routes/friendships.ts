@@ -7,6 +7,7 @@
 import { Router } from "express";
 import { FriendshipStatus } from "../generated/prisma/client";
 import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
+import { isUserOnline } from "../src/online";
 import prisma from "../src/prisma";
 
 const router = Router();
@@ -259,7 +260,6 @@ router.get("/:userId", async (req, res) => {
             id: true,
             username: true,
             avatarUrl: true,
-            isOnline: true,
           },
         },
         receiver: {
@@ -267,7 +267,6 @@ router.get("/:userId", async (req, res) => {
             id: true,
             username: true,
             avatarUrl: true,
-            isOnline: true,
           },
         },
       },
@@ -279,6 +278,7 @@ router.get("/:userId", async (req, res) => {
       return {
         friendshipId: f.id,
         ...friend,
+        isOnline: isUserOnline(friend.id),
       };
     });
 
