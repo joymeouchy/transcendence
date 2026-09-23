@@ -5,6 +5,7 @@ import MessageBubble from "../MessageBubble/MessagBubble";
 import styles from "./MessageList.module.scss";
 
 import { Message } from "@/types/messages";
+export type { Message };
 
 interface Props {
 	messages: Message[];
