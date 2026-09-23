@@ -22,8 +22,13 @@ the server tell two tabs of the same account apart from two different accounts.
 | `request_rematch` | `{ room: string }` | Request a rematch |
 | `decline_rematch` | `{ room: string }` | Decline a rematch |
 
+**INVITES**
+| `invite_friend` | `{ friendId: number }` | Invite a specific friend to play. Fails with `invite_error` if you're already in a game, the friend is offline, or you already have a pending invite to them |
+| `cancel_invite` | `{ friendId: number }` | Cancel an invite you sent before the friend responds |
+| `invite_response` | `{ fromUserId: number, accepted: boolean }` | Accept or decline an invite you received from `fromUserId` |
+
 **MESSAGES**
-<!-- | `send_message` | `{ fromUserId: number, toUserId: number, content: string }` | Send a chat message | -->
+Messages are sent over REST, not a socket event: see `POST /messages` and `GET /messages/:friendId` (`/api-docs`). The socket is only used for live delivery, below.
 
 ## Server → Client (on)
 
@@ -44,12 +49,12 @@ the server tell two tabs of the same account apart from two different accounts.
 | `power_up_expired` | `{ type: PowerUpType, side: "left" or "right" }` | A power-up's 5s effect just ended |
 
 **GAME END / CONNECTION**
-| `game_over` | `{ winnerSocketId: string, winnerId?: number, winnerUsername: string, scores: { left: number, right: number }, reason?: "disconnect" }` | Game ended (normal win or opponent disconnect) - same shape for both, `reason` is only set for the disconnect case |
+| `game_over` | `{ winnerSocketId: string, winnerId?: number, winnerUsername: string, scores: { left: number, right: number }, reason?: "disconnect" }` | Game ended (normal win or opponent disconnect): same shape for both, `reason` is only set for the disconnect case |
 | `player_disconnected` | none | Opponent disconnected, grace period started |
 | `player_reconnected` | none | Opponent reconnected, game resumed |
 
 **ONLINE**
-| `online_changed` | `{ userId: number, isOnline: boolean }` | Broadcast to every connected client whenever a user's online status actually flips (first tab connecting, or last tab disconnecting) - not sent on every connect/disconnect, only on a real transition |
+| `online_changed` | `{ userId: number, isOnline: boolean }` | Broadcast to every connected client whenever a user's online status actually flips (first tab connecting, or last tab disconnecting): not sent on every connect/disconnect, only on a real transition |
 
 **REMATCH**
 | `rematch_requested` | none | Opponent wants a rematch |
@@ -57,10 +62,15 @@ the server tell two tabs of the same account apart from two different accounts.
 | `rematch_declined` | none | Opponent declined rematch |
 | `rematch_failed` | none | Both players requested a rematch, but the other one disconnected before the new match could start |
 
+**INVITES**
+| `invite_received` | `{ fromUserId: number, fromUsername: string, fromAvatarUrl: string \| null }` | A friend invited you to play |
+| `invite_cancelled` | `{ fromUserId: number }` | The invite from `fromUserId` was cancelled (they cancelled it, timed out, or disconnected) |
+| `invite_declined` | `{ friendId: number }` | `friendId` declined your invite (or disconnected before responding) |
+| `invite_timeout` | `{ friendId: number }` | `friendId` didn't respond within 30s |
+| `invite_error` | `{ message: string }` | Your `invite_friend` request couldn't be sent (see `message`) |
+
 **MESSAGES**
-<!-- | `receive_message` | `{ id, createdAt, content, senderId, receiverId, sender }` | Incoming chat message |
-| `message_sent` | `{ id, createdAt, content, senderId, receiverId, sender }` | Confirm message was saved |
-| `message_error` | `{ error: string }` | Message failed to send | -->
+| `receive_message` | `{ id, createdAt, content, senderId, receiverId, sender: { id, username, avatarUrl } }` | Pushed to the recipient's connected socket(s) right after `POST /messages` persists it, not sent if the recipient is offline (they'll get it from `GET /messages/:friendId` on next load) |
 
 
 **NOTES**

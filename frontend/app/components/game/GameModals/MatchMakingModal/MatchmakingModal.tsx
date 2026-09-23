@@ -9,7 +9,9 @@ import XPModal from "../../../ui/XPModal/XPModal";
 export type MatchmakingStatus =
   | "searching"
   | "waitingFriend"
-  | "found";
+  | "found"
+  | "inviteRejected"
+  | "inviteTimeout";
 
 type Props = {
   isOpen: boolean;
@@ -18,6 +20,8 @@ type Props = {
   opponentName?: string;
 
   onCancel?: () => void;
+  onCancelInvite?: () => void;
+  onInviteResultClose?: () => void;
 };
 
 export default function MatchmakingModal({
@@ -25,6 +29,8 @@ export default function MatchmakingModal({
   status,
   opponentName,
   onCancel,
+  onCancelInvite,
+  onInviteResultClose,
 }: Props) {
   const [dots, setDots] = useState("");
 
@@ -72,13 +78,42 @@ export default function MatchmakingModal({
       hint: "Starting game...",
       showCancel: false,
     },
+    inviteRejected: {
+      title: "Invite Rejected",
+      icon: "❌",
+      heading: "Invite Rejected",
+      message: opponentName
+        ? `${opponentName} rejected your game invite.`
+        : "Your friend rejected your game invite.",
+      hint: "You can go back to the main menu and invite another friend.",
+      showCancel: false,
+    },
+
+    inviteTimeout: {
+      title: "Invite Timeout",
+      icon: "⏰",
+      heading: "Invite Timed Out",
+      message: opponentName
+        ? `${opponentName} did not respond to your invite.`
+        : "Your friend did not respond to the invite.",
+      hint: "You can go back to the main menu and invite another friend.",
+      showCancel: false,
+    },
   }[status];
 
   return (
     <XPModal
       title={content.title}
       isOpen={isOpen}
-      onClose={content.showCancel ? onCancel : undefined}
+      onClose={
+        status === "inviteRejected" || status === "inviteTimeout"
+          ? onInviteResultClose
+          : content.showCancel
+            ? status === "waitingFriend"
+              ? onCancelInvite
+              : onCancel
+            : undefined
+      }
     >
       <div className="matchmaking-modal">
         <div className="matchmaking-modal__icon">
@@ -93,11 +128,25 @@ export default function MatchmakingModal({
 
         {content.showCancel && (
           <div className="buttons">
-            <button onClick={onCancel}>
+            <button
+              onClick={
+                status === "waitingFriend"
+                  ? onCancelInvite
+                  : onCancel
+              }
+            >
               Cancel
             </button>
           </div>
         )}
+        {(status === "inviteRejected" ||
+          status === "inviteTimeout") && (
+            <div className="buttons">
+              <button onClick={onInviteResultClose}>
+                Back to Main Menu
+              </button>
+            </div>
+          )}
       </div>
     </XPModal>
   );
