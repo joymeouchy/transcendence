@@ -20,7 +20,7 @@ export default function GamePage() {
 	const [theme, setTheme] =
 		useState<CustomizationTheme | null>(null);
 
-	const [activeEffects, setActiveEffects] = useState<{
+const [activeEffects, setActiveEffects] = useState<{
 		left: {
 			type: string;
 			expiresAt: number;
@@ -114,12 +114,15 @@ export default function GamePage() {
 				scoreLeft={game.scoreLeft}
 				scoreRight={game.scoreRight}
 				onStartOnline={game.joinQueue}
-				onPlayFriend={game.playFriend}
 				onCancel={game.cancelMatchmaking}
 				onReset={game.resetGame}
 				onCustomize={handleCustomize}
 				onSaveTheme={handleSaveTheme}
 				onBackToSelect={game.backToSelect}
+				onPlayFriend={game.inviteFriend}
+				incomingInvite={game.incomingInvite}
+				onRespondToInvite={game.respondToInvite}
+				onCancelInvite={game.cancelInvite}
 				onExit={() => {
 					game.resetGame();
 					router.push("/home");
