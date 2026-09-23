@@ -10,6 +10,8 @@ import GameOverModal from "./MatchMakingModal/GameOverModal";
 import CustomizationModal from "./CustomizationModal/CustomizationModal";
 import RematchRequestModal from "./RematchRequestModal/RematchRequestModal";
 import OpponentDisconnectedModal from "./MatchMakingModal/OpponentDisconnectedModal";
+import InviteRequestModal from "./InviteRequestModal/InviteRequestModal";
+
 import { Friend } from "@/services/friendships.service";
 import { MatchmakingStatus } from "./MatchMakingModal/MatchmakingModal";
 import { CustomizationTheme } from "@/services/Customization.services";
@@ -21,6 +23,7 @@ interface Props {
 	| "matchmaking"
 	| "playing"
 	| "result";
+
 	room: string;
 	waitingRematch: boolean;
 	rematchRequested: boolean;
@@ -32,20 +35,31 @@ interface Props {
 	currentUser: string;
 	scoreLeft: number;
 	scoreRight: number;
+
+	incomingInvite: {
+		fromUserId: number;
+		fromUsername: string;
+		fromAvatarUrl: string | null;
+	} | null;
+
 	onRematch: () => void;
 	onAcceptRematch: () => void;
 	onDeclineRematch: () => void;
 	onStartOnline: () => void;
-	onPlayFriend: (username: string) => void;
+	onPlayFriend: (friend: Friend) => void;
 	onCancel: () => void;
 	onExit: () => void;
 	onReset: () => void;
 	onCustomize: () => void;
-	onSaveTheme: (
-		theme: CustomizationTheme
-	) => void;
+	onSaveTheme: (theme: CustomizationTheme) => void;
 	onBackToSelect: () => void;
 	onFindAnother: () => void;
+	onCancelInvite: () => void;
+
+	onRespondToInvite: (
+		fromUserId: number,
+		accepted: boolean
+	) => void;
 }
 
 export default function GameModals({
@@ -73,7 +87,9 @@ export default function GameModals({
 	onCustomize,
 	onSaveTheme,
 	onBackToSelect,
-
+	incomingInvite,
+	onRespondToInvite,
+	onCancelInvite,
 }: Props) {
 	const [showFriendSelect, setShowFriendSelect] =
 		useState(false);
@@ -84,7 +100,7 @@ export default function GameModals({
 
 	const handleSelectFriend = (friend: Friend) => {
 		setShowFriendSelect(false);
-		onPlayFriend(friend.username);
+		onPlayFriend(friend);
 	};
 
 	return (
@@ -92,7 +108,8 @@ export default function GameModals({
 			<MatchSelectModal
 				isOpen={
 					modalState === "select" &&
-					!showFriendSelect}
+					!showFriendSelect
+				}
 				onStartOnline={onStartOnline}
 				onPlayFriend={handlePlayFriend}
 				onCustomize={onCustomize}
@@ -101,16 +118,9 @@ export default function GameModals({
 			/>
 
 			<FriendSelectModal
-				isOpen={
-					modalState === "select" &&
-					showFriendSelect
-				}
-				onClose={() =>
-					setShowFriendSelect(false)
-				}
-				onSelectFriend={
-					handleSelectFriend
-				}
+				isOpen={showFriendSelect}
+				onClose={() => setShowFriendSelect(false)}
+				onSelectFriend={handleSelectFriend}
 			/>
 
 			<CustomizationModal
@@ -124,6 +134,8 @@ export default function GameModals({
 				status={matchmakingStatus}
 				opponentName={opponentName}
 				onCancel={onCancel}
+				onCancelInvite={onCancelInvite}
+				onInviteResultClose={onBackToSelect}
 			/>
 
 			<GameOverModal
@@ -150,6 +162,22 @@ export default function GameModals({
 				isOpen={opponentDisconnected}
 				onFindAnother={onFindAnother}
 				onExit={onReset}
+			/>
+
+			<InviteRequestModal
+				isOpen={incomingInvite !== null}
+				username={incomingInvite?.fromUsername ?? ""}
+				avatarUrl={incomingInvite?.fromAvatarUrl ?? null}
+				onAccept={() => {
+					if (incomingInvite) {
+						onRespondToInvite(incomingInvite.fromUserId, true);
+					}
+				}}
+				onDecline={() => {
+					if (incomingInvite) {
+						onRespondToInvite(incomingInvite.fromUserId, false);
+					}
+				}}
 			/>
 		</>
 	);

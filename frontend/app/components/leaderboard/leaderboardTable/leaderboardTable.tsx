@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import {
 	LeaderboardPlayer,
-} from "../leaderboardPodium/LeaderboardPodium";
+} from "../leaderboardPodium/leaderboardPodium";
 
 import styles from "./leaderboardTable.module.scss";
 

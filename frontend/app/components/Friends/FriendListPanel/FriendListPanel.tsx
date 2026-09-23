@@ -18,6 +18,7 @@ interface Props {
 	) => void;
 
 	selectedFriendId?: number;
+	unreadCounts?: Record<number, number>;
 }
 
 export default function FriendsListPanel({
@@ -25,6 +26,7 @@ export default function FriendsListPanel({
 	onRemoveFriend,
 	onSelectFriend,
 	selectedFriendId,
+	unreadCounts,
 }: Props) {
 	const [removingFriendId, setRemovingFriendId] =
 		useState<number | null>(null);
@@ -58,53 +60,63 @@ export default function FriendsListPanel({
 						No friends yet
 					</div>
 				) : (
-					friends.map((friend) => (
-						<div
-							key={friend.friendshipId}
-							className={`${styles.friend} ${
-								selectedFriendId === friend.id
-									? styles.selected
-									: ""
-							}`}
-							onClick={() =>
-								onSelectFriend?.(friend)
-							}
-						>
-							<div className={styles.user}>
-								<span
-									className={`${styles.dot} ${
-										friend.isOnline
-											? styles.online
-											: styles.offline
+					friends.map((friend) => {
+						const unreadCount =
+							unreadCounts?.[friend.id] ?? 0;
+
+						return (
+							<div
+								key={friend.friendshipId}
+								className={`${styles.friend} ${selectedFriendId === friend.id
+										? styles.selected
+										: ""
 									}`}
-								/>
+								onClick={() =>
+									onSelectFriend?.(friend)
+								}
+							>
+								<div className={styles.user}>
+									<span
+										className={`${styles.dot} ${friend.isOnline
+												? styles.online
+												: styles.offline
+											}`}
+									/>
+									{friend.username}
+								</div>
 
-								{friend.username}
-							</div>
+								{unreadCount > 0 && (
+									<span className={styles.unread}>
+										{unreadCount}
+									</span>
+								)}
 
-							{onRemoveFriend && (
-								<button
-									className={styles.friendButton}
-									disabled={
-										removingFriendId ===
-										friend.friendshipId
-									}
-									onClick={(e) => {
-										e.stopPropagation();
-
-										handleRemoveFriend(
+								{onRemoveFriend && (
+									<button
+										className={
+											styles.friendButton
+										}
+										disabled={
+											removingFriendId ===
 											friend.friendshipId
-										);
-									}}
-								>
-									{removingFriendId ===
-									friend.friendshipId
-										? "Removing..."
-										: "Remove"}
-								</button>
-							)}
-						</div>
-					))
+										}
+										onClick={(e) => {
+											e.stopPropagation();
+
+											handleRemoveFriend(
+												friend.friendshipId
+											);
+										}}
+									>
+										{removingFriendId ===
+											friend.friendshipId
+											? "Removing..."
+											: "Remove"}
+									</button>
+								)}
+							</div>
+						);
+					})
 				)}
 			</div>
 		</div>
