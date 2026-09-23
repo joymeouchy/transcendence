@@ -49,6 +49,9 @@ let waitingPlayer: any = null;
 let matchId = 0;
 const socketToUser = new Map<string, number>(); // socketId → userId
 const rematches = new Map<string, string[]>(); // room → [socketIds who want rematch]
+// "inviterId:inviteeId" → the pending friend invite between them
+const pendingInvites = new Map<string, { inviterSocketId: string; timeout: NodeJS.Timeout }>();
+const INVITE_TIMEOUT_MS = 30000;
 
 const app = express();
 app.use(
@@ -102,6 +105,12 @@ async function cleanupOldMessages() {
 
 cleanupOldMessages();
 setInterval(cleanupOldMessages, MESSAGE_CLEANUP_INTERVAL_MS);
+// in-memory socket tracking (onlineUsers/socketToUser) always starts empty on
+// boot, so no one is actually connected yet - clear out any isOnline flags
+// left over from before the last restart/crash
+prisma.user
+  .updateMany({ where: { isOnline: true }, data: { isOnline: false } })
+  .catch((err) => console.error("Failed to reset online status on startup:", err));
 
 // Authenticate the socket connection using the same JWT issued by /auth/login
 // or /auth/register, so we know the real userId behind a socket instead of
@@ -177,6 +186,9 @@ io.on("connection", (socket) => {
 
   if (wasOffline) {
     io.emit("online_changed", { userId, isOnline: true });
+    prisma.user
+      .update({ where: { id: userId }, data: { isOnline: true } })
+      .catch((err) => console.error("Failed to mark user online:", err));
   }
 
   if (socket.recovered) {
@@ -349,7 +361,116 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("disconnect", () => {
+  socket.on("invite_friend", ({ friendId }: { friendId: number }) => {
+    const inviterId = socketToUser.get(socket.id);
+    if (!inviterId) return;
+
+    if (inviterId === friendId) {
+      socket.emit("invite_error", { message: "You can't invite yourself." });
+      return;
+    }
+
+    if (findRoomBySocket(socket.id)) {
+      socket.emit("invite_error", { message: "You're already in a game." });
+      return;
+    }
+
+    const friendSockets = onlineUsers.get(friendId);
+    if (!friendSockets || friendSockets.size === 0) {
+      socket.emit("invite_error", { message: "Your friend is offline." });
+      return;
+    }
+
+    const key = `${inviterId}:${friendId}`;
+    if (pendingInvites.has(key)) {
+      socket.emit("invite_error", { message: "You already invited this friend." });
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      pendingInvites.delete(key);
+      socket.emit("invite_timeout", { friendId });
+      for (const friendSocketId of friendSockets) {
+        io.to(friendSocketId).emit("invite_cancelled", { fromUserId: inviterId });
+      }
+    }, INVITE_TIMEOUT_MS);
+
+    pendingInvites.set(key, { inviterSocketId: socket.id, timeout });
+
+    for (const friendSocketId of friendSockets) {
+      io.to(friendSocketId).emit("invite_received", {
+        fromUserId: inviterId,
+        fromUsername: socket.data.username,
+        fromAvatarUrl: socket.data.avatarUrl,
+      });
+    }
+  });
+
+  socket.on("cancel_invite", ({ friendId }: { friendId: number }) => {
+    const inviterId = socketToUser.get(socket.id);
+    if (!inviterId) return;
+
+    const key = `${inviterId}:${friendId}`;
+    const pending = pendingInvites.get(key);
+    if (!pending) return;
+
+    clearTimeout(pending.timeout);
+    pendingInvites.delete(key);
+
+    const friendSockets = onlineUsers.get(friendId);
+    friendSockets?.forEach((friendSocketId) =>
+      io.to(friendSocketId).emit("invite_cancelled", { fromUserId: inviterId }),
+    );
+  });
+
+  socket.on("invite_response", async ({ fromUserId, accepted }: { fromUserId: number; accepted: boolean }) => {
+    const responderId = socketToUser.get(socket.id);
+    if (!responderId) return;
+
+    const key = `${fromUserId}:${responderId}`;
+    const pending = pendingInvites.get(key);
+    if (!pending) return;
+
+    clearTimeout(pending.timeout);
+    pendingInvites.delete(key);
+
+    const inviterSocket = io.sockets.sockets.get(pending.inviterSocketId);
+    if (!inviterSocket) return; // inviter disconnected before responding
+
+    if (!accepted) {
+      inviterSocket.emit("invite_declined", { friendId: responderId });
+      return;
+    }
+
+    if (findRoomBySocket(inviterSocket.id) || findRoomBySocket(socket.id)) {
+      inviterSocket.emit("invite_error", { message: "Your friend is no longer available." });
+      return;
+    }
+
+    if (waitingPlayer?.id === inviterSocket.id || waitingPlayer?.id === socket.id) {
+      waitingPlayer = null;
+    }
+
+    const room = `match-${matchId++}`;
+    inviterSocket.join(room);
+    socket.join(room);
+
+    const [leftAvatar, rightAvatar] = await Promise.all([
+      getCurrentAvatarUrl(fromUserId),
+      getCurrentAvatarUrl(responderId),
+    ]);
+
+    io.to(room).emit("match_found", {
+      room,
+      players: [inviterSocket.data.username, socket.data.username],
+      avatars: { left: leftAvatar, right: rightAvatar },
+    });
+
+    startGame(io, room, inviterSocket.id, socket.id, socketToUser);
+    console.log("Friend match started in room:", room);
+  });
+
+  socket.on("disconnect", async () => {
     const userId = socketToUser.get(socket.id);
     if (userId) {
       socketToUser.delete(socket.id);
@@ -358,13 +479,40 @@ io.on("connection", (socket) => {
       userSockets?.delete(socket.id);
 
       // only mark offline once every socket/tab for this user has disconnected.
-      // No DB write and no await here - this stays fully synchronous so a
-      // reconnect can't interleave between the Set mutation and the emit
-      // (that gap is what let a stale disconnect race a newer connect before).
+      // DB bookkeeping is async and intentionally not awaited so state changes
+      // in onlineUsers + online_changed stay synchronous.
       if (!userSockets || userSockets.size === 0) {
         onlineUsers.delete(userId);
         io.emit("online_changed", { userId, isOnline: false });
+        prisma.user
+          .update({
+            where: { id: userId },
+            data: { isOnline: false },
+          })
+          .catch((err) => console.error("Failed to mark user offline:", err));
+
         console.log(`User ${userId} is offline`);
+      }
+
+      const stillOnline = onlineUsers.get(userId);
+      for (const [key, pending] of pendingInvites) {
+        const [, inviteeIdStr] = key.split(":");
+
+        if (pending.inviterSocketId === socket.id) {
+          // the tab that sent the invite is gone - cancel it
+          clearTimeout(pending.timeout);
+          pendingInvites.delete(key);
+          onlineUsers
+            .get(Number(inviteeIdStr))
+            ?.forEach((sId) => io.to(sId).emit("invite_cancelled", { fromUserId: userId }));
+        } else if (Number(inviteeIdStr) === userId && !stillOnline) {
+          // the invitee has no sockets left connected - treat as a decline
+          clearTimeout(pending.timeout);
+          pendingInvites.delete(key);
+          io.sockets.sockets
+            .get(pending.inviterSocketId)
+            ?.emit("invite_declined", { friendId: userId });
+        }
       }
     }
     console.log("Disconnected:", socket.id);
