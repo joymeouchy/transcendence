@@ -14,6 +14,7 @@ interface Props {
 	user: Friend;
 	currentUserId: number;
 	messages: Message[];
+	messagesLoading?: boolean;
 	onSendMessage?: (message: string) => void;
 }
 
@@ -21,6 +22,7 @@ export default function ChatPanel({
 	user,
 	currentUserId,
 	messages,
+	messagesLoading,
 	onSendMessage,
 }: Props) {
 	return (
@@ -30,6 +32,7 @@ export default function ChatPanel({
 			<MessageList
 				messages={messages}
 				currentUserId={currentUserId}
+				messagesLoading={messagesLoading}
 			/>
 
 			<ChatInput

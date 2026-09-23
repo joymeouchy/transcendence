@@ -4,14 +4,18 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
-import { FriendshipService } from "@/services/friendships.service";
-import { Friend, PendingRequest, } from "@/services/friendships.service";
+import {
+	FriendshipService,
+	Friend,
+	PendingRequest,
+} from "@/services/friendships.service";
 
 import FriendsPageTemplate from "../components/Friends/FriendsPageTemplate/FriendsPageTemplate";
 
 export default function FriendsPage() {
 	const router = useRouter();
-	const { user } = useAuth();
+	const { user, onlineUsers } = useAuth();
+
 	const [friends, setFriends] = useState<Friend[]>([]);
 	const [requests, setRequests] = useState<PendingRequest[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -50,15 +54,13 @@ export default function FriendsPage() {
 		if (!user) return;
 
 		try {
-			const [
-				friendsData,
-				requestsData,
-			] = await Promise.all([
-				FriendshipService.getFriends(user.id),
-				FriendshipService.getPendingRequests(
-					user.id
-				),
-			]);
+			const [friendsData, requestsData] =
+				await Promise.all([
+					FriendshipService.getFriends(user.id),
+					FriendshipService.getPendingRequests(
+						user.id
+					),
+				]);
 
 			setFriends(friendsData);
 			setRequests(requestsData);
@@ -142,9 +144,15 @@ export default function FriendsPage() {
 		}
 	}
 
+	const liveFriends = friends.map((friend) => ({
+		...friend,
+		isOnline:
+			onlineUsers[friend.id] ?? friend.isOnline,
+	}));
+
 	return (
 		<FriendsPageTemplate
-			friends={friends}
+			friends={liveFriends}
 			requests={requests}
 			loading={loading}
 			onAccept={handleAccept}
