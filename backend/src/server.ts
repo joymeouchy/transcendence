@@ -461,7 +461,7 @@ io.on("connection", (socket) => {
     console.log("Friend match started in room:", room);
   });
 
-  socket.on("disconnect", async () => {
+  socket.on("disconnect", () => {
     const userId = socketToUser.get(socket.id);
     if (userId) {
       socketToUser.delete(socket.id);
@@ -469,17 +469,13 @@ io.on("connection", (socket) => {
       const userSockets = onlineUsers.get(userId);
       userSockets?.delete(socket.id);
 
-      // only mark offline once every socket/tab for this user has disconnected
+      // only mark offline once every socket/tab for this user has disconnected.
+      // No DB write and no await here - this stays fully synchronous so a
+      // reconnect can't interleave between the Set mutation and the emit
+      // (that gap is what let a stale disconnect race a newer connect before).
       if (!userSockets || userSockets.size === 0) {
         onlineUsers.delete(userId);
-
-        await prisma.user
-          .update({
-            where: { id: userId },
-            data: { isOnline: false },
-          })
-          .catch((err) => console.error("Failed to mark user offline:", err));
-
+        io.emit("online_changed", { userId, isOnline: false });
         console.log(`User ${userId} is offline`);
       }
 
@@ -502,15 +498,6 @@ io.on("connection", (socket) => {
             .get(pending.inviterSocketId)
             ?.emit("invite_declined", { friendId: userId });
         }
-      }
-      // only mark offline once every socket/tab for this user has disconnected.
-      // No DB write and no await here - this stays fully synchronous so a
-      // reconnect can't interleave between the Set mutation and the emit
-      // (that gap is what let a stale disconnect race a newer connect before).
-      if (!userSockets || userSockets.size === 0) {
-        onlineUsers.delete(userId);
-        io.emit("online_changed", { userId, isOnline: false });
-        console.log(`User ${userId} is offline`);
       }
     }
     console.log("Disconnected:", socket.id);
