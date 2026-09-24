@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CustomizationTheme, customizationService, } from "@/services/Customization.services";
+import { socket } from "@/lib/socket";
 
 import GameCanvas from "../components/game/GameCanvas";
 import GameModals from "../components/game/GameModals/GameModals";
@@ -17,6 +18,23 @@ export default function GamePage() {
 
 	const game = useGameSocket();
 
+// 	useEffect(() => {
+// 	const handlePageLeave = () => {
+// 		console.log("Leaving game page");
+// 		socket.disconnect();
+// 	};
+
+// 	window.addEventListener("pagehide", handlePageLeave);
+
+// 	return () => {
+// 		window.removeEventListener("pagehide", handlePageLeave);
+// 	};
+// }, []);
+// useEffect(() => {
+// 	if (!socket.connected) {
+// 		socket.connect();
+// 	}
+// }, []);
 	const [theme, setTheme] =
 		useState<CustomizationTheme | null>(null);
 
@@ -51,6 +69,7 @@ const [activeEffects, setActiveEffects] = useState<{
 		loadTheme();
 
 	}, []);
+	
 
 	const handleCustomize = () => {
 		game.setModalState("customization");
@@ -99,7 +118,6 @@ const [activeEffects, setActiveEffects] = useState<{
 			<GameModals
 				opponentDisconnected={game.opponentDisconnected}
 				onFindAnother={game.findAnotherPlayer}
-				room={game.room}
 				waitingRematch={game.waitingRematch}
 				rematchRequested={game.rematchRequested}
 				rematchDeclined={game.rematchDeclined}
@@ -120,8 +138,6 @@ const [activeEffects, setActiveEffects] = useState<{
 				onSaveTheme={handleSaveTheme}
 				onBackToSelect={game.backToSelect}
 				onPlayFriend={game.inviteFriend}
-				incomingInvite={game.incomingInvite}
-				onRespondToInvite={game.respondToInvite}
 				onCancelInvite={game.cancelInvite}
 				onExit={() => {
 					game.resetGame();

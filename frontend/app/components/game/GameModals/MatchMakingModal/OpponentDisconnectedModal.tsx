@@ -6,13 +6,11 @@ import XPModal from "../../../ui/XPModal/XPModal";
 
 type Props = {
   isOpen: boolean;
-  onFindAnother: () => void;
   onExit: () => void;
 };
 
 export default function OpponentDisconnectedModal({
   isOpen,
-  onFindAnother,
   onExit,
 }: Props) {
   return (
@@ -26,17 +24,17 @@ export default function OpponentDisconnectedModal({
         <h2>Opponent Disconnected</h2>
 
         <p>
-          The match ended because your opponent
-          left the game.
+          Your opponent has disconnected.
+        </p>
+
+        <p>
+          The game is paused while we wait for them
+          to reconnect.
         </p>
 
         <div className="buttons">
-          <button onClick={onFindAnother}>
-            Find Another Player
-          </button>
-
           <button onClick={onExit}>
-            Return to Main Menu
+            Leave Game
           </button>
         </div>
       </div>
