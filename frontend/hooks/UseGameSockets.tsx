@@ -99,6 +99,8 @@ export default function useGameSocket() {
 			right: null,
 		});
 
+	// const [opponentReconnected, setOpponentReconnected] =
+	// 	useState(false);
 
 	useEffect(() => {
 		const handleConnect = () => {
@@ -178,28 +180,21 @@ export default function useGameSocket() {
 		};
 
 		const handleGameOver = (data: {
-			winnerSocketId: string;
-			winnerId: number;
-			winnerUsername: string;
-			scores: {
-				left: number;
-				right: number;
-			};
-		}) => {
-			console.log(
-				"GAME OVER DATA:",
-				data
-			);
+	winnerSocketId: string;
+	winnerId: number;
+	winnerUsername: string;
+	scores: { left: number; right: number };
+	reason?: "disconnect";
+}) => {
+	console.log("GAME OVER DATA:", data);
 
-			setWinner(data.winnerUsername);
-			setScoreLeft(data.scores.left);
-			setScoreRight(data.scores.right);
-			setModalState("result");
-		};
+	setOpponentDisconnected(false);
+	setWinner(data.winnerUsername);
+	setScoreLeft(data.scores.left);
+	setScoreRight(data.scores.right);
+	setModalState("result");
+};
 
-		const handleOpponentDisconnected = () => {
-			setOpponentDisconnected(true);
-		};
 
 		const handlePowerUpIncoming = (data: {
 			type: string;
@@ -254,13 +249,14 @@ export default function useGameSocket() {
 		socket.on("rematch_accepted", handleRematchAccepted);
 		socket.on("rematch_declined", handleRematchDeclined);
 		socket.on("rematch_failed", handleRematchFailed);
-		socket.on("player_disconnected", handleOpponentDisconnected);
 		socket.on("power_up_incoming", handlePowerUpIncoming);
 		socket.on("power_up_activated", handlePowerUpActivated);
 		socket.on("paddle_hit", handlePaddleHit);
 		socket.on("invite_declined", handleInviteDeclined);
 		socket.on("invite_timeout", handleInviteTimeout);
 		socket.on("invite_error", handleInviteError);
+		socket.on("player_disconnected", handleOpponentDisconnected);
+		socket.on("player_reconnected", handleOpponentReconnected);
 
 		return () => {
 			socket.off("connect", handleConnect);
@@ -271,13 +267,14 @@ export default function useGameSocket() {
 			socket.off("rematch_accepted", handleRematchAccepted);
 			socket.off("rematch_declined", handleRematchDeclined);
 			socket.off("rematch_failed", handleRematchFailed);
-			socket.off("player_disconnected", handleOpponentDisconnected);
 			socket.off("power_up_incoming", handlePowerUpIncoming);
 			socket.off("power_up_activated", handlePowerUpActivated);
 			socket.off("paddle_hit", handlePaddleHit);
 			socket.off("invite_declined", handleInviteDeclined);
 			socket.off("invite_timeout", handleInviteTimeout);
 			socket.off("invite_error", handleInviteError);
+			socket.off("player_disconnected", handleOpponentDisconnected);
+			socket.off("player_reconnected", handleOpponentReconnected);
 		};
 	}, [user]);
 
@@ -367,6 +364,16 @@ export default function useGameSocket() {
 		setInviteWaiting(false);
 		setInviteError(data.message);
 		setModalState("select");
+	};
+
+	const handleOpponentDisconnected = () => {
+		console.log("Opponent disconnected");
+		setOpponentDisconnected(true);
+	};
+
+	const handleOpponentReconnected = () => {
+		console.log("Opponent reconnected");
+		setOpponentDisconnected(false);
 	};
 
 	function cancelMatchmaking() {
