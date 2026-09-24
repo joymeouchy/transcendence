@@ -2,9 +2,10 @@
 --need handling errors from apis
 --fix match history width when no matches vs when there is
 --add button to remove profile picture
---user disconnect
---listen to `online_changed` where isOnline is used
+<!-- --listen to `online_changed` where isOnline is used -->
 --add emojis to chat
+--make sidebar modular when resizing window in height
+
 
 
 **what rawan needs:**
