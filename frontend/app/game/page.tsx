@@ -6,7 +6,7 @@ import { CustomizationTheme, customizationService, } from "@/services/Customizat
 
 import GameCanvas from "../components/game/GameCanvas";
 import GameModals from "../components/game/GameModals/GameModals";
-import useGameSocket from "../components/game/GameModals/UseGameSockets";
+import useGameSocket from "../../hooks/UseGameSockets";
 import PlayerInfo from "../components/game/playerInfo/playerInfo";
 
 import "./page.scss";
