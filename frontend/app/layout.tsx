@@ -5,6 +5,8 @@ import "./globals.scss";
 import "./styles/xp-theme.scss"
 
 import { AuthProvider } from "@/context/AuthContext";
+import { GameInviteProvider } from "@/context/GameInviteContext";
+import GameInvitePopup from "./components/GameInvitePopup/GameInvitePopup";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +35,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
       <body>
-        { <AuthProvider>{children}</AuthProvider> }
+        {<AuthProvider>
+          <GameInviteProvider>
+              {children}
+            <GameInvitePopup />
+          </GameInviteProvider>
+        </AuthProvider>}
       </body>
     </html>
   );

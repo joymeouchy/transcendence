@@ -35,7 +35,7 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "app/components/game/GameModals/UseGameSockets.tsx"  ],
+, "hooks/UseGameSockets.tsx"  ],
   "exclude": [
     "node_modules"
   ]

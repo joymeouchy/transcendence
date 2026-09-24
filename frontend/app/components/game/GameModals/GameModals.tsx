@@ -10,7 +10,6 @@ import GameOverModal from "./MatchMakingModal/GameOverModal";
 import CustomizationModal from "./CustomizationModal/CustomizationModal";
 import RematchRequestModal from "./RematchRequestModal/RematchRequestModal";
 import OpponentDisconnectedModal from "./MatchMakingModal/OpponentDisconnectedModal";
-import InviteRequestModal from "./InviteRequestModal/InviteRequestModal";
 
 import { Friend } from "@/services/friendships.service";
 import { MatchmakingStatus } from "./MatchMakingModal/MatchmakingModal";
@@ -24,7 +23,6 @@ interface Props {
 	| "playing"
 	| "result";
 
-	room: string;
 	waitingRematch: boolean;
 	rematchRequested: boolean;
 	rematchDeclined: boolean;
@@ -35,12 +33,6 @@ interface Props {
 	currentUser: string;
 	scoreLeft: number;
 	scoreRight: number;
-
-	incomingInvite: {
-		fromUserId: number;
-		fromUsername: string;
-		fromAvatarUrl: string | null;
-	} | null;
 
 	onRematch: () => void;
 	onAcceptRematch: () => void;
@@ -55,15 +47,9 @@ interface Props {
 	onBackToSelect: () => void;
 	onFindAnother: () => void;
 	onCancelInvite: () => void;
-
-	onRespondToInvite: (
-		fromUserId: number,
-		accepted: boolean
-	) => void;
 }
 
 export default function GameModals({
-	room,
 	waitingRematch,
 	rematchRequested,
 	rematchDeclined,
@@ -87,8 +73,6 @@ export default function GameModals({
 	onCustomize,
 	onSaveTheme,
 	onBackToSelect,
-	incomingInvite,
-	onRespondToInvite,
 	onCancelInvite,
 }: Props) {
 	const [showFriendSelect, setShowFriendSelect] =
@@ -162,22 +146,6 @@ export default function GameModals({
 				isOpen={opponentDisconnected}
 				onFindAnother={onFindAnother}
 				onExit={onReset}
-			/>
-
-			<InviteRequestModal
-				isOpen={incomingInvite !== null}
-				username={incomingInvite?.fromUsername ?? ""}
-				avatarUrl={incomingInvite?.fromAvatarUrl ?? null}
-				onAccept={() => {
-					if (incomingInvite) {
-						onRespondToInvite(incomingInvite.fromUserId, true);
-					}
-				}}
-				onDecline={() => {
-					if (incomingInvite) {
-						onRespondToInvite(incomingInvite.fromUserId, false);
-					}
-				}}
 			/>
 		</>
 	);
