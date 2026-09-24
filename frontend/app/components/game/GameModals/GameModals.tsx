@@ -144,7 +144,7 @@ export default function GameModals({
 
 			<OpponentDisconnectedModal
 				isOpen={opponentDisconnected}
-				onFindAnother={onFindAnother}
+				// onFindAnother={onFindAnother}
 				onExit={onReset}
 			/>
 		</>
