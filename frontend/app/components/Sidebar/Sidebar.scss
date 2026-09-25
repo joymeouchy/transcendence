@@ -1,47 +1,53 @@
 .xp-sidebar {
-  width: 100px;
+  width: 160px;
   height: 100vh;
-
-  padding-top: 20px;
-  padding-left: 10px;
+  padding: 20px 10px;
 
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  flex-wrap: wrap;
+  align-content: flex-start;
+
+  gap: 20px 16px;
 
   font-family: var(--xp-font-main);
+  box-sizing: border-box;
 }
 
 .xp-icon {
   width: 72px;
+  height: 82px;
+  flex: 0 0 82px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   gap: 6px;
+
+  padding: 4px;
+  box-sizing: border-box;
 
   background: transparent;
   border: none;
-
   cursor: pointer;
 
   color: white;
-
   font-family: var(--xp-font-main);
   font-size: 12px;
-
+  line-height: 1.2;
   text-align: center;
+  text-decoration: none;
 }
 
 .xp-icon img {
   width: 64px;
   height: 64px;
-
   object-fit: contain;
+  flex-shrink: 0;
 }
 
 .xp-icon:hover {
   background: rgba(255, 255, 255, 0.15);
-
   border-radius: var(--xp-radius-sm);
 }

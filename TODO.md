@@ -2,8 +2,7 @@
 --add button to remove profile picture : added the button but no backend to connect
 --need handling errors from apis
 --add emojis to chat
---make sidebar modular when resizing window in height
---double check the playing 3 players simultanuously. started fixing not fully functional yet
+d .--double check the playing 3 players simultanuously. started fixing not fully functional yet
 
 
 
