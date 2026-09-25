@@ -1,10 +1,9 @@
 **what joy needs:**
+--add button to remove profile picture : added the button but no backend to connect
 --need handling errors from apis
---fix match history width when no matches vs when there is
---add button to remove profile picture
-<!-- --listen to `online_changed` where isOnline is used -->
 --add emojis to chat
 --make sidebar modular when resizing window in height
+--double check the playing 3 players simultanuously. started fixing not fully functional yet
 
 
 
@@ -14,9 +13,10 @@
 --~~invite friends to join game socket~~
 --recheck how it's storing user new pfp
 --if online sockets works from both sides, remove isOnline attribute from db
+--add backend for remove profile picture button
+-- README2: ctrl + F "TODO" find all the notes i added and double check everything and if i missed any modules. there are things i didnt add/adjust yet
 
 
---readme
 --save pics online
 
 
