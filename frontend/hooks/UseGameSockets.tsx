@@ -66,8 +66,7 @@ export default function useGameSocket() {
 		"timeout" | "rejected" | null
 	>(null);
 
-	const [inviteError, setInviteError] =
-		useState("");
+	
 
 	const [inviteWaiting, setInviteWaiting] =
 		useState(false);
@@ -180,20 +179,20 @@ export default function useGameSocket() {
 		};
 
 		const handleGameOver = (data: {
-	winnerSocketId: string;
-	winnerId: number;
-	winnerUsername: string;
-	scores: { left: number; right: number };
-	reason?: "disconnect";
-}) => {
-	console.log("GAME OVER DATA:", data);
+			winnerSocketId: string;
+			winnerId: number;
+			winnerUsername: string;
+			scores: { left: number; right: number };
+			reason?: "disconnect";
+		}) => {
+			console.log("GAME OVER DATA:", data);
 
-	setOpponentDisconnected(false);
-	setWinner(data.winnerUsername);
-	setScoreLeft(data.scores.left);
-	setScoreRight(data.scores.right);
-	setModalState("result");
-};
+			setOpponentDisconnected(false);
+			setWinner(data.winnerUsername);
+			setScoreLeft(data.scores.left);
+			setScoreRight(data.scores.right);
+			setModalState("result");
+		};
 
 
 		const handlePowerUpIncoming = (data: {
@@ -300,7 +299,7 @@ export default function useGameSocket() {
 			return;
 		}
 
-		setInviteError("");
+		// setInviteError("");
 		setInvitedFriendId(friend.id);
 		setInviteWaiting(true);
 		setOpponentName(friend.username);
@@ -356,15 +355,15 @@ export default function useGameSocket() {
 		setModalState("matchmaking");
 	};
 
-	const handleInviteError = (data: {
-		message: string;
-	}) => {
-		console.log("Invite error:", data);
+	const handleInviteError = (data: { message: string }) => {
+	console.log("Invite error:", data.message);
 
-		setInviteWaiting(false);
-		setInviteError(data.message);
-		setModalState("select");
-	};
+	setInviteWaiting(false);
+	setInvitedFriendId(null);
+
+	setMatchmakingStatus("inviteBusy");
+	setModalState("matchmaking");
+};
 
 	const handleOpponentDisconnected = () => {
 		console.log("Opponent disconnected");
@@ -488,7 +487,7 @@ export default function useGameSocket() {
 		handleRespondToInvite,
 
 		inviteWaiting,
-		inviteError,
+		// inviteError,
 		inviteResult,
 		closeInviteResult,
 	};
