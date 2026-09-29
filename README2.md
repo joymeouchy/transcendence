@@ -442,7 +442,7 @@ Describe how it was implemented.
 
 **Contributors:**
 
-- `rdennaou`
+- `jmeouchy`
 
 ---
 
@@ -464,7 +464,7 @@ Describe how it was implemented.
 
 **Contributors:**
 
-- `rdennaou`
+- `jmeouchy and rdennaou`
 
 ---
 
@@ -504,7 +504,7 @@ Describe how it was implemented.
 
 **Contributors:**
 
-- `rdennaou`
+- `jmeouchy and rdennaou`
 
 ---
 

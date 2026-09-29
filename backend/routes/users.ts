@@ -9,7 +9,6 @@ import { isUserOnline } from "../src/online";
 import prisma from "../src/prisma";
 
 const router = Router();
-const BACKEND_URL = (process.env.BACKEND_URL || "http://localhost:3001").replace(/\/+$/, "");
 
 /**
  * @swagger
@@ -249,6 +248,157 @@ router.get("/search", authHelper, async (req: AuthRequest, res) => {
       users.map((u) => ({ ...u, isOnline: isUserOnline(u.id) })),
     );
   } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+/**
+ * @swagger
+ * /users/leaderboard:
+ *   get:
+ *     summary: Get leaderboard rankings for all players or only the current user's friends
+ *     description: >
+ *       Players are ranked by win rate, then by wins, then by fewest losses.
+ *       Players with no matches are included at the bottom (0% win rate).
+ *       The "friends" scope always includes the current user.
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bearer token, e.g. "Bearer <token>"
+ *       - in: query
+ *         name: scope
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [all, friends]
+ *           default: all
+ *     responses:
+ *       200:
+ *         description: Players sorted by rank
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   rank:
+ *                     type: integer
+ *                     example: 1
+ *                   id:
+ *                     type: integer
+ *                   username:
+ *                     type: string
+ *                   avatarUrl:
+ *                     type: string
+ *                     nullable: true
+ *                   wins:
+ *                     type: integer
+ *                   losses:
+ *                     type: integer
+ *                   totalMatches:
+ *                     type: integer
+ *                   winRate:
+ *                     type: integer
+ *                     description: Percentage, rounded (0-100)
+ *                     example: 67
+ *       400:
+ *         description: Invalid scope
+ *       401:
+ *         description: No token provided
+ *       500:
+ *         description: Server error
+ */
+router.get("/leaderboard", authHelper, async (req: AuthRequest, res) => {
+  try {
+    const currentUserId = req.userId!;
+    const scope = (req.query.scope as string) || "all";
+
+    if (scope !== "all" && scope !== "friends") {
+      return res.status(400).json({ error: "Invalid scope, use 'all' or 'friends'" });
+    }
+
+    // restrict to the current user + accepted friends when scope is "friends"
+    let userIds: number[] | undefined;
+    if (scope === "friends") {
+      const friendships = await prisma.friendship.findMany({
+        where: {
+          status: FriendshipStatus.accepted,
+          OR: [{ senderId: currentUserId }, { receiverId: currentUserId }],
+        },
+        select: { senderId: true, receiverId: true },
+      });
+
+      userIds = [
+        currentUserId,
+        ...friendships.map((f) =>
+          f.senderId === currentUserId ? f.receiverId : f.senderId,
+        ),
+      ];
+    }
+
+    const idFilter = userIds ? { in: userIds } : {};
+
+    // count wins and matches played per user in the DB instead of loading every match
+    const [users, winCounts, p1Counts, p2Counts] = await Promise.all([
+      prisma.user.findMany({
+        where: { id: idFilter },
+        select: { id: true, username: true, avatarUrl: true },
+      }),
+      prisma.match.groupBy({
+        by: ["winnerId"],
+        where: { winnerId: { not: null, ...idFilter } },
+        _count: { _all: true },
+      }),
+      prisma.match.groupBy({
+        by: ["player1Id"],
+        where: { player1Id: idFilter },
+        _count: { _all: true },
+      }),
+      prisma.match.groupBy({
+        by: ["player2Id"],
+        where: { player2Id: idFilter },
+        _count: { _all: true },
+      }),
+    ]);
+
+    const wins = new Map(winCounts.map((c) => [c.winnerId!, c._count._all]));
+    const played = new Map<number, number>();
+    for (const c of p1Counts) played.set(c.player1Id, c._count._all);
+    for (const c of p2Counts)
+      played.set(c.player2Id, (played.get(c.player2Id) ?? 0) + c._count._all);
+
+    const players = users
+      .map((u) => {
+        const userWins = wins.get(u.id) ?? 0;
+        const totalMatches = played.get(u.id) ?? 0;
+
+        return {
+          id: u.id,
+          username: u.username,
+          avatarUrl: u.avatarUrl,
+          wins: userWins,
+          losses: totalMatches - userWins, // same as /users/:id
+          totalMatches,
+          winRate:
+            totalMatches > 0 ? Math.round((userWins / totalMatches) * 100) : 0,
+        };
+      })
+      .sort(
+        (a, b) =>
+          b.winRate - a.winRate ||
+          b.wins - a.wins ||
+          a.losses - b.losses ||
+          a.username.localeCompare(b.username),
+      )
+      .map((p, index) => ({ rank: index + 1, ...p }));
+
+    res.json(players);
+  } catch (err) {
+    console.error("GET /leaderboard error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -496,7 +646,8 @@ router.post(
         select: { avatarUrl: true },
       });
 
-      const avatarUrl = `${BACKEND_URL}/uploads/avatars/${req.file.filename}`;
+      // the prisma extension adds BACKEND_URL when it's read
+      const avatarUrl = `/uploads/avatars/${req.file.filename}`;
 
       const user = await prisma.user.update({
         where: { id: userId },
@@ -519,5 +670,64 @@ router.post(
     }
   },
 );
+
+/**
+ * @swagger
+ * /users/me/avatar:
+ *   delete:
+ *     summary: Remove the current authenticated user's profile picture and reset it to the default icon
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bearer token, e.g. "Bearer <token>"
+ *     responses:
+ *       200:
+ *         description: Avatar removed, avatarUrl is now null (frontend shows the default icon)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 avatarUrl:
+ *                   type: string
+ *                   nullable: true
+ *                   example: null
+ *       401:
+ *         description: No token provided
+ *       500:
+ *         description: Server error
+ */
+router.delete("/me/avatar", authHelper, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.userId!;
+
+    const previousUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { avatarUrl: true },
+    });
+
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { avatarUrl: null },
+      select: { avatarUrl: true },
+    });
+
+    // clean up the previously uploaded file, if it was one of ours
+    if (previousUser?.avatarUrl?.includes("/uploads/avatars/")) {
+      const previousFilename = path.basename(previousUser.avatarUrl);
+      const previousFilePath = path.join(AVATAR_UPLOAD_DIR, previousFilename);
+
+      fs.unlink(previousFilePath, () => {});
+    }
+
+    res.json({ avatarUrl: user.avatarUrl });
+  } catch (err) {
+    console.error("DELETE /me/avatar error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 export default router;
