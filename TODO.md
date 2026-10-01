@@ -2,9 +2,8 @@
 --add button to remove profile picture : added the button but no backend to connect
 --need handling errors from apis
 --add emojis to chat
-d .--double check the playing 3 players simultanuously. started fixing not fully functional yet
-
-
+--double check the playing 3 players simultanuously. started fixing not fully functional yet
+--redirect from all pages if user not logged it back to /
 
 **what rawan needs:**
 --~~need to recheck isOnline~~
