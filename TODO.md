@@ -1,11 +1,8 @@
 **what joy needs:**
---add button to remove profile picture : added the button but no backend to connect
 --need handling errors from apis
---add emojis to chat
-d .--double check the playing 3 players simultanuously. started fixing not fully functional yet
+--double check the playing 3 players simultanuously. started fixing not fully functional yet
 
---connect remove profile picture button
---connect leaderboard api
+
 --hosting / other devices (so it works on devices other than localhost):
     - frontend/lib/socket.ts: "http://localhost:3001" is hardcoded -> read it from NEXT_PUBLIC_API_URL like lib/api.ts
     - set NEXT_PUBLIC_API_URL to the backend's real address (same value as BACKEND_URL in .env)

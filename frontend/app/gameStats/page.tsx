@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import {
 	MatchHistory as MatchHistoryType,
 	UserService,
+	LeaderboardPlayer,
 } from "@/services/user.services";
 
 import { useAuth } from "@/context/AuthContext";
@@ -17,76 +18,9 @@ import MatchHistory from "../components/matchHistory/matchHistory";
 import Leaderboard from "../components/leaderboard/leaderboard";
 
 import styles from "./gameStats.module.scss";
-import { LeaderboardPlayer } from "../components/leaderboard/leaderboardPodium/leaderboardPodium";
-
-const dummyPlayers: LeaderboardPlayer[] = [
-	{
-		id: 1,
-		username: "Shadow",
-		avatarUrl: null,
-		wins: 18,
-		losses: 2,
-		winRate: 90,
-	},
-	{
-		id: 2,
-		username: "PongMaster",
-		avatarUrl: null,
-		wins: 15,
-		losses: 5,
-		winRate: 75,
-	},
-	{
-		id: 3,
-		username: "Speedy",
-		avatarUrl: null,
-		wins: 12,
-		losses: 6,
-		winRate: 66.67,
-	},
-	{
-		id: 4,
-		username: "Ace",
-		avatarUrl: null,
-		wins: 10,
-		losses: 8,
-		winRate: 55.56,
-	},
-	{
-		id: 5,
-		username: "PlayerOne",
-		avatarUrl: null,
-		wins: 8,
-		losses: 8,
-		winRate: 50,
-	},
-	{
-		id: 6,
-		username: "Rally",
-		avatarUrl: null,
-		wins: 6,
-		losses: 10,
-		winRate: 37.5,
-	},
-	{
-		id: 7,
-		username: "Newbie",
-		avatarUrl: null,
-		wins: 3,
-		losses: 12,
-		winRate: 20,
-	},
-	{
-		id: 15,
-		username: "You",
-		avatarUrl: null,
-		wins: 11,
-		losses: 4,
-		winRate: 73.33,
-	},
-];
 
 type GameStatsTab = "history" | "leaderboard";
+export type LeaderboardScope = "all" | "friends";
 
 export default function GameStatsPage() {
 	const router = useRouter();
@@ -95,36 +29,71 @@ export default function GameStatsPage() {
 	const [activeTab, setActiveTab] =
 		useState<GameStatsTab>("history");
 
+	const [leaderboard, setLeaderboard] = useState<
+		LeaderboardPlayer[]
+	>([]);
+
+	const [leaderboardScope, setLeaderboardScope] =
+		useState<LeaderboardScope>("all");
+
 	const [matches, setMatches] =
 		useState<MatchHistoryType[]>([]);
 
-	const [loading, setLoading] =
+	const [leaderboardLoading, setLeaderboardLoading] =
 		useState(true);
 
+	// Load match history once
 	useEffect(() => {
 		async function loadMatches() {
 			if (!user) {
-				setLoading(false);
 				return;
 			}
 
 			try {
-				const data =
+				const matchesData =
 					await UserService.getMatches();
 
-				setMatches(data);
+				setMatches(matchesData);
 			} catch (error) {
 				console.error(
 					"Failed to load match history:",
 					error
 				);
-			} finally {
-				setLoading(false);
 			}
 		}
 
 		loadMatches();
 	}, [user]);
+
+	// Load leaderboard whenever the scope changes
+	useEffect(() => {
+		async function loadLeaderboard() {
+			if (!user) {
+				setLeaderboardLoading(false);
+				return;
+			}
+
+			setLeaderboardLoading(true);
+
+			try {
+				const leaderboardData =
+					await UserService.getLeaderboard(
+						leaderboardScope
+					);
+
+				setLeaderboard(leaderboardData);
+			} catch (error) {
+				console.error(
+					"Failed to load leaderboard:",
+					error
+				);
+			} finally {
+				setLeaderboardLoading(false);
+			}
+		}
+
+		loadLeaderboard();
+	}, [user, leaderboardScope]);
 
 	return (
 		<DesktopLayout>
@@ -170,8 +139,13 @@ export default function GameStatsPage() {
 
 						{activeTab === "leaderboard" && (
 							<Leaderboard
-								players={dummyPlayers}
+								players={leaderboard}
 								currentUserId={user?.id}
+								scope={leaderboardScope}
+								onScopeChange={
+									setLeaderboardScope
+								}
+								loading={leaderboardLoading}
 							/>
 						)}
 					</div>
