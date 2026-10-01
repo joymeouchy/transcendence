@@ -31,6 +31,19 @@ export interface MatchHistory {
 	result: "win" | "loss" | "draw";
 }
 
+export interface LeaderboardPlayer {
+	rank: number;
+	id: number;
+	username: string;
+	avatarUrl: string | null;
+	wins: number;
+	losses: number;
+	totalMatches: number;
+	winRate: number;
+}
+
+export type LeaderboardScope = "all" | "friends";
+
 export const UserService = {
 	/**
 	 * Get authenticated user
@@ -125,6 +138,36 @@ export const UserService = {
 							"multipart/form-data",
 					},
 				}
+			);
+
+		return data;
+	},
+	/**
+ * Get leaderboard
+ */
+	async getLeaderboard(
+		scope: LeaderboardScope = "all"
+	): Promise<LeaderboardPlayer[]> {
+		const { data } =
+			await api.get<LeaderboardPlayer[]>(
+				"/users/leaderboard",
+				{
+					params: {
+						scope,
+					},
+				}
+			);
+
+		return data;
+	},
+
+	/**
+	 * Remove profile picture
+	 */
+	async deleteAvatar(): Promise<UploadAvatarResponse> {
+		const { data } =
+			await api.delete<UploadAvatarResponse>(
+				"/users/me/avatar"
 			);
 
 		return data;
