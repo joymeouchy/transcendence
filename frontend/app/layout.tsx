@@ -5,6 +5,7 @@ import "./globals.scss";
 import "./styles/xp-theme.scss"
 
 import { AuthProvider } from "@/context/AuthContext";
+import { AlertProvider } from "@/context/AlertContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
       <body>
-        { <AuthProvider>{children}</AuthProvider> }
+        {<AuthProvider>
+          <AlertProvider>
+            {children}
+          </AlertProvider>
+        </AuthProvider>
+        }
       </body>
     </html>
   );

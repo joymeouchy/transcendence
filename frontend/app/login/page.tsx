@@ -23,9 +23,6 @@ export default function LoginPage() {
     password: "",
   });
 
-  const [alertMessage, setAlertMessage] =
-    useState<string | null>(null);
-
   const [isLoading, setIsLoading] =
     useState(false);
 
@@ -39,32 +36,27 @@ export default function LoginPage() {
     }
   }, []);
 
-const handleSubmit = async (
-  e: React.FormEvent<HTMLFormElement>
-) => {
-  e.preventDefault();
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    await login(
-      formData.email,
-      formData.password
-    );
-    router.push("/home");
+    try {
+      await login(
+        formData.email,
+        formData.password
+      );
+      router.push("/home");
 
-  } catch (err: any) {
-    console.error(err);
+    } catch (err: any) {
+      console.error(err);
 
-    setAlertMessage(
-      err.response?.data?.error ||
-      "Login failed"
-    );
-
-  } finally {
-    setIsLoading(false);
-  }
-};
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <AuthLayout>
       <AuthPanel>
@@ -147,18 +139,6 @@ const handleSubmit = async (
           Create a new account
         </Link>
       </AuthPanel>
-
-      <XPAlert
-        isOpen={
-          alertMessage !== null
-        }
-        message={
-          alertMessage ?? ""
-        }
-        onClose={() =>
-          setAlertMessage(null)
-        }
-      />
     </AuthLayout>
   );
 }

@@ -14,43 +14,35 @@ import AuthPanel from "../components/auth/AuthPanel";
 import XPAlert from "../components/ui/XPAlert/XPAlert";
 
 export default function ResetPasswordPage() {
-
   const router = useRouter();
 
-  const searchParams =
-    useSearchParams();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
 
-  const token =
-    searchParams.get("token");
-
-  const [password, setPassword] =
-    useState("");
-
+  const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] =
     useState("");
 
   const [alertMessage, setAlertMessage] =
     useState<string | null>(null);
 
-  const [isLoading, setIsLoading] =
-    useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+
     if (!token) {
-      setAlertMessage(
-        "Invalid reset link"
-      );
+      setAlertMessage("Invalid reset link");
       return;
     }
+
     if (password !== confirmPassword) {
-      setAlertMessage(
-        "Passwords do not match"
-      );
+      setAlertMessage("Passwords do not match");
       return;
     }
+
     setIsLoading(true);
 
     try {
@@ -59,17 +51,16 @@ export default function ResetPasswordPage() {
           token,
           password
         );
-      setAlertMessage(
-        res.message
-      );
+
+      // Success message stays local.
+      setAlertMessage(res.message);
+
       setTimeout(() => {
         router.push("/login");
       }, 1500);
-    } catch (err: any) {
-      setAlertMessage(
-        err.response?.data?.error ||
-        "Invalid or expired reset link"
-      );
+    } catch (err) {
+      // API error is handled by the global Axios interceptor.
+      console.error("Reset password error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -85,10 +76,12 @@ export default function ResetPasswordPage() {
           <h3 className="xp-title">
             Reset Password
           </h3>
+
           <div className="xp-field">
             <label className="xp-label">
               New Password
             </label>
+
             <input
               type="password"
               placeholder="New password"
@@ -101,24 +94,25 @@ export default function ResetPasswordPage() {
               disabled={isLoading}
             />
           </div>
+
           <div className="xp-field">
             <label className="xp-label">
               Confirm Password
             </label>
+
             <input
               type="password"
               placeholder="Confirm password"
               value={confirmPassword}
               onChange={(e) =>
-                setConfirmPassword(
-                  e.target.value
-                )
+                setConfirmPassword(e.target.value)
               }
               className="xp-input"
               required
               disabled={isLoading}
             />
           </div>
+
           <button
             type="submit"
             className="xp-submit"
@@ -129,6 +123,7 @@ export default function ResetPasswordPage() {
               : "Reset Password"}
           </button>
         </form>
+
         <Link
           href="/login"
           className="xp-link"
@@ -136,6 +131,7 @@ export default function ResetPasswordPage() {
           Back to login
         </Link>
       </AuthPanel>
+
       <XPAlert
         isOpen={alertMessage !== null}
         message={alertMessage ?? ""}
