@@ -33,17 +33,7 @@ export default function MyStats({
 		);
 	}
 
-	const sortedPlayers = [...players].sort(
-		(a, b) => b.winRate - a.winRate
-	);
-
-	const rank =
-		sortedPlayers.findIndex(
-			(player) => player.id === currentUser.id
-		) + 1;
-
-	const totalMatches =
-		currentUser.wins + currentUser.losses;
+	const rank = currentUser.rank;
 
 	return (
 		<div className={styles.container}>
