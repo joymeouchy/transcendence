@@ -1,14 +1,6 @@
 **what joy needs:**
---need handling errors from apis
 --double check the playing 3 players simultanuously. started fixing not fully functional yet
-
-
---hosting / other devices (so it works on devices other than localhost):
-    - frontend/lib/socket.ts: "http://localhost:3001" is hardcoded -> read it from NEXT_PUBLIC_API_URL like lib/api.ts
-    - set NEXT_PUBLIC_API_URL to the backend's real address (same value as BACKEND_URL in .env)
-    - next.config.ts: images.remotePatterns only allows localhost:3001/uploads -> add the real backend host (only matters where next/image is used for avatars)
-
-
+--redirect from all pages if user not logged it back to /
 
 **what rawan needs:**
 --~~need to recheck isOnline~~
@@ -24,9 +16,7 @@
 --save pics online
 
 
-issues incountered:
-in friends page if you try to add someone you already sent a friend request to, it returns "request failed error 400"
-
 
 photo sources:
 https://www.deviantart.com/windowsaesthetics/art/Windows-HD-User-Account-Picture-Pack-843341713
+https://nextjs.org/docs/app/api-reference/file-conventions/proxy
