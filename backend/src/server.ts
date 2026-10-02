@@ -50,8 +50,21 @@ let matchId = 0;
 const socketToUser = new Map<string, number>(); // socketId → userId
 const rematches = new Map<string, string[]>(); // room → [socketIds who want rematch]
 // "inviterId:inviteeId" → the pending friend invite between them
-const pendingInvites = new Map<string, { inviterSocketId: string; timeout: NodeJS.Timeout }>();
+const pendingInvites = new Map<
+  string,
+  { inviterSocketId: string; timeout: NodeJS.Timeout }
+>();
 const INVITE_TIMEOUT_MS = 30000;
+
+// true if any of the user's sockets/tabs is currently playing a match
+function isUserBusy(userId: number): boolean {
+  const sockets = onlineUsers.get(userId);
+  if (!sockets) return false;
+  for (const socketId of sockets) {
+    if (findRoomBySocket(socketId)) return true;
+  }
+  return false;
+}
 
 const app = express();
 app.use(
@@ -372,9 +385,18 @@ io.on("connection", (socket) => {
       return;
     }
 
+    if (isUserBusy(friendId)) {
+      socket.emit("invite_error", {
+        message: "Your friend is already in a game.",
+      });
+      return;
+    }
+
     const key = `${inviterId}:${friendId}`;
     if (pendingInvites.has(key)) {
-      socket.emit("invite_error", { message: "You already invited this friend." });
+      socket.emit("invite_error", {
+        message: "You already invited this friend.",
+      });
       return;
     }
 
@@ -382,7 +404,9 @@ io.on("connection", (socket) => {
       pendingInvites.delete(key);
       socket.emit("invite_timeout", { friendId });
       for (const friendSocketId of friendSockets) {
-        io.to(friendSocketId).emit("invite_cancelled", { fromUserId: inviterId });
+        io.to(friendSocketId).emit("invite_cancelled", {
+          fromUserId: inviterId,
+        });
       }
     }, INVITE_TIMEOUT_MS);
 
@@ -414,52 +438,66 @@ io.on("connection", (socket) => {
     );
   });
 
-  socket.on("invite_response", async ({ fromUserId, accepted }: { fromUserId: number; accepted: boolean }) => {
-    const responderId = socketToUser.get(socket.id);
-    if (!responderId) return;
+  socket.on(
+    "invite_response",
+    async ({
+      fromUserId,
+      accepted,
+    }: {
+      fromUserId: number;
+      accepted: boolean;
+    }) => {
+      const responderId = socketToUser.get(socket.id);
+      if (!responderId) return;
 
-    const key = `${fromUserId}:${responderId}`;
-    const pending = pendingInvites.get(key);
-    if (!pending) return;
+      const key = `${fromUserId}:${responderId}`;
+      const pending = pendingInvites.get(key);
+      if (!pending) return;
 
-    clearTimeout(pending.timeout);
-    pendingInvites.delete(key);
+      clearTimeout(pending.timeout);
+      pendingInvites.delete(key);
 
-    const inviterSocket = io.sockets.sockets.get(pending.inviterSocketId);
-    if (!inviterSocket) return; // inviter disconnected before responding
+      const inviterSocket = io.sockets.sockets.get(pending.inviterSocketId);
+      if (!inviterSocket) return; // inviter disconnected before responding
 
-    if (!accepted) {
-      inviterSocket.emit("invite_declined", { friendId: responderId });
-      return;
-    }
+      if (!accepted) {
+        inviterSocket.emit("invite_declined", { friendId: responderId });
+        return;
+      }
 
-    if (findRoomBySocket(inviterSocket.id) || findRoomBySocket(socket.id)) {
-      inviterSocket.emit("invite_error", { message: "Your friend is no longer available." });
-      return;
-    }
+      if (findRoomBySocket(inviterSocket.id) || findRoomBySocket(socket.id)) {
+        inviterSocket.emit("invite_error", {
+          message: "Your friend is no longer available.",
+        });
+        return;
+      }
 
-    if (waitingPlayer?.id === inviterSocket.id || waitingPlayer?.id === socket.id) {
-      waitingPlayer = null;
-    }
+      if (
+        waitingPlayer?.id === inviterSocket.id ||
+        waitingPlayer?.id === socket.id
+      ) {
+        waitingPlayer = null;
+      }
 
-    const room = `match-${matchId++}`;
-    inviterSocket.join(room);
-    socket.join(room);
+      const room = `match-${matchId++}`;
+      inviterSocket.join(room);
+      socket.join(room);
 
-    const [leftAvatar, rightAvatar] = await Promise.all([
-      getCurrentAvatarUrl(fromUserId),
-      getCurrentAvatarUrl(responderId),
-    ]);
+      const [leftAvatar, rightAvatar] = await Promise.all([
+        getCurrentAvatarUrl(fromUserId),
+        getCurrentAvatarUrl(responderId),
+      ]);
 
-    io.to(room).emit("match_found", {
-      room,
-      players: [inviterSocket.data.username, socket.data.username],
-      avatars: { left: leftAvatar, right: rightAvatar },
-    });
+      io.to(room).emit("match_found", {
+        room,
+        players: [inviterSocket.data.username, socket.data.username],
+        avatars: { left: leftAvatar, right: rightAvatar },
+      });
 
-    startGame(io, room, inviterSocket.id, socket.id, socketToUser);
-    console.log("Friend match started in room:", room);
-  });
+      startGame(io, room, inviterSocket.id, socket.id, socketToUser);
+      console.log("Friend match started in room:", room);
+    },
+  );
 
   socket.on("disconnect", () => {
     const userId = socketToUser.get(socket.id);
@@ -489,7 +527,9 @@ io.on("connection", (socket) => {
           pendingInvites.delete(key);
           onlineUsers
             .get(Number(inviteeIdStr))
-            ?.forEach((sId) => io.to(sId).emit("invite_cancelled", { fromUserId: userId }));
+            ?.forEach((sId) =>
+              io.to(sId).emit("invite_cancelled", { fromUserId: userId }),
+            );
         } else if (Number(inviteeIdStr) === userId && !stillOnline) {
           // the invitee has no sockets left connected - treat as a decline
           clearTimeout(pending.timeout);
