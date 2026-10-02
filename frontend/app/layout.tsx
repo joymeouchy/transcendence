@@ -38,15 +38,11 @@ export default function RootLayout({
       <body>
         {<AuthProvider>
           <AlertProvider>
-            {children}
-          </AlertProvider>
-        </AuthProvider>
-        }
-        {<AuthProvider>
-          <GameInviteProvider>
+            <GameInviteProvider>
               {children}
-            <GameInvitePopup />
-          </GameInviteProvider>
+              <GameInvitePopup />
+            </GameInviteProvider>
+          </AlertProvider>
         </AuthProvider>}
       </body>
     </html>
