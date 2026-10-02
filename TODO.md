@@ -1,7 +1,4 @@
 **what joy needs:**
---add button to remove profile picture : added the button but no backend to connect
---need handling errors from apis
---add emojis to chat
 --double check the playing 3 players simultanuously. started fixing not fully functional yet
 --redirect from all pages if user not logged it back to /
 
@@ -18,9 +15,7 @@
 --save pics online
 
 
-issues incountered:
-in friends page if you try to add someone you already sent a friend request to, it returns "request failed error 400"
-
 
 photo sources:
 https://www.deviantart.com/windowsaesthetics/art/Windows-HD-User-Account-Picture-Pack-843341713
+https://nextjs.org/docs/app/api-reference/file-conventions/proxy
