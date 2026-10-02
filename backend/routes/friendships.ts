@@ -24,23 +24,40 @@ const router = Router();
  *           schema:
  *             type: object
  *             properties:
- *               senderId:
- *                 type: integer
  *               receiverId:
  *                 type: integer
  *     responses:
  *       201:
  *         description: Friend request sent
  *       400:
- *         description: Friendship already exists
+ *         description: >
+ *           Invalid receiver ID, trying to add yourself, already friends,
+ *           request already sent, or the other user already sent you a request
+ *       401:
+ *         description: No token provided
+ *       404:
+ *         description: User not found
  */
 router.post("/send", authHelper, async (req: AuthRequest, res) => {
   try {
     const senderId = req.userId!;
-    const { receiverId } = req.body;
+    const receiverId = Number(req.body.receiverId);
+
+    if (!Number.isInteger(receiverId)) {
+      return res.status(400).json({ error: "Invalid receiver ID" });
+    }
 
     if (senderId === receiverId) {
       return res.status(400).json({ error: "Cannot add yourself as a friend" });
+    }
+
+    const receiver = await prisma.user.findUnique({
+      where: { id: receiverId },
+      select: { id: true },
+    });
+
+    if (!receiver) {
+      return res.status(404).json({ error: "User not found" });
     }
 
     const existing = await prisma.friendship.findFirst({
@@ -53,7 +70,18 @@ router.post("/send", authHelper, async (req: AuthRequest, res) => {
     });
 
     if (existing) {
-      return res.status(400).json({ error: "Friendship already exists" });
+      if (existing.status === FriendshipStatus.accepted) {
+        return res.status(400).json({ error: "You are already friends with this user" });
+      }
+
+      if (existing.senderId === senderId) {
+        return res.status(400).json({ error: "Friend request already sent" });
+      }
+
+      // the other user already sent us a request
+      return res.status(400).json({
+        error: "This user already sent you a friend request, accept it instead",
+      });
     }
 
     const friendship = await prisma.friendship.create({
