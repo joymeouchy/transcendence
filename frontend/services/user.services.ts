@@ -40,6 +40,7 @@ export interface LeaderboardPlayer {
 	losses: number;
 	totalMatches: number;
 	winRate: number;
+	score: number;
 }
 
 export type LeaderboardScope = "all" | "friends";

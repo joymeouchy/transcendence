@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 
 import { LeaderboardPlayer } from "@/services/user.services";
 
@@ -23,12 +22,6 @@ export default function LeaderboardTable({
 	onScopeChange,
 	loading,
 }: LeaderboardTableProps) {
-	const sortedPlayers = useMemo(() => {
-		return [...players].sort(
-			(a, b) => b.winRate - a.winRate
-		);
-	}, [players]);
-
 	return (
 		<div className={styles.container}>
 			{/* All Players / Friends tabs */}
@@ -73,8 +66,7 @@ export default function LeaderboardTable({
 						<span>Win Rate</span>
 					</div>
 
-					{sortedPlayers.map((player, index) => {
-						const rank = index + 1;
+					{players.map((player) => {
 
 						const isCurrentUser =
 							player.id === currentUserId;
@@ -89,7 +81,7 @@ export default function LeaderboardTable({
 								}`}
 							>
 								<span className={styles.rank}>
-									{rank}
+									{player.rank}
 								</span>
 
 								<div className={styles.player}>
