@@ -18,23 +18,6 @@ export default function GamePage() {
 
 	const game = useGameSocket();
 
-// 	useEffect(() => {
-// 	const handlePageLeave = () => {
-// 		console.log("Leaving game page");
-// 		socket.disconnect();
-// 	};
-
-// 	window.addEventListener("pagehide", handlePageLeave);
-
-// 	return () => {
-// 		window.removeEventListener("pagehide", handlePageLeave);
-// 	};
-// }, []);
-// useEffect(() => {
-// 	if (!socket.connected) {
-// 		socket.connect();
-// 	}
-// }, []);
 	const [theme, setTheme] =
 		useState<CustomizationTheme | null>(null);
 
@@ -71,6 +54,17 @@ const [activeEffects, setActiveEffects] = useState<{
 	}, []);
 	
 
+useEffect(() => {
+	if (!socket.connected) {
+		console.log("Connecting socket...");
+		socket.connect();
+	}
+
+	return () => {
+		console.log("Leaving game page - disconnecting socket");
+		socket.disconnect();
+	};
+}, []);
 	const handleCustomize = () => {
 		game.setModalState("customization");
 	};
@@ -140,6 +134,7 @@ const [activeEffects, setActiveEffects] = useState<{
 				onPlayFriend={game.inviteFriend}
 				onCancelInvite={game.cancelInvite}
 				onExit={() => {
+					game.leaveGame();
 					game.resetGame();
 					router.push("/home");
 				}}

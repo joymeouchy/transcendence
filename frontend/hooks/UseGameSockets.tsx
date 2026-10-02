@@ -98,9 +98,6 @@ export default function useGameSocket() {
 			right: null,
 		});
 
-	// const [opponentReconnected, setOpponentReconnected] =
-	// 	useState(false);
-
 	useEffect(() => {
 		const handleConnect = () => {
 			console.log(
@@ -195,6 +192,7 @@ export default function useGameSocket() {
 		};
 
 
+
 		const handlePowerUpIncoming = (data: {
 			type: string;
 			side: "left" | "right";
@@ -277,12 +275,16 @@ export default function useGameSocket() {
 		};
 	}, [user]);
 
+			const leaveGame = () => {
+	socket.disconnect();
+};
 	function closeInviteResult() {
 		setInviteResult(null);
 		setModalState("select");
 	}
 
 	function joinQueue() {
+		
 		if (!socket.connected) {
 			console.warn("Socket not connected yet");
 			return;
@@ -490,5 +492,6 @@ export default function useGameSocket() {
 		// inviteError,
 		inviteResult,
 		closeInviteResult,
+		leaveGame,
 	};
 }
