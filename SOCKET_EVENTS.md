@@ -23,7 +23,7 @@ the server tell two tabs of the same account apart from two different accounts.
 | `decline_rematch` | `{ room: string }` | Decline a rematch |
 
 **INVITES**
-| `invite_friend` | `{ friendId: number }` | Invite a specific friend to play. Fails with `invite_error` if you're already in a game, the friend is offline, or you already have a pending invite to them |
+| `invite_friend` | `{ friendId: number }` | Invite a specific friend to play. Fails with `invite_error` if you're already in a game, the friend is offline, the friend is already in a game, or you already have a pending invite to them |
 | `cancel_invite` | `{ friendId: number }` | Cancel an invite you sent before the friend responds |
 | `invite_response` | `{ fromUserId: number, accepted: boolean }` | Accept or decline an invite you received from `fromUserId` |
 
