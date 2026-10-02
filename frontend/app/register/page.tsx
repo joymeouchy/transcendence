@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import axios from "axios";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -24,12 +23,8 @@ export default function RegisterPage() {
 	});
 
 	const [loading, setLoading] = useState(false);
-
-	const [alertMessage, setAlertMessage] =
-		useState<string | null>(null);
-
-	const [alertTitle, setAlertTitle] =
-		useState("Alert");
+const [showSuccess, setShowSuccess] = useState(false);
+const [successMessage, setSuccessMessage] = useState("");
 
 	useEffect(() => {
 		if (isAuthenticated()) {
@@ -42,42 +37,31 @@ export default function RegisterPage() {
 	) => {
 		e.preventDefault();
 
-		if (formData.password !== formData.confirmPassword) {
-			setAlertTitle("Password Error");
-			setAlertMessage("Passwords do not match");
+		if (
+			formData.password !==
+			formData.confirmPassword
+		) {
 			return;
 		}
 
 		try {
 			setLoading(true);
 
-			const response = await authService.register({
+			await authService.register({
 				username: formData.username,
 				email: formData.email,
 				password: formData.password,
 			});
 
-			console.log("Register success:", response);
-			setAlertTitle("Success");
-			setAlertMessage("Registration successful");
+			setSuccessMessage("Registration successful");
+			setShowSuccess(true);
+
 			setTimeout(() => {
 				router.replace("/home");
 			}, 1000);
-
 		} catch (err) {
+			// Global Axios interceptor handles the API error.
 			console.error("Register error:", err);
-
-			if (axios.isAxiosError(err)) {
-				setAlertTitle("Registration Failed");
-				setAlertMessage(
-					err.response?.data?.error ||
-					err.response?.data?.message ||
-					"Registration failed"
-				);
-			} else {
-				setAlertTitle("Registration Failed");
-				setAlertMessage("Something went wrong");
-			}
 		} finally {
 			setLoading(false);
 		}
@@ -142,18 +126,13 @@ export default function RegisterPage() {
 				</Link>
 			</AuthPanel>
 			<XPAlert
-				isOpen={
-					alertMessage !== null
-				}
-				title={
-					alertTitle
-				}
-				message={
-					alertMessage ?? ""
-				}
-				onClose={() =>
-					setAlertMessage(null)
-				}
+				isOpen={showSuccess}
+				title="Success"
+				message={successMessage}
+				onClose={() => {
+					setShowSuccess(false);
+					setSuccessMessage("");
+				}}
 			/>
 		</AuthLayout>
 	);
