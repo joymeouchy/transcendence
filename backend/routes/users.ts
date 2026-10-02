@@ -252,14 +252,29 @@ router.get("/search", authHelper, async (req: AuthRequest, res) => {
   }
 });
 
+// lower bound of the 95% Wilson score interval for a win rate: the win rate we can be
+// confident a player has at least, which stops few-match players topping the board
+function wilsonLowerBound(wins: number, total: number): number {
+  if (total === 0) return 0;
+  const z = 1.96;
+  const p = wins / total;
+  const z2 = z * z;
+  return (
+    (p + z2 / (2 * total) - z * Math.sqrt((p * (1 - p) + z2 / (4 * total)) / total)) /
+    (1 + z2 / total)
+  );
+}
+
 /**
  * @swagger
  * /users/leaderboard:
  *   get:
  *     summary: Get leaderboard rankings for all players or only the current user's friends
  *     description: >
- *       Players are ranked by win rate, then by wins, then by fewest losses.
- *       Players with no matches are included at the bottom (0% win rate).
+ *       Players are ranked by the lower bound of the Wilson score interval (95%) on
+ *       their win rate, so a long winning record outranks a lucky short one
+ *       (e.g. 50W/5L ranks above 1W/0L). Ties are broken by wins, then fewest losses,
+ *       then username. Players with no matches are included at the bottom.
  *       The "friends" scope always includes the current user.
  *     parameters:
  *       - in: header
@@ -385,16 +400,17 @@ router.get("/leaderboard", authHelper, async (req: AuthRequest, res) => {
           totalMatches,
           winRate:
             totalMatches > 0 ? Math.round((userWins / totalMatches) * 100) : 0,
+          score: wilsonLowerBound(userWins, totalMatches),
         };
       })
       .sort(
         (a, b) =>
-          b.winRate - a.winRate ||
+          b.score - a.score ||
           b.wins - a.wins ||
           a.losses - b.losses ||
           a.username.localeCompare(b.username),
       )
-      .map((p, index) => ({ rank: index + 1, ...p }));
+      .map(({ score, ...p }, index) => ({ rank: index + 1, ...p }));
 
     res.json(players);
   } catch (err) {
