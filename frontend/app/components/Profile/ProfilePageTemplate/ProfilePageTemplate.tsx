@@ -112,15 +112,16 @@ export default function ProfilePageTemplate({
 									losses={user.losses}
 									winRate={user.winRate}
 								/>
-
-								<button
-									className={styles.statsButton}
-									onClick={() =>
-										router.push("/gameStats")
-									}
-								>
-									View Full Stats
-								</button>
+								{isOwnProfile && (
+									<button
+										className={styles.statsButton}
+										onClick={() =>
+											router.push("/gameStats")
+										}
+									>
+										View Full Stats
+									</button>
+								)}
 							</div>
 
 							{canSeePrivateInfo && (
