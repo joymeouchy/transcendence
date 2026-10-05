@@ -100,7 +100,30 @@ export default function ChangeProfilePictureModal({
     } catch (err: any) {
       setError(
         err?.response?.data?.error ??
-          "Failed to update profile picture."
+        "Failed to update profile picture."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleReset = async () => {
+    setError("");
+
+    try {
+      setLoading(true);
+
+      await UserService.deleteAvatar();
+      await refreshUser();
+
+      resetForm();
+      onClose();
+
+      setSuccessMessage("Profile picture reset to default.");
+      setShowSuccess(true);
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.error ??
+        "Failed to reset profile picture."
       );
     } finally {
       setLoading(false);
@@ -149,12 +172,18 @@ export default function ChangeProfilePictureModal({
 
             <button
               type="button"
+              onClick={handleReset}
+              disabled={loading}
+            >
+              {loading ? "Please wait..." : "Reset to Default"}
+            </button>
+
+            <button
+              type="button"
               onClick={handleSubmit}
               disabled={loading}
             >
-              {loading
-                ? "Uploading..."
-                : "Save"}
+              {loading ? "Uploading..." : "Save"}
             </button>
           </div>
         </div>

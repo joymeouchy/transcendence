@@ -4,11 +4,12 @@
 
 **what rawan needs:**
 --~~need to recheck isOnline~~
---implement chat system
+--~~implement chat system~~
 --~~invite friends to join game socket~~
+--~~add backend for remove profile picture button~~
+
 --recheck how it's storing user new pfp
 --if online sockets works from both sides, remove isOnline attribute from db
---add backend for remove profile picture button
 -- README2: ctrl + F "TODO" find all the notes i added and double check everything and if i missed any modules. there are things i didnt add/adjust yet
 
 

@@ -11,7 +11,8 @@ export type MatchmakingStatus =
   | "waitingFriend"
   | "found"
   | "inviteRejected"
-  | "inviteTimeout";
+  | "inviteTimeout"
+  | "inviteBusy";
 
 type Props = {
   isOpen: boolean;
@@ -99,6 +100,16 @@ export default function MatchmakingModal({
       hint: "You can go back to the main menu and invite another friend.",
       showCancel: false,
     },
+    inviteBusy: {
+      title: "Friend Unavailable",
+      icon: "⚠️",
+      heading: "Friend Unavailable",
+      message: opponentName
+        ? `${opponentName} is currently busy and cannot be invited.`
+        : "Your friend is currently busy and cannot be invited.",
+      hint: "You can go back to the main menu and choose another friend.",
+      showCancel: false,
+    },
   }[status];
 
   return (
@@ -106,7 +117,9 @@ export default function MatchmakingModal({
       title={content.title}
       isOpen={isOpen}
       onClose={
-        status === "inviteRejected" || status === "inviteTimeout"
+        status === "inviteRejected" ||
+          status === "inviteTimeout" ||
+          status === "inviteBusy"
           ? onInviteResultClose
           : content.showCancel
             ? status === "waitingFriend"
@@ -140,7 +153,8 @@ export default function MatchmakingModal({
           </div>
         )}
         {(status === "inviteRejected" ||
-          status === "inviteTimeout") && (
+          status === "inviteTimeout" ||
+          status === "inviteBusy") && (
             <div className="buttons">
               <button onClick={onInviteResultClose}>
                 Back to Main Menu
