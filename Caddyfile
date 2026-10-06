@@ -1,3 +1,16 @@
+## IN CASE OF "Not Secure" SHOWING UP ##
+# ---------------------------------------
+# Export the certificate:
+# docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt ./caddy-root.crt
+
+# and if ur on WSL, run this command with your device username:
+# cp caddy-root.crt /mnt/c/Users/<user>/Downloads/.
+
+# then import it and follow these steps:
+# Install Certificate → Current User → Place all certificates in the following store → Trusted Root Certification Authorities → Finish → Yes
+
+
+
 # Single HTTPS entry point for the whole app.
 # For "localhost" Caddy issues a certificate from its own local CA (the browser
 # will warn until that CA is trusted). On a real domain, replace "localhost"
