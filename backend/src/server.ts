@@ -25,6 +25,7 @@ import customizationRoutes from "../routes/customization";
 import messageRoutes from "../routes/messages";
 import { onlineUsers } from "./online";
 import { setIo } from "./io";
+import { FRONTEND_URL, BACKEND_URL } from "./urls";
 
 import prisma from "../src/prisma";
 import swaggerUi from "swagger-ui-express";
@@ -38,12 +39,22 @@ const swaggerOptions = {
       version: "1.0.0",
       description: "Pong game backend API",
     },
+    // so "Try it out" calls go through Caddy's /api prefix instead of the site root
+    servers: [{ url: BACKEND_URL }],
+    // adds the "Authorize" button: paste a JWT once and every "Try it out"
+    // request sends it as "Authorization: Bearer <token>". (Header params named
+    // Authorization are ignored by OpenAPI 3, so they can't do this.)
+    components: {
+      securitySchemes: {
+        bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+      },
+    },
+    security: [{ bearerAuth: [] }],
   },
   apis: [path.join(__dirname, "../routes/*.ts")],
 };
 
 const PORT = 3001;
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 let waitingPlayer: any = null;
 let matchId = 0;

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 
 import { socket } from "../../../lib/socket";
+import { API_URL } from "@/lib/api";
 import "./GameCanvas.scss";
 
 import { GameStateSend, pongConfig } from "@/types/game_types";
@@ -44,7 +45,7 @@ export default function GameCanvas({
     if (path.startsWith("/pong"))
       return path;
 
-    return `http://localhost:3001${path}`;
+    return `${API_URL}${path}`;
   };
 
  useEffect(() => {

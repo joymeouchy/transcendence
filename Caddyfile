@@ -1,0 +1,20 @@
+# Single HTTPS entry point for the whole app.
+# For "localhost" Caddy issues a certificate from its own local CA (the browser
+# will warn until that CA is trusted). On a real domain, replace "localhost"
+# with the domain and Caddy gets a Let's Encrypt certificate automatically.
+localhost {
+	# REST API: /api is stripped, so /api/users/me reaches the backend as /users/me
+	handle_path /api/* {
+		reverse_proxy backend:3001
+	}
+
+	# Socket.IO (upgraded to a secure websocket, wss://)
+	handle /socket.io/* {
+		reverse_proxy backend:3001
+	}
+
+	# everything else is the Next.js frontend
+	handle {
+		reverse_proxy frontend:3000
+	}
+}
