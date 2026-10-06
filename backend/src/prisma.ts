@@ -1,6 +1,5 @@
 import { PrismaClient } from "../generated/prisma/client";
-
-export const BACKEND_URL = (process.env.BACKEND_URL || "http://localhost:3001").replace(/\/+$/, "");
+import { BACKEND_URL } from "./urls";
 
 // uploaded avatars are stored as relative paths ("/uploads/avatars/x.png") so
 // the host isn't baked into the DB; prefix the current BACKEND_URL on every read.

@@ -6,6 +6,7 @@ import {
 	CustomizationTheme,
 } from "@/services/Customization.services";
 import { gameThemes } from "@/app/data/game/gameCustomization";
+import { API_URL } from "@/lib/api";
 import "./CustomizationModal.scss";
 
 type Props = {
@@ -38,7 +39,7 @@ export default function CustomizationModal({
 			return path;
 
 		if (path.startsWith("/uploads"))
-			return `http://localhost:3001${path}`;
+			return `${API_URL}${path}`;
 		return path;
 	};
 
