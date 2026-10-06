@@ -9,10 +9,11 @@ const nextConfig: NextConfig = {
           "lh3.googleusercontent.com",
       },
       {
-        protocol: "http",
+        // uploaded avatars, served by the backend behind Caddy's /api prefix
+        protocol: "https",
         hostname: "localhost",
-        port: "3001",
-        pathname: "/uploads/**",
+        port: "8443",
+        pathname: "/api/uploads/**",
       },
     ],
   },

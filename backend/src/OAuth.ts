@@ -6,13 +6,15 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { AuthProvider } from "../generated/prisma/client";
 import prisma from "../src/prisma";
+import { BACKEND_URL } from "./urls";
 
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      callbackURL: "http://localhost:3001/auth/google/callback",
+      // must match an authorized redirect URI in Google Cloud Console
+      callbackURL: `${BACKEND_URL}/auth/google/callback`,
     },
     async (_accessToken, _refreshToken, profile, done) => {
       try {
