@@ -107,7 +107,7 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT} (public URL: ${BACKEND_URL})`);
 });
 
 // Cleanup old messages every 24 hours, keeping only the last 7 days of messages.
