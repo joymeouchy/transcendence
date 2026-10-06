@@ -1,0 +1,35 @@
+## IN CASE OF "Not Secure" SHOWING UP ##
+# ---------------------------------------
+# Export the certificate:
+# docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt ./caddy-root.crt
+
+# and if ur on WSL, run this command with your device username:
+# cp caddy-root.crt /mnt/c/Users/<user>/Downloads/.
+
+# then import it and follow these steps:
+# Install Certificate → Current User → Place all certificates in the following store → Trusted Root Certification Authorities → Finish → Yes
+
+
+
+# Single HTTPS entry point for the whole app.
+# For "localhost" Caddy issues a certificate from its own local CA (the browser
+# will warn until that CA is trusted). On a real domain, replace "localhost"
+# with the domain and Caddy gets a Let's Encrypt certificate automatically.
+# Port 8443 (not 443) because rootless Docker can't publish ports below 1024. 
+# If you change it, also change .env and docker-compose.yml
+localhost:8443 {
+	# REST API: /api is stripped, so /api/users/me reaches the backend as /users/me
+	handle_path /api/* {
+		reverse_proxy backend:3001
+	}
+
+	# Socket.IO (upgraded to a secure websocket, wss://)
+	handle /socket.io/* {
+		reverse_proxy backend:3001
+	}
+
+	# everything else is the Next.js frontend
+	handle {
+		reverse_proxy frontend:3000
+	}
+}

@@ -4,12 +4,12 @@ import jwt from "jsonwebtoken";
 import passport from "../src/OAuth";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
+import { authHelper, AuthRequest, validatePassword } from "../src/helpers/auth_helpers";
 import prisma from "../src/prisma";
+import { FRONTEND_URL, JWT_SECRET } from "../src/urls";
 
 const router = Router();
 const SALT_ROUNDS = 12;
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 const transporter = nodemailer.createTransport({
   service: "gmail", // send to user's email
   auth: {
@@ -40,11 +40,12 @@ const transporter = nodemailer.createTransport({
  *                 type: string
  *               password:
  *                 type: string
+ *                 description: 8-72 characters, at least one letter and one number
  *     responses:
  *       201:
  *         description: User registered successfully
  *       400:
- *         description: User already exists or missing fields
+ *         description: User already exists, missing fields, or password doesn't meet the rules
  *       500:
  *         description: Server error
  */
@@ -55,6 +56,11 @@ router.post("/register", async (req, res) => {
 
     if (!username || !email || !password) {
       return res.status(400).json({ error: "Missing fields" });
+    }
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      return res.status(400).json({ error: passwordError });
     }
 
     const existingEmail = await prisma.user.findUnique({
@@ -201,7 +207,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:3000/login",
+    failureRedirect: `${FRONTEND_URL}/login`,
     session: false,
   }),
   (req, res) => {
@@ -215,7 +221,7 @@ router.get(
 
     // redirect to frontend with token
     res.redirect(
-      `http://localhost:3000/auth/callback?token=${token}&userId=${user.id}`,
+      `${FRONTEND_URL}/auth/callback?token=${token}&userId=${user.id}`,
     );
   },
 );
@@ -273,7 +279,7 @@ router.post("/forgot-password", async (req, res) => {
     });
 
     // send email
-    const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
+    const resetUrl = `${FRONTEND_URL}/reset-password?token=${resetToken}`;
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
@@ -314,17 +320,23 @@ router.post("/forgot-password", async (req, res) => {
  *                 description: Reset token received by email
  *               newPassword:
  *                 type: string
+ *                 description: 8-72 characters, at least one letter and one number
  *     responses:
  *       200:
  *         description: Password reset successfully
  *       400:
- *         description: Invalid or expired reset token
+ *         description: Invalid or expired reset token, or new password doesn't meet the rules
  *       500:
  *         description: Server error
  */
 router.post("/reset-password", async (req, res) => {
   try {
     const { token, newPassword } = req.body;
+
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      return res.status(400).json({ error: passwordError });
+    }
 
     const user = await prisma.user.findFirst({
       where: {
@@ -380,11 +392,12 @@ router.post("/reset-password", async (req, res) => {
  *                 type: string
  *               newPassword:
  *                 type: string
+ *                 description: 8-72 characters, at least one letter and one number
  *     responses:
  *       200:
  *         description: Password changed successfully
  *       400:
- *         description: No password set for this account, or current password is incorrect
+ *         description: Missing current password, new password doesn't meet the rules, no password set for this account, or current password is incorrect
  *       401:
  *         description: No token provided
  *       500:
@@ -394,6 +407,15 @@ router.patch("/change-password", authHelper, async (req: AuthRequest, res) => {
   try {
     const userId = req.userId!;
     const { currentPassword, newPassword } = req.body;
+
+    if (typeof currentPassword !== "string" || !currentPassword) {
+      return res.status(400).json({ error: "Current password is required" });
+    }
+
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      return res.status(400).json({ error: passwordError });
+    }
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
