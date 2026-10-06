@@ -660,10 +660,10 @@ For example:
 ```env
 DATABASE_URL=your_database_connection_string
 DIRECT_URL=your_direct_database_connection_string
-FRONTEND_URL=https://localhost:4242
-BACKEND_URL=https://localhost:4242/api
-NEXT_PUBLIC_API_URL=https://localhost:4242/api
-NEXT_PUBLIC_SOCKET_URL=https://localhost:4242
+FRONTEND_URL=https://localhost:8443
+BACKEND_URL=https://localhost:8443/api
+NEXT_PUBLIC_API_URL=https://localhost:8443/api
+NEXT_PUBLIC_SOCKET_URL=https://localhost:8443
 ```
 
 Additional authentication or Supabase variables may be required depending on the final project configuration.
@@ -729,8 +729,8 @@ npm run dev
 The development application uses:
 
 ```text
-Frontend: https://localhost:4242
-Backend:  https://localhost:4242/api
+Frontend: https://localhost:8443
+Backend:  https://localhost:8443/api
 Sockets:  wss://localhost/socket.io
 (all served through the Caddy reverse proxy, see Caddyfile)
 ```

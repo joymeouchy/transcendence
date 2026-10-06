@@ -6,15 +6,15 @@
 # if it says permission denied, run:
 # sudo chown -R $USER:$USER backend/generated/
 #
-# the app is served only through Caddy at https://localhost:4242
+# the app is served only through Caddy at https://localhost:8443
 # (frontend at /, backend at /api, sockets at /socket.io)
-# 4242 instead of 443 because rootless Docker can't publish ports below 1024
+# 8443 instead of 443 because rootless Docker can't publish ports below 1024
 
 services:
   caddy:
     image: caddy:2-alpine
     ports:
-      - "4242:4242"
+      - "8443:8443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data # keeps the local CA/certificates between restarts
