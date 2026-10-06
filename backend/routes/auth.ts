@@ -6,6 +6,7 @@ import nodemailer from "nodemailer";
 import crypto from "crypto";
 import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
 import prisma from "../src/prisma";
+import { FRONTEND_URL } from "../src/urls";
 
 const router = Router();
 const SALT_ROUNDS = 12;
@@ -201,7 +202,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:3000/login",
+    failureRedirect: `${FRONTEND_URL}/login`,
     session: false,
   }),
   (req, res) => {
@@ -215,7 +216,7 @@ router.get(
 
     // redirect to frontend with token
     res.redirect(
-      `http://localhost:3000/auth/callback?token=${token}&userId=${user.id}`,
+      `${FRONTEND_URL}/auth/callback?token=${token}&userId=${user.id}`,
     );
   },
 );
@@ -273,7 +274,7 @@ router.post("/forgot-password", async (req, res) => {
     });
 
     // send email
-    const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
+    const resetUrl = `${FRONTEND_URL}/reset-password?token=${resetToken}`;
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
