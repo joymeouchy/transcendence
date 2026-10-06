@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../urls";
 
 export interface AuthRequest<P = Record<string, string>> extends Request<P> {
   userId?: number;
@@ -23,10 +24,7 @@ export const authHelper = (
       return res.status(401).json({ error: "No token provided" });
     }
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || "supersecretkey",
-    ) as any;
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
 
     req.userId = decoded.userId;
     next();
