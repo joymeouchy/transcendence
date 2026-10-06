@@ -1,10 +1,8 @@
 import { Router } from "express";
-import fs from "fs";
-import path from "path";
 import jwt from "jsonwebtoken";
 import { FriendshipStatus } from "../generated/prisma/client";
 import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
-import { avatarUpload, AVATAR_UPLOAD_DIR } from "../src/helpers/upload_helpers";
+import { avatarUpload, uploadAvatar, deleteAvatar } from "../src/helpers/upload_helpers";
 import { isUserOnline } from "../src/online";
 import prisma from "../src/prisma";
 
@@ -630,13 +628,21 @@ router.get("/:id", authHelper, async (req: AuthRequest<{ id: string }>, res) => 
  *                 format: binary
  *     responses:
  *       200:
- *         description: Avatar updated successfully
+ *         description: Avatar uploaded to Supabase Storage; avatarUrl is its public URL
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 avatarUrl:
+ *                   type: string
+ *                   example: https://<project>.supabase.co/storage/v1/object/public/avatars/10-1785953759297.jpg
  *       400:
- *         description: No file uploaded or invalid file
+ *         description: No file uploaded or invalid file (JPEG, PNG, WEBP or GIF, max 5MB)
  *       401:
  *         description: No token provided
  *       500:
- *         description: Server error
+ *         description: Server error (including a failed upload to Supabase Storage)
  */
 router.post(
   "/me/avatar",
@@ -662,8 +668,8 @@ router.post(
         select: { avatarUrl: true },
       });
 
-      // the prisma extension adds BACKEND_URL when it's read
-      const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+      // full public Supabase Storage URL, stored as-is
+      const avatarUrl = await uploadAvatar(userId, req.file);
 
       const user = await prisma.user.update({
         where: { id: userId },
@@ -672,12 +678,7 @@ router.post(
       });
 
       // clean up the previously uploaded file, if it was one of ours
-      if (previousUser?.avatarUrl?.includes("/uploads/avatars/")) {
-        const previousFilename = path.basename(previousUser.avatarUrl);
-        const previousFilePath = path.join(AVATAR_UPLOAD_DIR, previousFilename);
-
-        fs.unlink(previousFilePath, () => {});
-      }
+      await deleteAvatar(previousUser?.avatarUrl);
 
       res.json({ avatarUrl: user.avatarUrl });
     } catch (err) {
@@ -732,12 +733,7 @@ router.delete("/me/avatar", authHelper, async (req: AuthRequest, res) => {
     });
 
     // clean up the previously uploaded file, if it was one of ours
-    if (previousUser?.avatarUrl?.includes("/uploads/avatars/")) {
-      const previousFilename = path.basename(previousUser.avatarUrl);
-      const previousFilePath = path.join(AVATAR_UPLOAD_DIR, previousFilename);
-
-      fs.unlink(previousFilePath, () => {});
-    }
+    await deleteAvatar(previousUser?.avatarUrl);
 
     res.json({ avatarUrl: user.avatarUrl });
   } catch (err) {
