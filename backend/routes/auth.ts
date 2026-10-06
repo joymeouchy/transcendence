@@ -6,11 +6,10 @@ import nodemailer from "nodemailer";
 import crypto from "crypto";
 import { authHelper, AuthRequest, validatePassword } from "../src/helpers/auth_helpers";
 import prisma from "../src/prisma";
-import { FRONTEND_URL } from "../src/urls";
+import { FRONTEND_URL, JWT_SECRET } from "../src/urls";
 
 const router = Router();
 const SALT_ROUNDS = 12;
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 const transporter = nodemailer.createTransport({
   service: "gmail", // send to user's email
   auth: {
