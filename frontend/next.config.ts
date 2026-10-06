@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
         // uploaded avatars, served by the backend behind Caddy's /api prefix
         protocol: "https",
         hostname: "localhost",
-        port: "4242",
+        port: "8443",
         pathname: "/api/uploads/**",
       },
     ],
