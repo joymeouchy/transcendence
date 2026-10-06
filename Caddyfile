@@ -15,7 +15,9 @@
 # For "localhost" Caddy issues a certificate from its own local CA (the browser
 # will warn until that CA is trusted). On a real domain, replace "localhost"
 # with the domain and Caddy gets a Let's Encrypt certificate automatically.
-localhost {
+# Port 4242 (not 443) because rootless Docker can't publish ports below 1024. 
+# If you change it, also change .env and docker-compose.yml
+localhost:4242 {
 	# REST API: /api is stripped, so /api/users/me reaches the backend as /users/me
 	handle_path /api/* {
 		reverse_proxy backend:3001

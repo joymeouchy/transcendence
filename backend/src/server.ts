@@ -25,7 +25,7 @@ import customizationRoutes from "../routes/customization";
 import messageRoutes from "../routes/messages";
 import { onlineUsers } from "./online";
 import { setIo } from "./io";
-import { FRONTEND_URL, BACKEND_URL } from "./urls";
+import { FRONTEND_URL, BACKEND_URL, JWT_SECRET } from "./urls";
 
 import prisma from "../src/prisma";
 import swaggerUi from "swagger-ui-express";
@@ -55,7 +55,6 @@ const swaggerOptions = {
 };
 
 const PORT = 3001;
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 let waitingPlayer: any = null;
 let matchId = 0;
 const socketToUser = new Map<string, number>(); // socketId → userId
