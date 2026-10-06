@@ -18,7 +18,13 @@ const nextConfig: NextConfig = {
           "lh3.googleusercontent.com",
       },
       {
-        // uploaded avatars, served by the backend behind Caddy's /api prefix
+        // uploaded avatars, stored in the Supabase Storage "avatars" bucket
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+      {
+        // older avatars, served by the backend behind Caddy's /api prefix
         protocol: "https",
         hostname: siteUrl.hostname,
         port: siteUrl.port,

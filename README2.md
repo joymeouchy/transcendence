@@ -664,6 +664,8 @@ FRONTEND_URL=https://localhost:8443
 BACKEND_URL=https://localhost:8443/api
 NEXT_PUBLIC_API_URL=https://localhost:8443/api
 NEXT_PUBLIC_SOCKET_URL=https://localhost:8443
+SUPABASE_URL=https://<project>.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key   # uploads avatars to the public "avatars" storage bucket
 ```
 
 Additional authentication or Supabase variables may be required depending on the final project configuration.
