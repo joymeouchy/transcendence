@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  module.exports = {
+  allowedDevOrigins: ['transcendence-frontend-production.up.railway.app'],
+}
 };
 
 export default nextConfig;
