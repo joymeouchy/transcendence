@@ -33,8 +33,10 @@ export default function MyStats({
 		);
 	}
 
-	const rank = currentUser.rank;
-
+const rank =
+	players.findIndex(
+		(player) => player.id === currentUserId
+	) + 1;
 	return (
 		<div className={styles.container}>
 			<div className={styles.title}>
