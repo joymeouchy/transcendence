@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import "./page.scss";
 
 import { authService } from "@/services/auth.services";
 import { useRouter } from "next/navigation";
@@ -13,7 +12,6 @@ import { loginFields } from "../data/auth/loginFields";
 
 import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
-import XPAlert from "../components/ui/XPAlert/XPAlert";
 
 
 
