@@ -36,7 +36,11 @@ services:
       - .env
     command: sh -c "rm -rf /app/generated && npx prisma generate && npx ts-node-dev src/server.ts"
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${BACKEND_URL}
+        NEXT_PUBLIC_SOCKET_URL: ${FRONTEND_URL}
     expose:
       - "3000"
     volumes:
