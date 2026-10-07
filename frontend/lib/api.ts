@@ -4,7 +4,7 @@ import { alertManager } from "./alert";
 
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  "https://localhost:8443/api";
+  "https://transcendence-backend-production.up.railway.app/api";
 
 export const api = axios.create({
   baseURL: API_URL,
