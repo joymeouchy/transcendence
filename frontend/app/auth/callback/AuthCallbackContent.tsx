@@ -3,27 +3,27 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function AuthCallbackContent()
-{
-    const router = useRouter(); const searchParams = useSearchParams();
+export default function AuthCallbackContent() {
+	const router = useRouter();
+	const searchParams = useSearchParams();
 
-    useEffect(() => { 
-        const token = searchParams.get("token"); const userId = searchParams.get("userId");
-        if (!token)
-        {
-            router.replace("/login");
-            return;
-        }
+	useEffect(() => {
+		const token = searchParams.get("token");
+		const userId = searchParams.get("userId");
 
-    localStorage.setItem("token", token);
+		if (!token) {
+			router.replace("/login");
+			return;
+		}
 
-    if (userId)
-    {
-        localStorage.setItem("userId", userId);
-    }
+		localStorage.setItem("token", token);
 
-    router.replace("/");
-    }, [router, searchParams]);
+		if (userId) {
+			localStorage.setItem("userId", userId);
+		}
 
-    return <div>Signing you in...</div>; 
+		window.location.replace("/");
+	}, [router, searchParams]);
+
+	return <div>Signing you in...</div>;
 }

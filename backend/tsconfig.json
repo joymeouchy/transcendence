@@ -3,6 +3,7 @@
   "include": ["src/**/*", "routes/**/*", "/shared/**/*"],
   "compilerOptions": {
     "rootDir": "..",
+    "outDir": "./dist",
     "module": "commonjs",
     "moduleResolution": "node",
     "ignoreDeprecations": "6.0",
