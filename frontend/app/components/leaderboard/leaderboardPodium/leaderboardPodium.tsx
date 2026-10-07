@@ -1,15 +1,7 @@
 "use client";
 
 import styles from "./leaderboardPodium.module.scss";
-
-export type LeaderboardPlayer = {
-	id: number;
-	username: string;
-	avatarUrl?: string | null;
-	wins: number;
-	losses: number;
-	winRate: number;
-};
+import type { LeaderboardPlayer } from "@/services/user.services";
 
 type LeaderboardPodiumProps = {
 	players: LeaderboardPlayer[];
