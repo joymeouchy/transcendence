@@ -1,5 +1,6 @@
 
 import { LeaderboardPlayer } from "@/services/user.services";
+import LeaderboardPodium from "./leaderboardPodium/leaderboardPodium";
 import LeaderboardTable from "./leaderboardTable/leaderboardTable";
 
 import MyStats from "./MyStats/myStats";
