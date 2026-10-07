@@ -2,9 +2,7 @@
 
 import styles from "./myStats.module.scss";
 
-import {
-	LeaderboardPlayer,
-} from "../leaderboardPodium/leaderboardPodium";
+import type { LeaderboardPlayer } from "@/services/user.services";
 
 type MyStatsProps = {
 	players: LeaderboardPlayer[];
@@ -33,10 +31,8 @@ export default function MyStats({
 		);
 	}
 
-const rank =
-	players.findIndex(
-		(player) => player.id === currentUserId
-	) + 1;
+	const rank = currentUser.rank;
+
 	return (
 		<div className={styles.container}>
 			<div className={styles.title}>
