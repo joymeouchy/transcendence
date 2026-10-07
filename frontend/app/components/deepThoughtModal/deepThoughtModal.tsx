@@ -216,9 +216,11 @@ export default function DeepThoughtModal({
 
 					<p>{config.result.description}</p>
 
-					<div className={styles.answer}>
-						{config.result.answer}
-					</div>
+					{config.result.answer && (
+						<div className={styles.answer}>
+							{config.result.answer}
+						</div>
+					)}
 
 					<button
 						className={styles.button}
