@@ -1,9 +1,7 @@
-import LeaderboardPodium, {
-	LeaderboardPlayer,
-} from "./leaderboardPodium/leaderboardPodium";
+import LeaderboardPodium from "./leaderboardPodium/leaderboardPodium";
 
 import LeaderboardTable from "./leaderboardTable/leaderboardTable";
-
+import { LeaderboardPlayer } from "@/services/user.services";
 import MyStats from "./MyStats/myStats";
 
 import styles from "./leaderboard.module.scss";

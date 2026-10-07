@@ -2,9 +2,8 @@
 
 import styles from "./myStats.module.scss";
 
-import {
-	LeaderboardPlayer,
-} from "../leaderboardPodium/leaderboardPodium";
+import { LeaderboardPlayer } from "@/services/user.services";
+
 
 type MyStatsProps = {
 	players: LeaderboardPlayer[];

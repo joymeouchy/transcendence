@@ -201,46 +201,27 @@ export default function DeepThoughtModal({
 	};
 
 	const renderResult = () => {
-		if (!question) {
-			return null;
-		}
+	if (!question) {
+		return null;
+	}
 
-		const config = QUESTION_CONFIG[question];
-
-		if (question === "answer") {
-			return (
-				<div className={styles.result}>
-					<div className={styles.heading}>
-						{config.result.title}
-					</div>
-
-					<p>{config.result.description}</p>
-
-					<div className={styles.answer}>
-						{config.result.answer}
-					</div>
-
-					<button
-						className={styles.button}
-						onClick={handleBack}
-					>
-						{config.result.buttonLabel}
-					</button>
-				</div>
-			);
-		}
+	if (question === "answer") {
+		const config = QUESTION_CONFIG.answer;
 
 		return (
-			<div className={styles.error}>
-				<div className={styles.errorTitle}>
+			<div className={styles.result}>
+				<div className={styles.heading}>
 					{config.result.title}
 				</div>
 
 				<p>{config.result.description}</p>
 
-				<p>{config.result.details}</p>
+				<div className={styles.answer}>
+					{config.result.answer}
+				</div>
 
 				<button
+					type="button"
 					className={styles.button}
 					onClick={handleBack}
 				>
@@ -248,7 +229,31 @@ export default function DeepThoughtModal({
 				</button>
 			</div>
 		);
-	};
+	}
+
+	const config = QUESTION_CONFIG.ultimate;
+
+	return (
+		<div className={styles.error}>
+			<div className={styles.errorTitle}>
+				{config.result.title}
+			</div>
+
+			<p>{config.result.description}</p>
+
+			<p>{config.result.details}</p>
+
+			<button
+				type="button"
+				className={styles.button}
+				onClick={handleBack}
+			>
+				{config.result.buttonLabel}
+			</button>
+		</div>
+	);
+};
+
 
 	const renderContent = () => {
 		switch (stage) {
