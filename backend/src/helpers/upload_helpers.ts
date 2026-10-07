@@ -36,7 +36,9 @@ export const avatarUpload = multer({
 
 const storageHeaders = () => {
   if (!SUPABASE_URL || !SUPABASE_KEY) {
-    throw new Error("SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are not set in .env");
+    throw new Error(
+      "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are not set in .env",
+    );
   }
   return { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` };
 };
@@ -57,7 +59,9 @@ export async function uploadAvatar(
     },
   );
   if (!res.ok) {
-    throw new Error(`Supabase upload failed (${res.status}): ${await res.text()}`);
+    throw new Error(
+      `Supabase upload failed (${res.status}): ${await res.text()}`,
+    );
   }
 
   return PUBLIC_PREFIX + filename;
@@ -72,7 +76,9 @@ export async function deleteAvatar(avatarUrl: string | null | undefined) {
     await fetch(`${SUPABASE_URL}/storage/v1/object/${AVATAR_BUCKET}`, {
       method: "DELETE",
       headers: { ...storageHeaders(), "Content-Type": "application/json" },
-      body: JSON.stringify({ prefixes: [avatarUrl.slice(PUBLIC_PREFIX.length)] }),
+      body: JSON.stringify({
+        prefixes: [avatarUrl.slice(PUBLIC_PREFIX.length)],
+      }),
     });
   } catch (err) {
     console.error("Failed to delete old avatar:", err);
