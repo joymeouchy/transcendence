@@ -3,6 +3,8 @@
 # Export the certificate:
 # docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt ./caddy-root.crt
 
+# docker compose exec caddy cat /data/caddy/pki/authorities/local/root.crt > caddy-root.crt
+
 # and if ur on WSL, run this command with your device username:
 # cp caddy-root.crt /mnt/c/Users/<user>/Downloads/.
 
