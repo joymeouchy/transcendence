@@ -75,7 +75,7 @@ const [successMessage, setSuccessMessage] = useState("");
 					className="xp-form"
 				>
 					<h3 className="xp-title">
-						Register for PONG
+						Register for Pong XP
 					</h3>
 
 					{registerFields.map((field) => (
