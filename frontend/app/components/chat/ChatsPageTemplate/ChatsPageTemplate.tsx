@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import DesktopLayout from "../../DesktopLayout/DesktopLayout";
 import XPWindow from "../../ui/XPWindow/XPWindow";
@@ -39,6 +39,7 @@ export default function ChatsPageTemplate({
 	const [unreadCounts, setUnreadCounts] =
 		useState<Record<number, number>>({});
 	const { receivedMessage } = useMessageSocket();
+	const lastProcessedMessageId = useRef<number | null>(null);
 
 	useEffect(() => {
 		if (
@@ -77,28 +78,43 @@ export default function ChatsPageTemplate({
 		loadMessages();
 	}, [selectedFriend]);
 
-	useEffect(() => {
-		if (!receivedMessage) return;
+	
+useEffect(() => {
+    if (!receivedMessage) return;
 
-		if (
-			selectedFriend &&
-			receivedMessage.senderId ===
-			selectedFriend.id
-		) {
-			setMessages((prev) => [
-				...prev,
-				receivedMessage,
-			]);
+    // Ignore messages we've already processed
+    if (lastProcessedMessageId.current === receivedMessage.id) {
+        return;
+    }
 
-			return;
-		}
+    lastProcessedMessageId.current = receivedMessage.id;
 
-		setUnreadCounts((prev) => ({
-			...prev,
-			[receivedMessage.senderId]:
-				(prev[receivedMessage.senderId] || 0) + 1,
-		}));
-	}, [receivedMessage, selectedFriend]);
+    // Ignore messages sent by the current user
+    if (receivedMessage.senderId === user?.id) {
+        return;
+    }
+
+    // Message belongs to the currently open chat
+    if (selectedFriend?.id === receivedMessage.senderId) {
+        setMessages((prev) => {
+            // Prevent duplicate messages in the chat
+            if (prev.some((message) => message.id === receivedMessage.id)) {
+                return prev;
+            }
+
+            return [...prev, receivedMessage];
+        });
+
+        return;
+    }
+
+    // Message belongs to another chat
+    setUnreadCounts((prev) => ({
+        ...prev,
+        [receivedMessage.senderId]:
+            (prev[receivedMessage.senderId] || 0) + 1,
+    }));
+}, [receivedMessage, selectedFriend?.id, user?.id]);
 
 	function handleSelectFriend(friend: Friend) {
 		setSelectedFriend(friend);

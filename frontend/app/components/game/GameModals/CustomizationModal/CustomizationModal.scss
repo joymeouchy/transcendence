@@ -1,20 +1,39 @@
+.customization {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	height: auto;
+	min-height: 0;
+	max-height: 75vh;
+}
+
+/* Theme list */
 .theme-list {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 16px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-content: start;
+	align-items: start;
+	gap: 10px;
 
-	max-height: 580px;
+	max-height: 320px;
+	min-height: 0;
 	overflow-y: auto;
+	overflow-x: hidden;
 
-	padding-right: 8px;
+	padding: 4px 8px 4px 4px;
+	flex: 0 1 auto;
 
-	button {
+	/* Theme cards */
+	.theme-card {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		align-self: start;
+		justify-content: flex-start;
 		gap: 8px;
 
-		padding: 8px;
+		height: auto;
+		padding: 10px;
 
 		background: transparent;
 		border: 2px solid transparent;
@@ -24,7 +43,7 @@
 		cursor: pointer;
 		transition: all 0.2s ease;
 
-		&:hover {
+		&:hover:not(:disabled) {
 			border-color: #5a9cff;
 			transform: translateY(-2px);
 		}
@@ -40,24 +59,26 @@
 			color: black;
 		}
 
-		button:disabled {
+		&:disabled {
 			cursor: not-allowed;
 			opacity: 0.6;
 		}
 
-		disabled:hover {
+		&:disabled:hover {
 			transform: none;
 			border-color: transparent;
 		}
 	}
 }
 
-
+/* Theme previews */
 .theme-preview {
 	position: relative;
-
-	width: 220px;
-	height: 130px;
+	width: 180px;
+	max-width: 100%;
+	height: auto;
+	aspect-ratio: 22 / 13;
+	flex-shrink: 0;
 
 	overflow: hidden;
 	border-radius: 6px;
@@ -66,21 +87,17 @@
 	.preview-background {
 		position: absolute;
 		inset: 0;
-
 		width: 100%;
 		height: 100%;
-
 		object-fit: cover;
 	}
 
 	.preview-paddle {
 		position: absolute;
-
 		width: 12px;
 		height: 50px;
-
-		top: 40px;
-
+		top: 50%;
+		transform: translateY(-50%);
 		object-fit: contain;
 	}
 
@@ -94,21 +111,35 @@
 
 	.preview-ball {
 		position: absolute;
-
 		width: 20px;
 		height: 20px;
-
 		left: 50%;
 		top: 50%;
 		transform: translate(-50%, -50%);
-
 		object-fit: contain;
 	}
 }
 
+/* Action buttons */
 .customization_actions {
 	display: flex;
 	justify-content: flex-end;
 	gap: 10px;
-	margin-top: 20px;
+	margin-top: 6px;
+	flex-shrink: 0;
+}
+
+/* Short screens */
+@media (max-height: 700px) {
+	.customization {
+		max-height: 75vh;
+	}
+
+	.theme-list {
+		max-height: 240px;
+	}
+
+	.theme-preview {
+		width: 150px;
+	}
 }
