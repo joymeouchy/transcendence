@@ -1,11 +1,10 @@
 {
   "scripts": {
-    "dev": "ts-node-dev src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
     "prisma:generate": "prisma generate --config prisma.config.ts",
     "prisma:migrate": "prisma migrate dev --config prisma.config.ts",
-    "prisma:studio": "prisma studio --config prisma.config.ts"
+    "prisma:studio": "prisma studio --config prisma.config.ts",
+    "build": "tsc"
   },
   "prisma": {
     "seed": "ts-node --transpile-only prisma/seed.ts"
