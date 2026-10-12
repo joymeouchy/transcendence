@@ -56,18 +56,15 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-
 	gap: 8px;
 	padding: 6px 8px;
-
 	background: white;
 	border-bottom: 1px solid #e1e8ee;
-
 	font-family: var(--xp-font-main);
 	font-size: 11px;
 	color: #222;
-
 	box-sizing: border-box;
+	cursor: pointer;
 }
 
 .friend:nth-child(even) {
@@ -78,6 +75,10 @@
 	background: #dceeff;
 }
 
+.friend:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: -2px;
+}
 .user {
 	display: flex;
 	align-items: center;

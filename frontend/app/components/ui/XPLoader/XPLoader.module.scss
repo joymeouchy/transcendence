@@ -1,0 +1,51 @@
+
+.loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #ece9d8;
+  color: #000;
+  font-family: Tahoma, sans-serif;
+  font-size: 13px;
+  z-index: 1;
+
+  p {
+    margin: 0;
+  }
+}
+
+.progressBar {
+  width: 180px;
+  height: 16px;
+  padding: 2px;
+  border: 1px solid #808080;
+  background: #fff;
+  overflow: hidden;
+}
+
+.progress {
+  width: 40%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    #245edb 0px,
+    #245edb 10px,
+    transparent 10px,
+    transparent 13px
+  );
+  animation: loadingProgress 1.2s linear infinite;
+}
+
+@keyframes loadingProgress {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(350%);
+  }
+}

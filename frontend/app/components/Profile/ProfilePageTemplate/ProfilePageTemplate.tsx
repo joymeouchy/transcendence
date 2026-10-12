@@ -17,147 +17,129 @@ import { UserProfile } from "@/types/types.dto";
 import styles from "./ProfilePageTemplate.module.scss";
 
 interface ProfilePageTemplateProps {
-	user?: UserProfile;
-	friends: Friend[];
-	loadingFriends: boolean;
-	onClose?: () => void;
-	isOwnProfile?: boolean;
-	isFriend?: boolean;
-	onAddFriend?: () => void;
-	onRemoveFriend?: () => void;
+  user?: UserProfile;
+  friends: Friend[];
+  loadingFriends: boolean;
+  loadingProfile?: boolean;
+  onClose?: () => void;
+  isOwnProfile?: boolean;
+  isFriend?: boolean;
+  onAddFriend?: () => void;
+  onRemoveFriend?: () => void;
 }
 
 export default function ProfilePageTemplate({
-	user,
-	friends,
-	loadingFriends,
-	onClose,
-	isOwnProfile = false,
-	isFriend = false,
-	onAddFriend,
-	onRemoveFriend,
+  user,
+  friends,
+  loadingFriends,
+  loadingProfile = false,
+  onClose,
+  isOwnProfile = false,
+  isFriend = false,
+  onAddFriend,
+  onRemoveFriend,
 }: ProfilePageTemplateProps) {
-	const router = useRouter();
+  const router = useRouter();
 
-	if (!user) {
-		return (
-			<DesktopLayout>
-				<XPWindow
-					title="User Profile"
-					onClose={onClose}
-				>
-					<div className={styles.loading}>
-						Loading user profile...
-					</div>
-				</XPWindow>
-			</DesktopLayout>
-		);
-	}
+  const canSeePrivateInfo = isOwnProfile || isFriend;
 
-	const canSeePrivateInfo =
-		isOwnProfile || isFriend;
+  return (
+    <DesktopLayout>
+      <XPWindow
+        title="User Profile"
+        onClose={onClose}
+        isLoading={loadingProfile || loadingFriends}
+        loadingMessage={
+          loadingProfile ? "Loading friends..." : "Loading user profile..."
+        }
+      >
+        <div className={styles.page}>
+          {!user ? (
+            !loadingProfile && (
+              <div className={styles.loading}>Could not load user profile.</div>
+            )
+          ) : (
+            <div className={styles.page}>
+              <aside className={styles.leftPanel}>
+                <ProfileHeader
+                  username={user.username}
+                  avatarUrl={user.avatarUrl}
+                />
 
-	return (
-		<DesktopLayout>
-			<XPWindow
-				title="User Profile"
-				onClose={onClose}
-			>
-				<div className={styles.page}>
-					<aside className={styles.leftPanel}>
-						<ProfileHeader
-							username={user.username}
-							avatarUrl={user.avatarUrl}
-						/>
+                <div className={styles.groupBox}>
+                  <div className={styles.groupTitle}>Account Actions</div>
 
-						<div className={styles.groupBox}>
-							<div className={styles.groupTitle}>
-								Account Actions
-							</div>
+                  <AccountActions
+                    provider={user.provider}
+                    username={user.username}
+                    isOwnProfile={isOwnProfile}
+                    isFriend={isFriend}
+                    onAddFriend={onAddFriend}
+                    onRemoveFriend={onRemoveFriend}
+                  />
+                </div>
 
-							<AccountActions
-								provider={user.provider}
-								username={user.username}
-								isOwnProfile={isOwnProfile}
-								isFriend={isFriend}
-								onAddFriend={onAddFriend}
-								onRemoveFriend={onRemoveFriend}
-							/>
-						</div>
+                {canSeePrivateInfo && (
+                  <div className={styles.groupBox}>
+                    <div className={styles.groupTitle}>Status</div>
 
-						{canSeePrivateInfo && (
-							<div className={styles.groupBox}>
-								<div className={styles.groupTitle}>
-									Status
-								</div>
+                    <div className={styles.status}>
+                      {user.isOnline ? "🟢 Online" : "⚫ Offline"}
+                    </div>
+                  </div>
+                )}
+              </aside>
 
-								<div className={styles.status}>
-									{user.isOnline
-										? "🟢 Online"
-										: "⚫ Offline"}
-								</div>
-							</div>
-						)}
-					</aside>
+              <section className={styles.rightPanel}>
+                <div className={styles.topRow}>
+                  <div className={styles.groupBox}>
+                    <div className={styles.groupTitle}>Game Statistics</div>
 
-					<section className={styles.rightPanel}>
-						<div className={styles.topRow}>
-							<div className={styles.groupBox}>
-								<div className={styles.groupTitle}>
-									Game Statistics
-								</div>
+                    <ProfileStats
+                      wins={user.wins}
+                      losses={user.losses}
+                      winRate={user.winRate}
+                    />
 
-								<ProfileStats
-									wins={user.wins}
-									losses={user.losses}
-									winRate={user.winRate}
-								/>
-								{isOwnProfile && (
-									<button
-										className={styles.statsButton}
-										onClick={() =>
-											router.push("/gameStats")
-										}
-									>
-										View Full Stats
-									</button>
-								)}
-							</div>
+                    {isOwnProfile && (
+                      <button
+                        className={styles.statsButton}
+                        onClick={() => router.push("/gameStats")}
+                      >
+                        View Full Stats
+                      </button>
+                    )}
+                  </div>
 
-							{canSeePrivateInfo && (
-								<div className={styles.groupBox}>
-									<div className={styles.groupTitle}>
-										Account Info
-									</div>
+                  {canSeePrivateInfo && (
+                    <div className={styles.groupBox}>
+                      <div className={styles.groupTitle}>Account Info</div>
 
-									<AccountInfo
-										username={user.username}
-										email={user.email ?? ""}
-										totalMatches={user.totalMatches}
-									/>
-								</div>
-							)}
-						</div>
+                      <AccountInfo
+                        username={user.username}
+                        email={user.email ?? ""}
+                        totalMatches={user.totalMatches}
+                      />
+                    </div>
+                  )}
+                </div>
 
-						<div className={styles.groupBox}>
-							<div className={styles.groupTitle}>
-								Friends
-							</div>
+                <div className={styles.groupBox}>
+                  <div className={styles.groupTitle}>Friends</div>
 
-							{canSeePrivateInfo ? (
-								<FriendsPanel
-									friends={friends}
-									loading={loadingFriends}
-								/>
-							) : (
-								<div className={styles.status}>
-									Add this user as a friend to see their friends.
-								</div>
-							)}
-						</div>
-					</section>
-				</div>
-			</XPWindow>
-		</DesktopLayout>
-	);
+                  {canSeePrivateInfo ? (
+                    <FriendsPanel friends={friends} loading={loadingFriends} />
+                  ) : (
+                    <div className={styles.status}>
+                      Add this user as a friend to see their friends.
+                    </div>
+                  )}
+                </div>
+              </section>
+            </div>
+          )}
+        </div>
+      </XPWindow>
+    </DesktopLayout>
+  );
 }
