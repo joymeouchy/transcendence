@@ -6,54 +6,49 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
-import {
-	Friend,
-	FriendshipService,
-} from "@/services/friendships.service";
+import { Friend, FriendshipService } from "@/services/friendships.service";
 
 export default function ProfilePage() {
-	const router = useRouter();
+  const router = useRouter();
 
-	const { user } = useAuth();
+  const { user, loading } = useAuth();
 
-	const [friends, setFriends] =
-		useState<Friend[]>([]);
+  const [friends, setFriends] = useState<Friend[]>([]);
+  const [loadingFriends, setLoadingFriends] = useState(true);
 
-	const [loadingFriends, setLoadingFriends] =
-		useState(true);
+  useEffect(() => {
+    async function loadFriends() {
+      if (loading) return;
 
-	useEffect(() => {
-		async function loadFriends() {
-			if (!user)
-				return;
+      if (!user) {
+        setFriends([]);
+        setLoadingFriends(false);
+        return;
+      }
 
-			try {
-				const data =
-					await FriendshipService.getFriends(
-						user.id
-					);
-				setFriends(data);
-			} catch (error) {
-				console.error(
-					"Failed to load friends:",
-					error
-				);
-			} finally {
-				setLoadingFriends(false);
-			}
-		}
-		loadFriends();
-	}, [user]);
+      setLoadingFriends(true);
 
-	return (
-		<ProfilePageTemplate
-			user={user ?? undefined}
-			friends={friends}
-			loadingFriends={loadingFriends}
-			isOwnProfile={true}
-			onClose={() =>
-				router.push("/home")
-			}
-		/>
-	);
+      try {
+        const data = await FriendshipService.getFriends(user.id);
+        setFriends(data);
+      } catch (error) {
+        console.error("Failed to load friends:", error);
+      } finally {
+        setLoadingFriends(false);
+      }
+    }
+
+    loadFriends();
+  }, [user, loading]);
+
+  return (
+    <ProfilePageTemplate
+      user={user ?? undefined}
+      friends={friends}
+      loadingProfile={loading}
+      loadingFriends={loadingFriends}
+      isOwnProfile={true}
+      onClose={() => router.push("/home")}
+    />
+  );
 }

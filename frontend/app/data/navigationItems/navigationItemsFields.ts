@@ -75,4 +75,5 @@ export const paintItem = {
   image: images.customization,
   label: "paint",
   position: "paint",
+  href: "/paint",
 };
