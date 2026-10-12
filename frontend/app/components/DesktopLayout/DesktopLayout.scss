@@ -7,20 +7,43 @@ body {
 }
 
 .xp-desktop {
+  position: relative;
+  isolation: isolate;
+
   width: 100vw;
   height: 100vh;
 
   display: flex;
-
   overflow: hidden;
+}
+
+.xp-desktop-wallpaper {
+  position: absolute;
+  inset: -14px;
+  z-index: -1;
 
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+
+  filter: blur(0) brightness(1);
+  transform: scale(1.02);
+
+  transition:
+    filter 0.7s ease,
+    transform 0.7s ease;
+
+  pointer-events: none;
+}
+
+.xp-desktop-wallpaper.is-loading {
+  filter: blur(12px) brightness(0.65);
+  transform: scale(1.06);
 }
 
 .xp-desktop-content {
   flex: 1;
+  min-width: 0;
 
   padding: 40px;
 
@@ -28,4 +51,10 @@ body {
 
   display: flex;
   align-items: flex-start;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-desktop-wallpaper {
+    transition: none;
+  }
 }

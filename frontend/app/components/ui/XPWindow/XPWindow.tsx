@@ -1,4 +1,6 @@
+
 import "./XPWindow.scss";
+import XPLoader from "../XPLoader/XPLoader";
 
 type XPWindowProps = {
   title: string;
@@ -6,6 +8,8 @@ type XPWindowProps = {
   className?: string;
   onClose?: () => void;
   headerButton?: React.ReactNode;
+  isLoading?: boolean;
+  loadingMessage?: string;
 };
 
 export default function XPWindow({
@@ -14,6 +18,8 @@ export default function XPWindow({
   className = "",
   onClose,
   headerButton,
+  isLoading = false,
+  loadingMessage = "Loading...",
 }: XPWindowProps) {
   return (
     <div className={`xp-window-outline ${className}`}>
@@ -37,6 +43,10 @@ export default function XPWindow({
 
         <div className="xp-content">
           {children}
+
+          {isLoading && (
+            <XPLoader message={loadingMessage} />
+          )}
         </div>
       </div>
     </div>

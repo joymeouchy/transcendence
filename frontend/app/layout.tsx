@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.scss";
-import "./styles/xp-theme.scss"
+import "./styles/xp-theme.scss";
 
 import { AuthProvider } from "@/context/AuthContext";
 import { GameInviteProvider } from "@/context/GameInviteContext";
 import GameInvitePopup from "./components/GameInvitePopup/GameInvitePopup";
 import { AlertProvider } from "@/context/AlertContext";
+import AuthRedirect from "./auth/authRedirect/AuthRedirect";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,26 +25,25 @@ export const metadata: Metadata = {
   description: "Created by jmeouchy and rdennaou",
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable}`}
-    >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        {<AuthProvider>
-          <AlertProvider>
-            <GameInviteProvider>
-              {children}
-              <GameInvitePopup />
-            </GameInviteProvider>
-          </AlertProvider>
-        </AuthProvider>}
+        {
+          <AuthProvider>
+            <AuthRedirect />
+            <AlertProvider>
+              <GameInviteProvider>
+                {children}
+                <GameInvitePopup />
+              </GameInviteProvider>
+            </AlertProvider>
+          </AuthProvider>
+        }
       </body>
     </html>
   );
