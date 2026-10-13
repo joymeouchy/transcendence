@@ -17,6 +17,8 @@ const DISCONNECT_GRACE_MS = 15000; // time left to reconnect before the match en
 const MATCH_COUNTDOWN_MS = 3000; // pre-match countdown before the ball starts moving
 const BALL_SPEEDUP_FACTOR = 1.05; // +5% speed per paddle hit
 const BALL_MAX_SPEED_MULTIPLIER = 2.5; // max speed is 2.5x the original speed
+const POWER_UP_DURATION_MS = 5000; // how long a power-up stays active
+const FREEZE_DURATION_MS = 3000; // freeze is the exception
 
 // scales the ball's velocity by `factor` while keeping direction, capped so
 // consecutive paddle hits / speed boosts can't push it past a playable speed
@@ -38,7 +40,10 @@ function applyPowerUp(
   room: string,
 ) {
   const opponent = side === "left" ? "right" : "left";
-  const expiresAt = Date.now() + 5000; // 5 seconds
+  // freeze is shorter than the rest to keep it fair
+  const duration =
+    type === "freeze" ? FREEZE_DURATION_MS : POWER_UP_DURATION_MS;
+  const expiresAt = Date.now() + duration;
   const { config } = game;
 
   // "freeze"/"smallPaddle" are debuffs aimed at the opponent; everything else
@@ -91,7 +96,7 @@ function applyPowerUp(
 
     game.activeEffects[affected] = null;
     io.to(room).emit("power_up_expired", { type, side });
-  }, 5000);
+  }, duration);
 }
 
 function runGameLoop(io: Server, room: string) {

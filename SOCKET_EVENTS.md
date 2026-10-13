@@ -46,7 +46,7 @@ Messages are sent over REST, not a socket event: see `POST /messages` and `GET /
 **POWER-UPS**
 | `power_up_incoming` | `PendingPowerUp` = `{ type: PowerUpType, side: "left" or "right", applyAt: number }` | A power-up has been chosen and will self-activate at `applyAt` (~2s warning, no need to touch anything to trigger it) |
 | `power_up_activated` | `{ type: PowerUpType, side: "left" or "right" }` | The announced power-up just took effect |
-| `power_up_expired` | `{ type: PowerUpType, side: "left" or "right" }` | A power-up's 5s effect just ended |
+| `power_up_expired` | `{ type: PowerUpType, side: "left" or "right" }` | A power-up's effect just ended (5s, or 3s for `freeze`) |
 
 **GAME END / CONNECTION**
 | `game_over` | `{ winnerSocketId: string, winnerId?: number, winnerUsername: string, scores: { left: number, right: number }, reason?: "disconnect" }` | Game ended (normal win or opponent disconnect): same shape for both, `reason` is only set for the disconnect case |
