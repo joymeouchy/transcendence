@@ -1,3 +1,4 @@
+
 .page {
 	display: flex;
 	gap: var(--xp-space-md);
@@ -5,7 +6,7 @@
 	width: 100%;
 
 	min-width: 0;
-	min-height: 0;
+	min-height: 360px;
 
 	box-sizing: border-box;
 

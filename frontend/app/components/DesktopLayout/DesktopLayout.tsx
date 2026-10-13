@@ -19,7 +19,7 @@ type DesktopLayoutProps = {
 export default function DesktopLayout({
 	children,
 }: DesktopLayoutProps) {
-	const { user } = useAuth();
+	const { user, loading } = useAuth();
 
 	const selectedTheme = desktopThemes.find(
 		(theme) => theme.id === user?.preferredWallpaper
@@ -30,12 +30,16 @@ export default function DesktopLayout({
 		images.windowsDefaultWallpaper;
 
 	return (
-		<div
-			className="xp-desktop"
-			style={{
-				backgroundImage: `url(${wallpaper})`,
-			}}
-		>
+		<div className="xp-desktop">
+			<div
+				className={`xp-desktop-wallpaper ${
+					loading ? "is-loading" : ""
+				}`}
+				style={{
+					backgroundImage: `url(${wallpaper})`,
+				}}
+			/>
+
 			<Sidebar />
 
 			<main className="xp-desktop-content">

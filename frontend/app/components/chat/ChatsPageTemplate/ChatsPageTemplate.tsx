@@ -16,203 +16,161 @@ import { MessagesService } from "@/services/messages.services";
 import useMessageSocket from "../UseMessagesSocket";
 
 interface Props {
-	user?: UserProfile;
-	friends: Friend[];
+  user?: UserProfile;
+  friends: Friend[];
 
-	loading?: boolean;
+  loading?: boolean;
 
-	onClose?: () => void;
+  onClose?: () => void;
 }
 
 export default function ChatsPageTemplate({
-	user,
-	friends,
-	loading = false,
-	onClose,
+  user,
+  friends,
+  loading = false,
+  onClose,
 }: Props) {
-	const [selectedFriend, setSelectedFriend] =
-		useState<Friend | null>(null);
+  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
 
-	const [messages, setMessages] = useState<Message[]>([]);
-	const [messagesLoading, setMessagesLoading] =
-		useState(false);
-	const [unreadCounts, setUnreadCounts] =
-		useState<Record<number, number>>({});
-	const { receivedMessage } = useMessageSocket();
-	const lastProcessedMessageId = useRef<number | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const [unreadCounts, setUnreadCounts] = useState<Record<number, number>>({});
+  const { receivedMessage } = useMessageSocket();
+  const lastProcessedMessageId = useRef<number | null>(null);
 
-	useEffect(() => {
-		if (
-			!selectedFriend &&
-			friends.length > 0
-		) {
-			setSelectedFriend(friends[0]);
-		}
-	}, [friends, selectedFriend]);
-	useEffect(() => {
-		if (!selectedFriend) return;
+  useEffect(() => {
+    if (!selectedFriend && friends.length > 0) {
+      setSelectedFriend(friends[0]);
+    }
+  }, [friends, selectedFriend]);
+  useEffect(() => {
+    if (!selectedFriend) return;
 
-		const friendId = selectedFriend.id;
+    const friendId = selectedFriend.id;
 
-		async function loadMessages() {
-			setMessagesLoading(true);
+    async function loadMessages() {
+      setMessagesLoading(true);
 
-			try {
-				const messagesData =
-					await MessagesService.getMessages(
-						friendId
-					);
+      try {
+        const messagesData = await MessagesService.getMessages(friendId);
 
-				setMessages(messagesData);
-			} catch (error) {
-				console.error(
-					"Failed to load messages:",
-					error
-				);
-				setMessages([]);
-			} finally {
-				setMessagesLoading(false);
-			}
-		}
+        setMessages(messagesData);
+      } catch (error) {
+        console.error("Failed to load messages:", error);
+        setMessages([]);
+      } finally {
+        setMessagesLoading(false);
+      }
+    }
 
-		loadMessages();
-	}, [selectedFriend]);
+    loadMessages();
+  }, [selectedFriend]);
 
-	
-useEffect(() => {
+  useEffect(() => {
     if (!receivedMessage) return;
 
     // Ignore messages we've already processed
     if (lastProcessedMessageId.current === receivedMessage.id) {
-        return;
+      return;
     }
 
     lastProcessedMessageId.current = receivedMessage.id;
 
     // Ignore messages sent by the current user
     if (receivedMessage.senderId === user?.id) {
-        return;
+      return;
     }
 
     // Message belongs to the currently open chat
     if (selectedFriend?.id === receivedMessage.senderId) {
-        setMessages((prev) => {
-            // Prevent duplicate messages in the chat
-            if (prev.some((message) => message.id === receivedMessage.id)) {
-                return prev;
-            }
+      setMessages((prev) => {
+        // Prevent duplicate messages in the chat
+        if (prev.some((message) => message.id === receivedMessage.id)) {
+          return prev;
+        }
 
-            return [...prev, receivedMessage];
-        });
+        return [...prev, receivedMessage];
+      });
 
-        return;
+      return;
     }
 
     // Message belongs to another chat
     setUnreadCounts((prev) => ({
-        ...prev,
-        [receivedMessage.senderId]:
-            (prev[receivedMessage.senderId] || 0) + 1,
+      ...prev,
+      [receivedMessage.senderId]: (prev[receivedMessage.senderId] || 0) + 1,
     }));
-}, [receivedMessage, selectedFriend?.id, user?.id]);
+  }, [receivedMessage, selectedFriend?.id, user?.id]);
 
-	function handleSelectFriend(friend: Friend) {
-		setSelectedFriend(friend);
+  function handleSelectFriend(friend: Friend) {
+    setSelectedFriend(friend);
 
-		setUnreadCounts((prev) => {
-			const updated = { ...prev };
-			delete updated[friend.id];
-			return updated;
-		});
-	}
+    setUnreadCounts((prev) => {
+      const updated = { ...prev };
+      delete updated[friend.id];
+      return updated;
+    });
+  }
 
-	if (loading) {
-		return (
-			<DesktopLayout>
-				<XPWindow
-					title="MSN"
-					onClose={onClose}
-				>
-					<div className={styles.loading}>
-						Loading chats...
-					</div>
-				</XPWindow>
-			</DesktopLayout>
-		);
-	}
-	async function handleSendMessage(content: string) {
-		if (!user) return;
-		if (!selectedFriend) return;
+  
+  async function handleSendMessage(content: string) {
+    if (!user) return;
+    if (!selectedFriend) return;
 
-		const tempMessage: Message = {
-			id: Date.now(),
-			senderId: user.id,
-			receiverId: selectedFriend.id,
-			content,
-			createdAt: new Date().toISOString(),
-		};
-		setMessages((prev) => [
-			...prev,
-			tempMessage,
-		]);
+    const tempMessage: Message = {
+      id: Date.now(),
+      senderId: user.id,
+      receiverId: selectedFriend.id,
+      content,
+      createdAt: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, tempMessage]);
 
-		try {
-			await MessagesService.sendMessage(
-				selectedFriend.id,
-				content
-			);
-		} catch (error) {
-			console.error(
-				"Failed to send message:",
-				error
-			);
+    try {
+      await MessagesService.sendMessage(selectedFriend.id, content);
+    } catch (error) {
+      console.error("Failed to send message:", error);
 
-			setMessages((prev) =>
-				prev.filter(
-					(message) =>
-						message.id !== tempMessage.id
-				)
-			);
-		}
-	}
-	return (
-		<DesktopLayout>
-			<XPWindow
-				title="MSN"
-				onClose={onClose}
-			>
-				<div className={styles.page}>
-					<div className={styles.friendsPanel}>
-						<FriendsListPanel
-							friends={friends}
-							selectedFriendId={
-								selectedFriend?.id
-							}
-							onSelectFriend={
-								handleSelectFriend
-							}
-							unreadCounts={unreadCounts}
-						/>
-					</div>
+      setMessages((prev) =>
+        prev.filter((message) => message.id !== tempMessage.id)
+      );
+    }
+  }
+  return (
+    <DesktopLayout>
+      <XPWindow
+        title="MSN"
+        onClose={onClose}
+        isLoading={loading}
+        loadingMessage="Loading chats..."
+      >
+        <div className={styles.page}>
+          <div className={styles.friendsPanel}>
+            <FriendsListPanel
+              friends={friends}
+              selectedFriendId={selectedFriend?.id}
+              onSelectFriend={handleSelectFriend}
+              unreadCounts={unreadCounts}
+            />
+          </div>
 
-					<div className={styles.chatPanel}>
-						{selectedFriend ? (
-							<ChatPanel
-								user={selectedFriend}
-								currentUserId={user?.id ?? 0}
-								messages={messages}
-								messagesLoading={messagesLoading}
-								onSendMessage={handleSendMessage}
-							/>
-						) : (
-							<div className={styles.empty}>
-								Select a friend to start
-								chatting
-							</div>
-						)}
-					</div>
-				</div>
-			</XPWindow>
-		</DesktopLayout>
-	);
+          <div className={styles.chatPanel}>
+            {selectedFriend ? (
+              <ChatPanel
+                user={selectedFriend}
+                currentUserId={user?.id ?? 0}
+                messages={messages}
+                messagesLoading={messagesLoading}
+                onSendMessage={handleSendMessage}
+              />
+            ) : (
+              <div className={styles.empty}>
+                Select a friend to start chatting
+              </div>
+            )}
+          </div>
+        </div>
+      </XPWindow>
+    </DesktopLayout>
+  );
 }
