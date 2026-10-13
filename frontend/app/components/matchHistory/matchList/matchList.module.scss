@@ -140,30 +140,17 @@
 
 .row {
 	display: grid;
-
-	grid-template-columns:
-		minmax(140px, 1fr)
-		70px
-		60px
-		90px;
-
+	grid-template-columns: minmax(140px, 1fr) 70px 60px 90px;
 	align-items: center;
-
 	min-height: 46px;
-
 	padding: 5px 8px;
-
 	box-sizing: border-box;
-
 	border-bottom: 1px solid #d8e2ea;
-
 	background: white;
-
 	font-family: var(--xp-font-main);
 	font-size: 11px;
-
 	color: #222;
-
+	cursor: pointer;
 	transition: background 0.1s ease;
 }
 
@@ -173,6 +160,11 @@
 
 .row:hover {
 	background: #dceeff;
+}
+
+.row:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: -2px;
 }
 
 /* =========================

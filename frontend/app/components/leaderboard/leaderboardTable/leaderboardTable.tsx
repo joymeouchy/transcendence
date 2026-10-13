@@ -1,8 +1,7 @@
 "use client";
 
-
+import { useRouter } from "next/navigation";
 import { LeaderboardPlayer } from "@/services/user.services";
-
 import styles from "./leaderboardTable.module.scss";
 
 type LeaderboardScope = "all" | "friends";
@@ -22,98 +21,76 @@ export default function LeaderboardTable({
 	onScopeChange,
 	loading,
 }: LeaderboardTableProps) {
+	const router = useRouter();
+
 	return (
 		<div className={styles.container}>
-			{/* All Players / Friends tabs */}
 			<div className={styles.tabs}>
 				<button
-					className={
-						scope === "all"
-							? styles.activeTab
-							: styles.tab
-					}
+					className={scope === "all" ? styles.activeTab : styles.tab}
 					onClick={() => onScopeChange("all")}
 				>
 					All Players
 				</button>
 
 				<button
-					className={
-						scope === "friends"
-							? styles.activeTab
-							: styles.tab
-					}
+					className={scope === "friends" ? styles.activeTab : styles.tab}
 					onClick={() => onScopeChange("friends")}
 				>
 					Friends
 				</button>
 			</div>
 
-			{/* Leaderboard table */}
 			<div className={styles.tableWrapper}>
 				<div className={styles.table}>
 					<div className={styles.header}>
-						<span className={styles.rank}>
-							#
-						</span>
-
-						<span className={styles.player}>
-							Player
-						</span>
-
+						<span className={styles.rank}>#</span>
+						<span className={styles.player}>Player</span>
 						<span>W</span>
 						<span>L</span>
 						<span>Win Rate</span>
 					</div>
 
 					{players.map((player) => {
-
-						const isCurrentUser =
-							player.id === currentUserId;
+						const isCurrentUser = player.id === currentUserId;
 
 						return (
 							<div
 								key={player.id}
 								className={`${styles.row} ${
-									isCurrentUser
-										? styles.currentUser
-										: ""
+									isCurrentUser ? styles.currentUser : ""
 								}`}
+								role="link"
+								tabIndex={0}
+								onClick={() => router.push(`/profile/${player.id}`)}
+								onKeyDown={(e) => {
+									if (e.key === "Enter" || e.key === " ") {
+										e.preventDefault();
+										router.push(`/profile/${player.id}`);
+									}
+								}}
 							>
-								<span className={styles.rank}>
-									{player.rank}
-								</span>
+								<span className={styles.rank}>{player.rank}</span>
 
 								<div className={styles.player}>
 									{player.avatarUrl ? (
 										<img
 											src={player.avatarUrl}
-											alt={`${player.username}'s avatar`}
+											alt=""
 											className={styles.avatar}
 										/>
 									) : (
-										<div
-											className={
-												styles.avatarFallback
-											}
-										>
-											{player.username
-												.charAt(0)
-												.toUpperCase()}
+										<div className={styles.avatarFallback}>
+											{player.username.charAt(0).toUpperCase()}
 										</div>
 									)}
 
-									<span>
-										{player.username}
-									</span>
+									<span>{player.username}</span>
 								</div>
 
 								<span>{player.wins}</span>
 								<span>{player.losses}</span>
-
-								<strong>
-									{player.winRate}%
-								</strong>
+								<strong>{player.winRate}%</strong>
 							</div>
 						);
 					})}
