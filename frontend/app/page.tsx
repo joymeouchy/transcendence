@@ -1,12 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import AuthLayout from "./components/auth/AuthLayout";
 import AuthIcon from "./components/auth/AuthIcon";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { isAuthenticated } from "@/lib/auth";
 import { images } from "@/lib/images";
 
 import "./page.scss";
@@ -14,11 +11,6 @@ import "./page.scss";
 export default function LandingPage() {
   const router = useRouter();
 
-  useEffect(() => {
-    if (isAuthenticated()) {
-      router.replace("/home");
-    }
-  }, []);
 
   return (
     <AuthLayout>

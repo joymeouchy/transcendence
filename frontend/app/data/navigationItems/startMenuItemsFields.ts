@@ -9,6 +9,7 @@ import {
   friendshipsItem,
   messagingItem,
   gameStatsItem,
+  paintItem,
 } from "./navigationItemsFields";
 
 export const startMenuItemsLeft = [
@@ -17,12 +18,12 @@ export const startMenuItemsLeft = [
   friendshipsItem,
   messagingItem,
   customizationItem,
+  paintItem,
   ];
 
 export const startMenuItemsRight = [
   profileItem,
   gameStatsItem,
-  // achievementsItem,
   termsOfServicesItem,
   privacyPolicyItem,
 ];

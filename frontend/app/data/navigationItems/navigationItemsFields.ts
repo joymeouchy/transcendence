@@ -70,3 +70,10 @@ export const deepThoughtItem = {
   label: "Deep Thought",
   position: "deep-thought",
 };
+
+export const paintItem = {
+  image: images.customization,
+  label: "paint",
+  position: "paint",
+  href: "/paint",
+};

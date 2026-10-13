@@ -1,4 +1,3 @@
-// XPModal.tsx
 
 import XPWindow from "./../XPWindow/XPWindow";
 
@@ -7,14 +6,12 @@ import "./XPModal.scss";
 type XPModalProps = {
   title: string;
   children: React.ReactNode;
-
   isOpen: boolean;
-
   onClose?: () => void;
-
   className?: string;
-
   headerButton?: React.ReactNode;
+  isLoading?: boolean;
+  loadingMessage?: string;
 };
 
 export default function XPModal({
@@ -24,6 +21,8 @@ export default function XPModal({
   onClose,
   className = "",
   headerButton,
+  isLoading = false,
+  loadingMessage = "Loading...",
 }: XPModalProps) {
   if (!isOpen) return null;
 
@@ -41,6 +40,8 @@ export default function XPModal({
           onClose={onClose}
           className={className}
           headerButton={headerButton}
+          isLoading={isLoading}
+          loadingMessage={loadingMessage}
         >
           {children}
         </XPWindow>
