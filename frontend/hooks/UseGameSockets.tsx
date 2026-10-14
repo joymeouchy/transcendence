@@ -79,8 +79,6 @@ export default function useGameSocket() {
     right: null,
   });
 
-  const gameEndedRef = useRef(false);
-
   useEffect(() => {
     const handleConnect = () => {
       console.log("Socket connected:", socket.id);
@@ -99,10 +97,6 @@ export default function useGameSocket() {
       setRoom(data.room);
 
       const [leftPlayer, rightPlayer] = data.players;
-      gameEndedRef.current = false;
-      setOpponentDisconnected(false);
-      setPendingPowerUp(null);
-      setActiveEffects({ left: null, right: null });
 
       if (user?.username === leftPlayer) {
         setPlayerSide("left");
@@ -138,14 +132,23 @@ export default function useGameSocket() {
 
     const handleRematchDeclined = () => {
       setWaitingRematch(false);
-      setRematchRequested(false);
       setRematchDeclined(true);
     };
 
-    const handleRematchFailed = () => {
-      setWaitingRematch(false);
-      setRematchRequested(false);
-    };
+const handleRematchFailed = () => {
+  setWaitingRematch(false);
+  setRematchRequested(false);
+  setRematchDeclined(false);
+  setOpponentDisconnected(false);
+
+  setWinner("");
+  setScoreLeft(0);
+  setScoreRight(0);
+  setOpponentName("");
+  setRoom("");
+
+  setModalState("select");
+};
 
     const handleGameOver = (data: {
       winnerSocketId: string;
@@ -154,20 +157,9 @@ export default function useGameSocket() {
       scores: { left: number; right: number };
       reason?: "disconnect";
     }) => {
-      gameEndedRef.current = true;
-
       console.log("GAME OVER DATA:", data);
 
-      setPendingPowerUp(null);
-      setActiveEffects({
-        left: null,
-        right: null,
-      });
-
-      setWaitingRematch(false);
-      setRematchRequested(false);
-
-      setOpponentDisconnected(data.reason === "disconnect");
+      setOpponentDisconnected(false);
       setWinner(data.winnerUsername);
       setScoreLeft(data.scores.left);
       setScoreRight(data.scores.right);
@@ -179,20 +171,16 @@ export default function useGameSocket() {
       side: "left" | "right";
       applyAt: number;
     }) => {
-      if (gameEndedRef.current) return;
+      console.log("Power up incoming:", data);
 
       setPendingPowerUp(data);
     };
 
     const handlePowerUpActivated = () => {
-      if (gameEndedRef.current) return;
-
       setPendingPowerUp(null);
     };
 
     const handleGameState = (state: GameStateSend) => {
-      if (gameEndedRef.current) return;
-
       setActiveEffects(state.activeEffects);
 
       if (
@@ -251,7 +239,9 @@ export default function useGameSocket() {
   }, [user]);
 
   const leaveGame = () => {
-    socket.disconnect();
+    if (!socket.connected || !room) return;
+
+    socket.emit("leave_game");
   };
   function closeInviteResult() {
     setInviteResult(null);
@@ -334,18 +324,7 @@ export default function useGameSocket() {
 
   const handleOpponentDisconnected = () => {
     console.log("Opponent disconnected");
-
     setOpponentDisconnected(true);
-
-    setWaitingRematch(false);
-    setRematchRequested(false);
-
-    // Clear power-ups while the opponent is disconnected
-    setPendingPowerUp(null);
-    setActiveEffects({
-      left: null,
-      right: null,
-    });
   };
 
   const handleOpponentReconnected = () => {
@@ -390,16 +369,6 @@ export default function useGameSocket() {
 
     setRematchRequested(false);
     setRematchDeclined(false);
-    setWaitingRematch(false);
-
-    setWinner("");
-    setOpponentName("");
-    setScoreLeft(0);
-    setScoreRight(0);
-    setRoom("");
-    setOpponentDisconnected(false);
-
-    setModalState("select");
   }
 
   function findAnotherPlayer() {
