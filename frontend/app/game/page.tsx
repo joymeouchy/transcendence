@@ -98,7 +98,9 @@ useEffect(() => {
 					effect={playerEffect}
 				/>
 
-				{<GameCanvas theme={theme} />}
+				{<GameCanvas theme={theme} 
+				    pendingPowerUp={game.pendingPowerUp}
+					/>}
 
 				<PlayerInfo
 					side={game.playerSide === "left" ? "right" : "left"}

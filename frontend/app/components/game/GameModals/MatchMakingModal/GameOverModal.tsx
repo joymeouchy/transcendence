@@ -6,16 +6,12 @@ import "./GameOverModal.scss";
 
 type Props = {
   isOpen: boolean;
-
   winner: string;
   currentUser: string;
-
   scoreLeft: number;
   scoreRight: number;
-
   waitingRematch: boolean;
   rematchDeclined: boolean;
-
   onRematch: () => void;
   onFindNew: () => void;
   onExit: () => void;
@@ -33,56 +29,44 @@ export default function GameOverModal({
   onFindNew,
   onExit,
 }: Props) {
-
   const won = winner === currentUser;
 
   return (
     <XPModal
-      title="Match Complete"
+      title={rematchDeclined ? "Rematch Declined" : "Match Complete"}
       isOpen={isOpen}
     >
       <div className="game-over">
+        {rematchDeclined ? (
+          <>
+            <h2>Rematch Declined</h2>
 
-        <h2>
-          {won
-            ? "You Won!"
-            : `${winner} Won!`}
-        </h2>
+            <p className="rematch-declined-message">
+              Your opponent declined your rematch request.
+            </p>
 
-
-        <div className="score">
-          {scoreLeft} : {scoreRight}
-        </div>
-
-
-        <div className="buttons">
-
-          {rematchDeclined ? (
-
-            <>
-              <h3>
-                Opponent declined the rematch
-              </h3>
-
-              <button onClick={onFindNew}>
-                Find New Opponent
-              </button>
-
+            <div className="buttons">
               <button onClick={onExit}>
                 Return to Main Menu
               </button>
-            </>
-          ) : (
-            <>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2>
+              {won ? "You Won!" : `${winner} Won!`}
+            </h2>
+
+            <div className="score">
+              {scoreLeft} : {scoreRight}
+            </div>
+
+            <div className="buttons">
               <button
                 onClick={onRematch}
                 disabled={waitingRematch}
               >
-                {
-                  waitingRematch
-                    ? "Waiting..."
-                    : "Rematch"
-                }
+                {waitingRematch ? "Waiting..." : "Rematch"}
               </button>
 
               <button onClick={onFindNew}>
@@ -92,9 +76,9 @@ export default function GameOverModal({
               <button onClick={onExit}>
                 Return to Main Menu
               </button>
-            </>
-          )}
-        </div>
+            </div>
+          </>
+        )}
       </div>
     </XPModal>
   );
