@@ -3,7 +3,7 @@
 import "./playerInfo.scss";
 
 import { images } from "@/lib/images";
-import ActivePowerUp from "../PowerUps/PowerUpExpiration";
+import ActivePowerUp from "../PowerUps/ActivePowerUp";
 
 
 type Props = {

@@ -1,0 +1,94 @@
+.active-power-up {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 120px;
+
+  background: #ece9d8;
+  border: 1px solid #003c74;
+  border-radius: 4px;
+
+  font-family: Tahoma, Verdana, sans-serif;
+  color: #222;
+
+  box-shadow:
+    inset 1px 1px 0 #fff,
+    2px 2px 0 rgba(0, 0, 0, 0.3);
+
+  overflow: visible;
+}
+
+.active-power-up-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  padding: 4px 7px;
+
+  background: linear-gradient(
+    180deg,
+    #3c91e8 0%,
+    #1671d9 50%,
+    #0755ad 100%
+  );
+
+  border-bottom: 1px solid #003c74;
+
+  color: #fff;
+}
+
+.active-power-up-icon {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.active-power-up-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.active-power-up-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.active-power-up-name {
+  flex: 1;
+  min-width: 0;
+  white-space: normal;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  text-overflow: unset;
+  line-height: 1.3;
+}
+
+
+.active-power-up-timer {
+flex-shrink: 0;
+white-space: nowrap;
+
+  min-width: 30px;
+  padding: 3px 5px;
+
+  background: #fff;
+  border: 1px solid #9aabc0;
+  border-radius: 3px;
+
+  color: #003c74;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .active-power-up {
+    animation: none;
+  }
+}
