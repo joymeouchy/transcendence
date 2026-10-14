@@ -10,7 +10,7 @@ import { FRONTEND_URL, JWT_SECRET } from "../src/urls";
 
 const router = Router();
 const SALT_ROUNDS = 12;
-const TOKEN_EXPIRES_IN = "5m";
+const TOKEN_EXPIRES_IN = "7d";
 const transporter = nodemailer.createTransport({
   service: "gmail", // send to user's email
   auth: {

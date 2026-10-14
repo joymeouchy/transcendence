@@ -133,6 +133,8 @@ It is used for functionality such as:
 - Player disconnection events.
 - Real-time game updates.
 
+**Why Socket.IO instead of plain WebSockets:** it provides rooms (each match is a room, so game state is broadcast only to its two players), automatic reconnection, and connection state recovery, which lets a player who briefly drops rejoin their match during the 15-second grace period.
+
 ---
 
 ## Database
@@ -141,7 +143,7 @@ It is used for functionality such as:
 
 The project uses **PostgreSQL** as its relational database.
 
-A relational database was chosen because the application contains structured relationships between users, friendships, games, and game statistics. PostgreSQL provides strong relational integrity and is well suited to querying this type of data.
+A relational database was chosen because the application contains structured relationships between users, friendships, matches, and messages (game statistics are computed from the matches rather than stored separately). PostgreSQL provides strong relational integrity and is well suited to querying this type of data.
 
 ### Prisma
 
@@ -157,58 +159,145 @@ Prisma provides:
 
 ### Supabase
 
-Supabase is used as the PostgreSQL database infrastructure for development/deployment where applicable.
+Supabase is used as the PostgreSQL database infrastructure for development/deployment where applicable. Its Storage service also hosts the uploaded avatar images.
 
----Gaming and user experience: Web-based game (2pts) + Remote players (2pts)
-+ Tournament system (1pt) + Game customization (1pt) = 6 points
-• User Management: Standard user management (2pts) + OAuth (1pt) = 3 points
-• Web: Use frameworks (frontend + backend = 2pts) + ORM (1pt) = 3 points
+---
 
 ## Docker
 
 Docker is used to provide a consistent development environment and simplify running the different services required by the application.
 
+## Caddy
+
+Caddy is the single entry point to the application. It serves everything over HTTPS on port 8443 and routes `/api/*` and `/socket.io/*` to the backend and every other path to the frontend.
+
+**Why:** it creates and renews TLS certificates automatically (including for `localhost`), so HTTPS works with a few lines of configuration.
+
+## Other Libraries
+
+| Library | Used for |
+| --- | --- |
+| **jsonwebtoken (JWT)** | Login tokens, sent with every API request and on socket connection. |
+| **bcrypt** | Hashing passwords before they are stored. |
+| **Passport + passport-google-oauth20** | "Sign in with Google". |
+| **Nodemailer** | Sending password-reset emails through Gmail. |
+| **Multer** | Receiving avatar uploads before they are sent to Supabase Storage. |
+| **Swagger (swagger-jsdoc, swagger-ui-express)** | Interactive API documentation at `/api-docs`. |
+| **Axios** | The frontend's HTTP client, with the login token added to every request. |
+| **socket.io-client** | The frontend side of the real-time connection. |
+| **Recharts** | The match history chart on the game stats page. |
+
 ---
 
-# Technical Architecture //TODO check this chart
+# Technical Architecture
 
 The application is divided into several logical layers:
 
-```text
                     ┌─────────────────────┐
                     │       Browser       │
-                    │                     │
-                    │ Next.js / React /   │
-                    │ TypeScript / SCSS   │
                     └──────────┬──────────┘
-                               │
-                    HTTP / WebSocket
-                               │
-                 ┌─────────────▼─────────────┐
-                 │          Backend          │
-                 │                           │
-                 │ Node.js / Express /       │
-                 │ Socket.IO                 │
-                 └─────────────┬─────────────┘
-                               │
-                         Prisma ORM
-                               │
-                 ┌─────────────▼─────────────┐
-                 │       PostgreSQL          │
-                 │                           │
-                 │ Users / Friends / Games / │
-                 │ Statistics / Sessions     │
-                 └───────────────────────────┘
+                               │ HTTPS / WSS (port 8443)
+                    ┌──────────▼──────────┐
+                    │    Caddy (proxy)    │
+                    └────┬───────────┬────┘
+                 /       │           │  /api/*, /socket.io/*
+             ┌───────────▼───┐   ┌───▼───────────────┐
+             │   Frontend    │   │      Backend      │
+             │ Next.js/React │   │ Node.js / Express │──── Google OAuth
+             │ TS / SCSS     │   │ Socket.IO         │──── Gmail (password reset)
+             └───────────────┘   └─────────┬─────────┘
+                                           │ Prisma ORM
+                                 ┌─────────▼─────────┐
+                                 │    PostgreSQL     │
+                                 │ Users / Matches / │
+                                 │ Friendships /     │
+                                 │ Messages /        │
+                                 │ Customizations    │
+                                 └───────────────────┘
 ```
+
+Caddy is the only entry point: it serves HTTPS and forwards `/api/*` and `/socket.io/*` to the backend and everything else to the frontend. PostgreSQL is not one of the Docker containers. The backend connects to it through `DATABASE_URL`.
 
 ---
 
-# Database Schema
+# Database Schema //TODO: check iza mn5ali erd hek or a pic
 
-The database uses PostgreSQL with Prisma ORM.
+The database uses PostgreSQL with Prisma ORM. The source of truth is `backend/prisma/schema.prisma`, and this section summarizes it.
 
-The exact schema should be kept synchronized with `prisma/schema.prisma`. 
-//TODO add a photo of the schema
+```mermaid
+erDiagram
+    User ||--o{ Match : "player1 / player2"
+    User |o--o{ Match : "winner"
+    User ||--o{ Friendship : "sender / receiver"
+    User ||--o{ Message : "sender / receiver"
+
+    User {
+        Int id PK
+        String username UK
+        String email UK
+        String password "null for OAuth users"
+        String avatarUrl
+        Boolean isOnline
+        String oauthId UK
+        AuthProvider provider "email | google | fortytwo"
+        String resetToken
+        DateTime resetTokenExpiresAt
+        String preferredTheme "default classic"
+        String preferredWallpaper "default classic"
+    }
+    Match {
+        Int id PK
+        DateTime createdAt
+        Int player1Id FK
+        Int player2Id FK
+        Int winnerId FK "nullable"
+        Int player1Score
+        Int player2Score
+    }
+    Friendship {
+        Int id PK
+        FriendshipStatus status "pending | accepted"
+        Int senderId FK
+        Int receiverId FK
+    }
+    Message {
+        Int id PK
+        DateTime createdAt
+        String content
+        Int senderId FK
+        Int receiverId FK
+    }
+    Customization {
+        Int id PK
+        String name UK
+        String backgroundColor
+        String backgroundImageUrl
+        String leftPaddleColor
+        String leftPaddleImageUrl
+        String rightPaddleColor
+        String rightPaddleImageUrl
+        String ballColor
+        String ballImageUrl
+        Boolean isDefault
+    }
+```
+
+| Table | What it stores |
+| --- | --- |
+| **User** | Account and profile. `password` is empty for Google sign-ins, which use `oauthId` + `provider` instead. `resetToken` / `resetTokenExpiresAt` back the forgot-password flow. `preferredTheme` holds the `name` of a Customization theme. |
+| **Match** | One finished game: both players, both scores, the winner, and when it was played. Game stats and match history are computed from this table. |
+| **Friendship** | A friend request from `sender` to `receiver`. Its `status` goes from `pending` to `accepted`. |
+| **Message** | A direct chat message between two users. Messages older than 7 days are deleted automatically. |
+| **Customization** | A game theme (colors / images for the background, paddles and ball). Not linked by foreign key: users point to a theme by its `name`. |
+
+**Relationships:**
+
+- **User → Match:** a user appears in many matches, as `player1` or `player2`, and optionally as the `winner` (`winnerId` is nullable).
+- **User → Friendship:** a user sends and receives many friendships, and each friendship links exactly one `sender` and one `receiver`.
+- **User → Message:** a user sends and receives many messages, and each message links exactly one `sender` and one `receiver`.
+- **User → Customization:** no foreign key. `User.preferredTheme` stores a `Customization.name`.
+
+Login sessions are not stored in the database: authentication uses JWT tokens. Online status is tracked live by the backend.
 
 ---
 
