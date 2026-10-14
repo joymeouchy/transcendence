@@ -1,6 +1,5 @@
 **what joy needs:**
 --if player disconnected, emit `leave_game` (check SOCKET_EVENT.md)
---can't log in when an expired token is still in localStorage. fix for now: run `localStorage.removeItem("token")` in the browser console
 
 
 **what rawan needs:**
