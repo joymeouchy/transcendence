@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import PowerUpIncoming from "./PowerUps/PowerUpPowerUpIncoming";
 
 import { socket } from "../../../lib/socket";
 import { API_URL } from "@/lib/api";
@@ -9,26 +10,22 @@ import "./GameCanvas.scss";
 import { GameStateSend, pongConfig } from "@/types/game_types";
 import { gameThemes } from "@/app/data/game/gameCustomization";
 
-import {
-  customizationService,
-  CustomizationTheme,
-} from "@/services/Customization.services";
-
+import { CustomizationTheme } from "@/services/Customization.services";
 
 type Props = {
   theme: CustomizationTheme | null;
+  pendingPowerUp: {
+    type: string;
+    side: "left" | "right";
+    applyAt: number;
+  } | null;
 };
 
-export default function GameCanvas({
-  theme,
-}: Props) {
-// export default function GameCanvas() {
+export default function GameCanvas({ theme, pendingPowerUp }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const gameState = useRef<GameStateSend | null>(null);
   const roomRef = useRef<string | null>(null);
-
-  // const theme = useRef<CustomizationTheme | null>(null);
 
   const backgroundImg = useRef<HTMLImageElement | null>(null);
   const leftPaddleImg = useRef<HTMLImageElement | null>(null);
@@ -36,139 +33,85 @@ export default function GameCanvas({
   const ballImg = useRef<HTMLImageElement | null>(null);
 
   const getAssetUrl = (path: string | null) => {
-    if (!path)
-      return "";
+    if (!path) return "";
 
-    if (path.startsWith("http"))
-      return path;
+    if (path.startsWith("http")) return path;
 
-    if (path.startsWith("/pong"))
-      return path;
+    if (path.startsWith("/pong")) return path;
 
     return `${API_URL}${path}`;
   };
 
- useEffect(() => {
-  console.log("theme chosen is:", theme?.name);
-  if (!theme)
-    return;
+  useEffect(() => {
+    console.log("theme chosen is:", theme?.name);
+    if (!theme) return;
 
-  backgroundImg.current = new Image();
-  leftPaddleImg.current = new Image();
-  rightPaddleImg.current = new Image();
-  ballImg.current = new Image();
+    backgroundImg.current = new Image();
+    leftPaddleImg.current = new Image();
+    rightPaddleImg.current = new Image();
+    ballImg.current = new Image();
 
+    backgroundImg.current.onload = () => {
+      backgroundImg.current = backgroundImg.current;
+    };
 
-  backgroundImg.current.onload = () => {
-  backgroundImg.current = backgroundImg.current;
-};
-
-backgroundImg.current.src =
-  getAssetUrl(
-    theme.backgroundImageUrl ??
-    gameThemes.classic.background
-  );
-
-
-  leftPaddleImg.current.src =
-    getAssetUrl(
-      theme.leftPaddleImageUrl ??
-      gameThemes.classic.leftPaddle
+    backgroundImg.current.src = getAssetUrl(
+      theme.backgroundImageUrl ?? gameThemes.classic.background
     );
 
-
-  rightPaddleImg.current.src =
-    getAssetUrl(
-      theme.rightPaddleImageUrl ??
-      gameThemes.classic.rightPaddle
+    leftPaddleImg.current.src = getAssetUrl(
+      theme.leftPaddleImageUrl ?? gameThemes.classic.leftPaddle
     );
 
-
-  ballImg.current.src =
-    getAssetUrl(
-      theme.ballImageUrl ??
-      gameThemes.classic.ball
+    rightPaddleImg.current.src = getAssetUrl(
+      theme.rightPaddleImageUrl ?? gameThemes.classic.rightPaddle
     );
 
-}, [theme]);
+    ballImg.current.src = getAssetUrl(
+      theme.ballImageUrl ?? gameThemes.classic.ball
+    );
+  }, [theme]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
 
-    if (!canvas)
-      return;
+    if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
 
-    if (!ctx)
-      return;
+    if (!ctx) return;
 
     const width = pongConfig.canvasWidth;
     const height = pongConfig.canvasHeight;
 
-    const handleMatchFound = ({
-      room,
-    }: {
-      room: string;
-    }) => {
+    const handleMatchFound = ({ room }: { room: string }) => {
       roomRef.current = room;
     };
 
-    const handleGameState = (
-      state: GameStateSend
-    ) => {
+    const handleGameState = (state: GameStateSend) => {
       gameState.current = state;
     };
 
-    socket.on(
-      "match_found",
-      handleMatchFound
-    );
+    socket.on("match_found", handleMatchFound);
 
-    socket.on(
-      "game_state",
-      handleGameState
-    );
+    socket.on("game_state", handleGameState);
 
     const draw = () => {
       const state = gameState.current;
 
-      if (!state)
-        return;
+      if (!state) return;
 
-      ctx.clearRect(
-        0,
-        0,
-        width,
-        height
-      );
+      ctx.clearRect(0, 0, width, height);
 
-      if (
-        backgroundImg.current &&
-        backgroundImg.current.complete
-      ) {
-        ctx.drawImage(
-          backgroundImg.current,
-          0,
-          0,
-          width,
-          height
-        );
+      if (backgroundImg.current && backgroundImg.current.complete) {
+        ctx.drawImage(backgroundImg.current, 0, 0, width, height);
       } else {
         ctx.fillStyle = "#111827";
 
-        ctx.fillRect(
-          0,
-          0,
-          width,
-          height
-        );
+        ctx.fillRect(0, 0, width, height);
       }
 
-      if (
-        leftPaddleImg.current &&
-        leftPaddleImg.current.complete
-      ) {
+      if (leftPaddleImg.current && leftPaddleImg.current.complete) {
         ctx.drawImage(
           leftPaddleImg.current,
           pongConfig.leftPaddleOffset,
@@ -178,27 +121,18 @@ backgroundImg.current.src =
         );
       }
 
-      if (
-        rightPaddleImg.current &&
-        rightPaddleImg.current.complete
-      ) {
+      if (rightPaddleImg.current && rightPaddleImg.current.complete) {
         ctx.drawImage(
           rightPaddleImg.current,
-          width -
-          pongConfig.rightPaddleOffset -
-          pongConfig.paddleWidth,
+          width - pongConfig.rightPaddleOffset - pongConfig.paddleWidth,
           state.paddles.right,
           pongConfig.paddleWidth,
           state.dynamicConfig.paddleHeights.right
         );
       }
 
-      if (
-        ballImg.current &&
-        ballImg.current.complete
-      ) {
-        const size =
-          state.dynamicConfig.ballSize;
+      if (ballImg.current && ballImg.current.complete) {
+        const size = state.dynamicConfig.ballSize;
 
         ctx.drawImage(
           ballImg.current,
@@ -212,72 +146,29 @@ backgroundImg.current.src =
       /*
   Score
 */
-ctx.fillStyle = "white";
-ctx.font = "48px monospace";
-ctx.textAlign = "center";
+      ctx.fillStyle = "white";
+      ctx.font = "48px monospace";
+      ctx.textAlign = "center";
 
-ctx.fillText(
-  String(state.scores.left),
-  width / 4,
-  60
-);
+      ctx.fillText(String(state.scores.left), width / 4, 60);
 
-ctx.fillText(
-  String(state.scores.right),
-  (width * 3) / 4,
-  60
-);
-
-
-/*
-  Power Up Incoming
-*/
-if (state.pendingPowerUp) {
-  const remaining = Math.ceil(
-    (state.pendingPowerUp.applyAt - Date.now()) / 1000
-  );
-
-  if (remaining > 0) {
-    ctx.fillStyle = "yellow";
-    ctx.font = "22px monospace";
-
-    ctx.fillText(
-      `${state.pendingPowerUp.type} in ${remaining}`,
-      width / 2,
-      60
-    );
-  }
-}
-
-    
+      ctx.fillText(String(state.scores.right), (width * 3) / 4, 60);
 
       /*
         Match countdown
       */
       if (state.countdownEndsAt) {
-        const remaining =
-          Math.ceil(
-            (
-              state.countdownEndsAt -
-              Date.now()
-            ) / 1000
-          );
+        const remaining = Math.ceil(
+          (state.countdownEndsAt - Date.now()) / 1000
+        );
 
         ctx.fillStyle = "white";
         ctx.font = "80px monospace";
 
         if (remaining > 0) {
-          ctx.fillText(
-            String(remaining),
-            width / 2,
-            height / 2
-          );
+          ctx.fillText(String(remaining), width / 2, height / 2);
         } else if (remaining === 0) {
-          ctx.fillText(
-            "GO!",
-            width / 2,
-            height / 2
-          );
+          ctx.fillText("GO!", width / 2, height / 2);
         }
       }
     };
@@ -287,78 +178,44 @@ if (state.pendingPowerUp) {
     const renderLoop = () => {
       draw();
 
-      animationFrame =
-        requestAnimationFrame(
-          renderLoop
-        );
+      animationFrame = requestAnimationFrame(renderLoop);
     };
 
     renderLoop();
 
     return () => {
-      cancelAnimationFrame(
-        animationFrame
-      );
+      cancelAnimationFrame(animationFrame);
 
-      socket.off(
-        "match_found",
-        handleMatchFound
-      );
+      socket.off("match_found", handleMatchFound);
 
-      socket.off(
-        "game_state",
-        handleGameState
-      );
+      socket.off("game_state", handleGameState);
     };
-
-   }, []);
+  }, []);
 
   useEffect(() => {
-    const handleKeyDown = (
-      event: KeyboardEvent
-    ) => {
-      if (!roomRef.current)
-        return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!roomRef.current) return;
 
-      if (
-        event.key === "w" ||
-        event.key === "ArrowUp"
-      ) {
-        socket.emit(
-          "paddle_move",
-          {
-            room: roomRef.current,
-            direction: "up",
-          }
-        );
+      if (event.key === "w" || event.key === "ArrowUp") {
+        socket.emit("paddle_move", {
+          room: roomRef.current,
+          direction: "up",
+        });
       }
 
-      if (
-        event.key === "s" ||
-        event.key === "ArrowDown"
-      ) {
-        socket.emit(
-          "paddle_move",
-          {
-            room: roomRef.current,
-            direction: "down",
-          }
-        );
+      if (event.key === "s" || event.key === "ArrowDown") {
+        socket.emit("paddle_move", {
+          room: roomRef.current,
+          direction: "down",
+        });
       }
     };
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
+      window.removeEventListener("keydown", handleKeyDown);
     };
-
   }, []);
 
   return (
@@ -368,6 +225,8 @@ if (state.pendingPowerUp) {
         width={pongConfig.canvasWidth}
         height={pongConfig.canvasHeight}
       />
+
+      <PowerUpIncoming powerUp={pendingPowerUp} />
     </div>
   );
 }

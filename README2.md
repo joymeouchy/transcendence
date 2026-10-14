@@ -1,6 +1,6 @@
 *This project has been created as part of the 42 curriculum by jmeouchy and rdennaou.*
 
-# fPONG_XP
+# PONG_XP
 
 ## Description
 
@@ -159,7 +159,10 @@ Prisma provides:
 
 Supabase is used as the PostgreSQL database infrastructure for development/deployment where applicable.
 
----
+---Gaming and user experience: Web-based game (2pts) + Remote players (2pts)
++ Tournament system (1pt) + Game customization (1pt) = 6 points
+• User Management: Standard user management (2pts) + OAuth (1pt) = 3 points
+• Web: Use frameworks (frontend + backend = 2pts) + ORM (1pt) = 3 points
 
 ## Docker
 
@@ -508,7 +511,7 @@ Describe how it was implemented.
 
 ---
 
-Major modules tota: 12 pts;
+Major modules totaL: 12 pts;
 Minor modules total: 5 pts;
 
 Points total: 17 pts

@@ -1,12 +1,12 @@
-/* GameCanvas.scss */
-
-
 .canvas-wrapper {
+  position: relative;
+
   width: 100%;
   aspect-ratio: 4 / 3;
 
   border: 4px solid #475569;
   background: #111827;
+  overflow: hidden;
 }
 
 .canvas-wrapper canvas {
@@ -14,25 +14,9 @@
   height: 100%;
   display: block;
 }
-// .canvas-wrapper {
-//   width: 100%;
-//   aspect-ratio: 4 / 3;
-
-//   border: 4px solid #475569;
-//   background: #111827;
-//   position: relative;
-//   flex-shrink: 0;
-// }
-
-// .canvas-wrapper canvas {
-//   width: 100%;
-//   height: 100%;
-//   display: block;
-// }
 
 .game-canvas {
   width: 100%;
   height: 100%;
-
   display: block;
 }
