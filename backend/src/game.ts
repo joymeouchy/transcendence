@@ -46,8 +46,8 @@ function applyPowerUp(
   const expiresAt = Date.now() + duration;
   const { config } = game;
 
-  // "freeze"/"smallPaddle" are debuffs aimed at the opponent; everything else
-  // is a self-buff for the collector — this also decides which activeEffects
+  // "freeze"/"smallPaddle" are debuffs aimed at the opponent, everything else
+  // is a self-buff for the collector. This also decides which activeEffects
   // slot (and cooldown label) the effect shows up under
   const affected =
     type === "freeze" || type === "smallPaddle" ? opponent : side;
