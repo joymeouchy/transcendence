@@ -10,6 +10,7 @@ import { FRONTEND_URL, JWT_SECRET } from "../src/urls";
 
 const router = Router();
 const SALT_ROUNDS = 12;
+const TOKEN_EXPIRES_IN = "5m";
 const transporter = nodemailer.createTransport({
   service: "gmail", // send to user's email
   auth: {
@@ -90,7 +91,7 @@ router.post("/register", async (req, res) => {
     const token = jwt.sign(
       { userId: newUser.id, username: newUser.username },
       JWT_SECRET,
-      { expiresIn: "7d" },
+      { expiresIn: TOKEN_EXPIRES_IN },
     );
 
     res
@@ -156,7 +157,7 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign(
       { userId: user.id, username: user.username },
       JWT_SECRET,
-      { expiresIn: "7d" },
+      { expiresIn: TOKEN_EXPIRES_IN },
     );
 
     res.json({ message: "Login successful", token, userId: user.id });
@@ -216,7 +217,7 @@ router.get(
     const token = jwt.sign(
       { userId: user.id, username: user.username },
       JWT_SECRET,
-      { expiresIn: "7d" },
+      { expiresIn: TOKEN_EXPIRES_IN },
     );
 
     // redirect to frontend with token
