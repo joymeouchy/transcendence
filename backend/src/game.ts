@@ -305,6 +305,20 @@ export function cancelGameCleanup(room: string) {
   }
 }
 
+// the remaining player chose to leave while waiting for a disconnected
+// opponent: drop the match now instead of declaring them the winner once the
+// grace period runs out. Returns false if the room isn't in that state.
+export function abandonPausedGame(room: string): boolean {
+  if (!games[room] || !disconnectTimers[room]) return false;
+
+  cancelGameCleanup(room);
+  clearTimeout(powerUpTimers[room]);
+  delete games[room];
+  delete gameIntervals[room];
+  delete powerUpTimers[room];
+  return true;
+}
+
 export function handlePaddleMove(
   socketId: string,
   room: string,
@@ -312,6 +326,10 @@ export function handlePaddleMove(
 ) {
   const game = games[room];
   if (!game) return;
+
+  // the room name comes from the client, so make sure the sender is actually
+  // one of this match's players before moving a paddle
+  if (game.players.left !== socketId && game.players.right !== socketId) return;
 
   const { config } = game;
   const side = game.players.left === socketId ? "left" : "right";
