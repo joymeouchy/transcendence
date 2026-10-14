@@ -12,18 +12,19 @@ the server tell two tabs of the same account apart from two different accounts.
 | Event | Payload | Description |
 |-------|---------|-------------|
 **MATCHMAKING**
-| `join_queue` | none | Join matchmaking queue |
+| `join_queue` | none | Join matchmaking queue. Silently ignored if you're already in a game (in this tab or another one). If your current match is paused on a disconnected opponent, queueing leaves it first (same as `leave_game`) |
 | `leave_queue` | none | Leave matchmaking queue |
 
 **GAMEPLAY**
 | `paddle_move` | `{ room: string, direction: "up" or "down" }` | Move paddle up or down |
+| `leave_game` | none | Leave a match that is paused because the opponent disconnected (the "Leave Game" button). The match is dropped immediately with no winner, so no `game_over` follows. Ignored if you're not in a paused match |
 
 **REMATCH**
 | `request_rematch` | `{ room: string }` | Request a rematch |
 | `decline_rematch` | `{ room: string }` | Decline a rematch |
 
 **INVITES**
-| `invite_friend` | `{ friendId: number }` | Invite a specific friend to play. Fails with `invite_error` if you're already in a game, the friend is offline, the friend is already in a game, or you already have a pending invite to them |
+| `invite_friend` | `{ friendId: number }` | Invite a specific friend to play. Fails with `invite_error` if you're already in a game, the friend is offline, the friend is already in a game, you already have a pending invite (to them or to anyone else), or they already have a pending invite from someone else |
 | `cancel_invite` | `{ friendId: number }` | Cancel an invite you sent before the friend responds |
 | `invite_response` | `{ fromUserId: number, accepted: boolean }` | Accept or decline an invite you received from `fromUserId` |
 
@@ -67,7 +68,7 @@ Messages are sent over REST, not a socket event: see `POST /messages` and `GET /
 | `invite_cancelled` | `{ fromUserId: number }` | The invite from `fromUserId` was cancelled (they cancelled it, timed out, or disconnected) |
 | `invite_declined` | `{ friendId: number }` | `friendId` declined your invite (or disconnected before responding) |
 | `invite_timeout` | `{ friendId: number }` | `friendId` didn't respond within 30s |
-| `invite_error` | `{ message: string }` | Your `invite_friend` request couldn't be sent (see `message`) |
+| `invite_error` | `{ message: string }` | Your `invite_friend` request couldn't be sent, or an invite you accepted with `invite_response` can't start because the inviter left or one of you is already in a game (see `message`) |
 
 **MESSAGES**
 | `receive_message` | `{ id, createdAt, content, senderId, receiverId, sender: { id, username, avatarUrl } }` | Pushed to the recipient's connected socket(s) right after `POST /messages` persists it, not sent if the recipient is offline (they'll get it from `GET /messages/:friendId` on next load) |

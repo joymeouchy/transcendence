@@ -17,6 +17,7 @@ import {
   resumeGame,
   scheduleGameCleanup,
   cancelGameCleanup,
+  abandonPausedGame,
 } from "./game";
 import passport from "./OAuth";
 import userRoutes from "../routes/users";
@@ -218,6 +219,23 @@ io.on("connection", (socket) => {
   socket.on("join_queue", async () => {
     console.log(socket.id, "wants to play");
 
+    // queueing from a match that's paused on a disconnected opponent counts
+    // as leaving it
+    const currentRoom = findRoomBySocket(socket.id);
+    if (currentRoom && abandonPausedGame(currentRoom)) {
+      socket.leave(currentRoom);
+    }
+
+    // already playing (in this tab or another one): don't queue for a second game
+    const queueingUserId = socketToUser.get(socket.id);
+    if (
+      findRoomBySocket(socket.id) ||
+      (queueingUserId && isUserBusy(queueingUserId))
+    ) {
+      console.log(socket.id, "tried to queue while already in a game");
+      return;
+    }
+
     if (waitingPlayer === null) {
       waitingPlayer = socket;
       socket.emit("waiting");
@@ -368,6 +386,15 @@ io.on("connection", (socket) => {
     socket.to(room).emit("rematch_declined");
   });
 
+  // if opponent disconnects, the player can leave the paused game and go back to the queue
+  socket.on("leave_game", () => {
+    const room = findRoomBySocket(socket.id);
+    if (room && abandonPausedGame(room)) {
+      socket.leave(room);
+      console.log(socket.id, "left paused game in room:", room);
+    }
+  });
+
   socket.on("leave_queue", () => {
     if (waitingPlayer?.id === socket.id) {
       waitingPlayer = null;
@@ -384,7 +411,7 @@ io.on("connection", (socket) => {
       return;
     }
 
-    if (findRoomBySocket(socket.id)) {
+    if (isUserBusy(inviterId)) {
       socket.emit("invite_error", { message: "You're already in a game." });
       return;
     }
@@ -408,6 +435,26 @@ io.on("connection", (socket) => {
         message: "You already invited this friend.",
       });
       return;
+    }
+
+    for (const pendingKey of pendingInvites.keys()) {
+      // one outgoing invite at a time: if two friends both accepted, only one
+      // match could start and the other friend would be left hanging
+      if (pendingKey.startsWith(`${inviterId}:`)) {
+        socket.emit("invite_error", {
+          message: "You already have a pending invite.",
+        });
+        return;
+      }
+
+      // the invitee's popup only shows one invite at a time, so a second one
+      // from someone else would hide the first and leave that inviter waiting
+      if (pendingKey.endsWith(`:${friendId}`)) {
+        socket.emit("invite_error", {
+          message: "Your friend already has a pending invite.",
+        });
+        return;
+      }
     }
 
     const timeout = setTimeout(() => {
@@ -468,24 +515,40 @@ io.on("connection", (socket) => {
       pendingInvites.delete(key);
 
       const inviterSocket = io.sockets.sockets.get(pending.inviterSocketId);
-      if (!inviterSocket) return; // inviter disconnected before responding
+      if (!inviterSocket) {
+        // inviter disconnected before the response: tell the accepter who
+        // has already been sent to the game page and would otherwise just wait
+        if (accepted) {
+          socket.emit("invite_error", {
+            message: "Your friend is no longer available.",
+          });
+        }
+        return;
+      }
 
       if (!accepted) {
         inviterSocket.emit("invite_declined", { friendId: responderId });
         return;
       }
 
-      if (findRoomBySocket(inviterSocket.id) || findRoomBySocket(socket.id)) {
+      if (isUserBusy(fromUserId) || isUserBusy(responderId)) {
+        // one of them started a game (possibly from another tab) since the
+        // invite was sent: let both sides know, not just the inviter
         inviterSocket.emit("invite_error", {
           message: "Your friend is no longer available.",
+        });
+        socket.emit("invite_error", {
+          message: "This invite is no longer available.",
         });
         return;
       }
 
-      if (
-        waitingPlayer?.id === inviterSocket.id ||
-        waitingPlayer?.id === socket.id
-      ) {
+      // take either player out of the queue, including a tab other than the
+      // one that sent/accepted the invite, so they can't be matched again
+      const waitingUserId = waitingPlayer
+        ? socketToUser.get(waitingPlayer.id)
+        : undefined;
+      if (waitingUserId === fromUserId || waitingUserId === responderId) {
         waitingPlayer = null;
       }
 
