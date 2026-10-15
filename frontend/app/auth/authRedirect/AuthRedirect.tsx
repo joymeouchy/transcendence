@@ -15,6 +15,10 @@ export default function AuthRedirect() {
   useEffect(() => {
     const isPublicRoute = publicRoutes.includes(pathname);
 
+    if (user && pathname === "/") {
+    router.replace("/home");
+    return;
+   }
     if (!loading && !user && !isPublicRoute) {
       router.replace("/");
     }

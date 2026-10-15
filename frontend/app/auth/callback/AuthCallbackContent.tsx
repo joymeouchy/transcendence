@@ -22,7 +22,7 @@ export default function AuthCallbackContent() {
 			localStorage.setItem("userId", userId);
 		}
 
-		window.location.replace("/");
+		window.location.replace("/home");
 	}, [router, searchParams]);
 
 	return <div>Signing you in...</div>;
