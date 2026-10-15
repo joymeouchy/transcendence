@@ -1,6 +1,9 @@
 **what joy needs:**
 --if player disconnected, emit `leave_game` (check SOCKET_EVENT.md)
-
+--fix the user rematch thing
+--add 404 page
+--change styling of "signing in" after google signin page
+--add login sound after google page
 
 **what rawan needs:**
 -- README2: ctrl + F "TODO" find all the notes i added and double check everything and if i missed any modules. there are things i didnt add/adjust yet
