@@ -126,7 +126,7 @@ router.post("/register", async (req, res) => {
  *       200:
  *         description: Login successful, returns JWT token
  *       400:
- *         description: Invalid credentials
+ *         description: Wrong email or password
  *       500:
  *         description: Server error
  */
@@ -139,7 +139,7 @@ router.post("/login", async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ error: "Invalid credentials" });
+      return res.status(400).json({ error: "Email doesn't exist" });
     }
 
     if (!user.password) {
@@ -151,7 +151,7 @@ router.post("/login", async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "Invalid credentials" });
+      return res.status(400).json({ error: "Wrong password" });
     }
 
     const token = jwt.sign(
