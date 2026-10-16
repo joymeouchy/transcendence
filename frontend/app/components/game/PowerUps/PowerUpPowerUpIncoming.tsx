@@ -57,9 +57,7 @@ export default function PowerUpIncoming({ powerUp }: Props) {
           {formatPowerUpName(powerUp.type)}
         </span>
 
-        <span className="power-up-target">
-          {powerUp.side === "left" ? "LEFT" : "RIGHT"} PLAYER
-        </span>
+        
       </div>
 
       <div className="power-up-countdown">

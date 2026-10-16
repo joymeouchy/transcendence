@@ -41,8 +41,6 @@ export default function ActivePowerUp({ effect }: Props) {
   return (
     <div className="active-power-up">
       <div className="active-power-up-header">
-        <span className="active-power-up-icon">⚡</span>
-        <span className="active-power-up-label">POWER-UP ACTIVE</span>
       </div>
 
       <div className="active-power-up-content">
