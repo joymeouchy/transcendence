@@ -366,247 +366,37 @@ The application also prevents users who are already participating in an active g
 ---
 
 # Modules
- //TODO add description
 
-## Major Modules — 2 points each
-
-### Major Module 1: Use a framework for both the frontend and backend.
-◦ Use a frontend framework (React).
-◦ Use a backend framework (Express, NestJS, Django, Flask, Ruby on Rails, etc.).
-◦ Full-stack frameworks (Next.js) count as both if you use both their frontend and backend capabilities.
-
-**Points:** 2
-
-**Justification:**
-
-This module was selected because it adds a significant technical component to the application and directly supports the project's functionality.
-
-**Implementation:**
-
-Describe the architecture, libraries, APIs, and components used to implement the module.
-
-**Contributors:**
-
-- `jmeouchy and rdennaou`
-
----
-
-###  Major Module 2: Implement real-time features using WebSockets or similar technology.
-◦ Real-time updates across clients.
-◦ Handle connection/disconnection gracefully.
-◦ Efficient message broadcasting.
-
-**Points:** 2
-
-**Justification:**
-
-This module was selected because it adds a significant technical component to the application and directly supports the project's functionality.
-
-**Implementation:**
-
-Describe the architecture, libraries, APIs, and components used to implement the module.
-
-**Contributors:**
-
-- `jmeouchy and rdennaou`
-
----
-
-###  Major Module 3: Allow users to interact with other users. The minimum requirements are:
-◦ A basic chat system (send/receive messages between users).
-◦ A profile system (view user information).
-◦ A friends system (add/remove friends, see friends list).
-
-**Points:** 2
-
-**Justification:**
-
-This module was selected because it adds a significant technical component to the application and directly supports the project's functionality.
-
-**Implementation:**
-
-Describe the architecture, libraries, APIs, and components used to implement the module.
-
-**Contributors:**
-
-- `jmeouchy and rdennaou`
-
----
-
-
-### Major Module 4: Standard user management and authentication.
-◦ Users can update their profile information.
-Surprise.
-◦ Users can upload an avatar (with a default avatar if none provided).
-◦ Users can add other users as friends and see their online status.
-◦ Users have a profile page displaying their information.
-
-**Points:** 2
-
-**Justification:**
-
-This module was selected because it adds a significant technical component to the application and directly supports the project's functionality.
-
-**Implementation:**
-
-Describe the architecture, libraries, APIs, and components used to implement the module.
-
-**Contributors:**
-
-- `jmeouchy and rdennaou`
-
----
-
-### Major Module 5: Implement a complete web-based game where users can play against each other.
-◦ The game can be real-time multiplayer (e.g., Pong, Chess, Tic-Tac-Toe, Card games, etc.).
-◦ Players must be able to play live matches.
-◦ The game must have clear rules and win/loss conditions.
-◦ The game can be 2D or 3D.
-
-**Points:** 2
-
-**Justification:**
-
-This module was selected because it adds a significant technical component to the application and directly supports the project's functionality.
-
-**Implementation:**
-
-Describe the architecture, libraries, APIs, and components used to implement the module.
-
-**Contributors:**
-
-- `jmeouchy and rdennaou`
-
----
-
-### Major Module 6: Remote players — Enable two players on separate computers to play the same game in real-time.
-◦ Handle network latency and disconnections gracefully.
-◦ Provide a smooth user experience for remote gameplay.
-◦ Implement reconnection logic.
-
-**Points:** 2
-
-**Justification:**
-
-This module was selected because it adds a significant technical component to the application and directly supports the project's functionality.
-
-**Implementation:**
-
-Describe the architecture, libraries, APIs, and components used to implement the module.
-
-**Contributors:**
-
-- `jmeouchy and rdennaou`
-
----
-
-## Minor Modules — 1 point each
-
-### Minor Module 1: Use an ORM for the database.
-
-**Points:** 1
-
-**Justification:**
-
-Describe why this module was selected.
-
-**Implementation:**
-
-Describe how it was implemented.
-
-**Contributors:**
-
-- `rdennaou`
-
----
-
-### Minor Module 2: Custom-made design system with reusable components, including a proper color palette, typography, and icons (minimum: 10 reusable components).
-
-**Points:** 1
-
-**Justification:**
-
-Describe why this module was selected.
-
-**Implementation:**
-
-Describe how it was implemented.
-
-**Contributors:**
-
-- `jmeouchy`
-
----
-
-### Minor Module 3: Game statistics and match history (requires a game module).
-◦ Track user game statistics (wins, losses, ranking, level, etc.).
-◦ Display match history (1v1 games, dates, results, opponents).
-◦ Show achievements and progression.
-◦ Leaderboard integration.
-
-**Points:** 1
-
-**Justification:**
-
-Describe why this module was selected.
-
-**Implementation:**
-
-Describe how it was implemented.
-
-**Contributors:**
-
-- `jmeouchy and rdennaou`
-
----
-
-### Minor Module 4: Implement remote authentication with OAuth 2.0 (Google, GitHub, 42, etc.).
-
-**Points:** 1
-
-**Justification:**
-
-Describe why this module was selected.
-
-**Implementation:**
-
-Describe how it was implemented.
-
-**Contributors:**
-
-- `rdennaou`
-
----
-
-### Minor Module 5: Game customization options.
-◦ Power-ups, attacks, or special abilities
-◦ Different maps or themes.
-◦ Customizable game settings.
-◦ Default options must be available.
-
-**Points:** 1
-
-**Justification:**
-
-Describe why this module was selected.
-
-**Implementation:**
-
-Describe how it was implemented.
-
-**Contributors:**
-
-- `jmeouchy and rdennaou`
-
----
-
-Major modules totaL: 12 pts;
-Minor modules total: 5 pts;
-
-Points total: 17 pts
-
----
-
+## Major Modules — 2 Points Each
+
+| # | Module | Points |
+|---|---|---:|
+| 1 | Frontend and Backend Frameworks (React + Express) | 2 |
+| 2 | Real-Time Features (WebSockets) | 2 |
+| 3 | User Interaction (Chat, Profiles, Friends) | 2 |
+| 4 | User Management and Authentication | 2 |
+| 5 | Web-Based Multiplayer Game (Pong) | 2 |
+| 6 | Remote Multiplayer and Reconnection | 2 |
+| | **Major Modules Total** | **12** |
+
+## Minor Modules — 1 Point Each
+
+| # | Module | Points |
+|---|---|---:|
+| 1 | ORM for Database (Prisma) | 1 |
+| 2 | Custom Design System and Reusable Components | 1 |
+| 3 | Game Statistics, Match History, and Leaderboard | 1 |
+| 4 | OAuth 2.0 Authentication (Google) | 1 |
+| 5 | Game Customization (Themes and Power-Ups) | 1 |
+| | **Minor Modules Total** | **5** |
+
+## Overall Total
+
+| Category | Points |
+|---|---:|
+| Major Modules | 12 |
+| Minor Modules | 5 |
+| **Grand Total** | **17 / 17** |
 # Individual Contributions
 
 ## `<login1>`

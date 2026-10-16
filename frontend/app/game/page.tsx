@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CustomizationTheme, customizationService, } from "@/services/Customization.services";
 import { socket } from "@/lib/socket";
-
+import { gameThemes } from "@/app/data/game/gameCustomization";
+import { API_URL } from "@/lib/api";
 import GameCanvas from "../components/game/GameCanvas";
 import GameModals from "../components/game/GameModals/GameModals";
 import useGameSocket from "../../hooks/UseGameSockets";
@@ -21,7 +22,7 @@ export default function GamePage() {
 	const [theme, setTheme] =
 		useState<CustomizationTheme | null>(null);
 
-const [activeEffects, setActiveEffects] = useState<{
+	const [activeEffects, setActiveEffects] = useState<{
 		left: {
 			type: string;
 			expiresAt: number;
@@ -52,19 +53,19 @@ const [activeEffects, setActiveEffects] = useState<{
 		loadTheme();
 
 	}, []);
-	
 
-useEffect(() => {
-	if (!socket.connected) {
-		console.log("Connecting socket...");
-		socket.connect();
-	}
 
-	return () => {
-		console.log("Leaving game page - disconnecting socket");
-		socket.disconnect();
-	};
-}, []);
+	useEffect(() => {
+		if (!socket.connected) {
+			console.log("Connecting socket...");
+			socket.connect();
+		}
+
+		return () => {
+			console.log("Leaving game page - disconnecting socket");
+			socket.disconnect();
+		};
+	}, []);
 	const handleCustomize = () => {
 		game.setModalState("customization");
 	};
@@ -85,9 +86,28 @@ useEffect(() => {
 		game.playerSide === "left"
 			? game.activeEffects.right
 			: game.activeEffects.left;
+	const getBackgroundUrl = (path: string | null | undefined) => {
+		if (!path) return "";
+
+		if (path.startsWith("http") || path.startsWith("/pong")) {
+			return path;
+		}
+
+		return `${API_URL}${path}`;
+	};
+
+	const backgroundImage = getBackgroundUrl(
+		theme?.backgroundImageUrl ?? gameThemes.classic.background
+	);
 
 	return (
-		<div className="game-page">
+		<div
+			className="game-page"
+			style={{
+				"--game-background-image": `url("${backgroundImage}")`,
+			} as React.CSSProperties}
+		>
+			<div className="game-page__background" />
 
 			<div className="game-container">
 
@@ -98,9 +118,9 @@ useEffect(() => {
 					effect={playerEffect}
 				/>
 
-				{<GameCanvas theme={theme} 
-				    pendingPowerUp={game.pendingPowerUp}
-					/>}
+				{<GameCanvas theme={theme}
+					pendingPowerUp={game.pendingPowerUp}
+				/>}
 
 				<PlayerInfo
 					side={game.playerSide === "left" ? "right" : "left"}
