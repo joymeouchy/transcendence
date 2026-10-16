@@ -190,6 +190,10 @@ async function getCurrentAvatarUrl(userId: number): Promise<string | null> {
 }
 
 io.on("connection", (socket) => {
+  console.log(new Date().toISOString(), "[SRV] connected", socket.id, socketToUser.get(socket.id));
+socket.on("disconnect", (reason) =>
+  console.log(new Date().toISOString(), "[SRV] disconnected", socket.id, socketToUser.get(socket.id), reason)
+);
   const userId = socket.data.userId as number;
   console.log("Client connected:", socket.id, "userId:", userId);
 
@@ -516,6 +520,12 @@ io.on("connection", (socket) => {
       fromUserId: number;
       accepted: boolean;
     }) => {
+      console.log(new Date().toISOString(), "[SRV] emitting match_found", {
+  room,
+  responderSocket: socket.id,
+  inviterSocket: pending.inviterSocketId,
+  members: [...(io.sockets.adapter.rooms.get(room) ?? [])],
+});
       const responderId = socketToUser.get(socket.id);
       if (!responderId) return;
 
@@ -534,6 +544,7 @@ io.on("connection", (socket) => {
           socket.emit("invite_error", {
             message: "Your friend is no longer available.",
           });
+          console.log(new Date().toISOString(), "[SRV] match_found emitted", room);
         }
         return;
       }

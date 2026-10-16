@@ -20,6 +20,13 @@ type ModalState =
   | "result";
 
 export default function useGameSocket() {
+  const instanceId = useRef(Math.random().toString(36).slice(2, 6)).current;
+const t = () => new Date().toISOString().slice(11, 23);
+
+useEffect(() => {
+  console.log(`[GAME ${t()}] hook mounted`, instanceId);
+  return () => console.log(`[GAME ${t()}] hook unmounted`, instanceId);
+}, []);
   const { user } = useAuth();
 
   const { incomingInvite, respondToInvite } = useGameInvite();
@@ -90,6 +97,7 @@ export default function useGameSocket() {
         right: string | null;
       };
     }) => {
+      console.log(`[GAME ${t()}] match_found received`, instanceId, socket.id, data.room);
 
       setRoom(data.room);
 
@@ -196,6 +204,11 @@ const handleRematchFailed = () => {
 
     socket.on("game_state", handleGameState);
     socket.on("connect", handleConnect);
+    console.log(`[GAME ${t()}] register`, instanceId, {
+  connected: socket.connected,
+  socketId: socket.id,
+  username: user?.username,
+});
     socket.on("match_found", handleMatchFound);
     socket.on("game_over", handleGameOver);
     socket.on("rematch_requested", handleRematchRequested);

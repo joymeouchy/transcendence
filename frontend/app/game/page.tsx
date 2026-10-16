@@ -11,7 +11,7 @@ import GameCanvas from "../components/game/GameCanvas";
 import GameModals from "../components/game/GameModals/GameModals";
 import useGameSocket from "../../hooks/UseGameSockets";
 import PlayerInfo from "../components/game/playerInfo/playerInfo";
-
+import { useRef } from "react";   // add useRef
 import "./page.scss";
 
 export default function GamePage() {
@@ -51,23 +51,32 @@ export default function GamePage() {
 
 	}, []);
 
+	const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	useEffect(() => {
-		if (!socket.connected) {
-			socket.connect();
-		}
+    // Strict Mode re-mount: cancel the pending disconnect from the fake unmount
+    if (leaveTimer.current) {
+        clearTimeout(leaveTimer.current);
+        leaveTimer.current = null;
+    }
 
-		return () => {
-			// disconnecting is what drops us from the queue or ends the match on the server
-			socket.disconnect();
+    if (!socket.connected) {
+        socket.connect();
+    }
 
-			// if the user is signed out, we don't want to reconnect
-			// because we won't have a valid token
-			if (tokenStorage.get()) {
-				socket.connect();
-			}
-		};
-	}, []);
+    return () => {
+        leaveTimer.current = setTimeout(() => {
+            // disconnecting is what drops us from the queue or ends the match on the server
+            socket.disconnect();
+
+            // if the user is signed out, we don't want to reconnect
+            // because we won't have a valid token
+            if (tokenStorage.get()) {
+                socket.connect();
+            }
+        }, 0);
+    };
+}, []);
 	const handleCustomize = () => {
 		game.setModalState("customization");
 	};
