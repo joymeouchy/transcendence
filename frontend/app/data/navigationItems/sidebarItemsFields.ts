@@ -4,6 +4,7 @@ import {
   gameItem,
   messagingItem,
   friendshipsItem,
+  paintItem,
 } from "./navigationItemsFields";
 
 export const sidebarItems = [
@@ -12,4 +13,5 @@ export const sidebarItems = [
   profileItem,
   friendshipsItem,  
   messagingItem,
+  paintItem,
 ];

@@ -35,10 +35,6 @@ export default function FloatingIcons() {
                                 if (icon.label === "Marvin") {
                                     setMarvinOpen(true);
                                 }
-
-                                if (icon.label === "paint") {
-                                    router.push("/paint");
-                                }
                             }}
                         />
                     </div>
