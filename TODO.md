@@ -4,6 +4,7 @@
 --add 404 page
 --change styling of "signing in" after google signin page
 --add login sound after google page
+--fix rematch delined x button
 
 **what rawan needs:**
 -- README2: ctrl + F "TODO" find all the notes i added and double check everything and if i missed any modules. there are things i didnt add/adjust yet

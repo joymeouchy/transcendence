@@ -28,6 +28,8 @@ export const images = {
 
 	deepthought: "/DeepThought.png",
 
+	paint: "/paint.png",
+
 	windowsOneCatLeftWallpaper: "/wallpapers/catXP.jpg",
 	windowsOneCatRightWallpaper: "/wallpapers/catXP2.jpg",
 	windowsDogWallpaper: "/wallpapers/dogXP.jpg",
