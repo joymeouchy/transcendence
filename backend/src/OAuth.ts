@@ -59,12 +59,9 @@ passport.use(
             },
           });
         } else if (user.provider !== AuthProvider.google) {
-          // user exists but registered with email/password
-          return done(
-            new Error(
-              "This email is already registered. Please log in with your password.",
-            ),
-          );
+          // user exists but registered with email/password.
+          // fail with a code so the callback route can redirect it to the frontend
+          return done(null, false, { message: "google_email_exists" });
         }
         return done(null, user);
       } catch (err) {
