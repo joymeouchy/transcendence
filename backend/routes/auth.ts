@@ -8,6 +8,7 @@ import {
   authHelper,
   AuthRequest,
   validatePassword,
+  validateUsername,
 } from "../src/helpers/auth_helpers";
 import prisma from "../src/prisma";
 import { FRONTEND_URL, JWT_SECRET } from "../src/urls";
@@ -41,6 +42,7 @@ const transporter = nodemailer.createTransport({
  *             properties:
  *               username:
  *                 type: string
+ *                 description: 3-20 characters, leading and trailing spaces are trimmed
  *               email:
  *                 type: string
  *               password:
@@ -50,17 +52,24 @@ const transporter = nodemailer.createTransport({
  *       201:
  *         description: User registered successfully
  *       400:
- *         description: User already exists, missing fields, or password doesn't meet the rules
+ *         description: User already exists, missing fields, or username or password doesn't meet the rules
  *       500:
  *         description: Server error
  */
 
 router.post("/register", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { email, password } = req.body;
+    const username =
+      typeof req.body.username === "string" ? req.body.username.trim() : "";
 
     if (!username || !email || !password) {
       return res.status(400).json({ error: "Missing fields" });
+    }
+
+    const usernameError = validateUsername(username);
+    if (usernameError) {
+      return res.status(400).json({ error: usernameError });
     }
 
     const passwordError = validatePassword(password);
