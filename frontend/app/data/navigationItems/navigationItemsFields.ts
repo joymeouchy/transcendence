@@ -72,7 +72,7 @@ export const deepThoughtItem = {
 };
 
 export const paintItem = {
-  image: images.customization,
+  image: images.paint,
   label: "paint",
   position: "paint",
   href: "/paint",
