@@ -4,7 +4,11 @@ import jwt from "jsonwebtoken";
 import passport from "../src/OAuth";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import { authHelper, AuthRequest, validatePassword } from "../src/helpers/auth_helpers";
+import {
+  authHelper,
+  AuthRequest,
+  validatePassword,
+} from "../src/helpers/auth_helpers";
 import prisma from "../src/prisma";
 import { FRONTEND_URL, JWT_SECRET } from "../src/urls";
 
@@ -144,8 +148,7 @@ router.post("/login", async (req, res) => {
 
     if (!user.password) {
       return res.status(400).json({
-        error:
-          "This account uses social login. Please sign in with Google.",
+        error: "This account uses social login. Please sign in with Google.",
       });
     }
 
@@ -203,29 +206,35 @@ router.get(
  *     summary: Google OAuth callback
  *     responses:
  *       302:
- *         description: Redirects to frontend with token
+ *         description: Redirects to frontend with token, or to /login?error=<code> on failure (google_email_exists, google_failed)
  */
-router.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: `${FRONTEND_URL}/login`,
-    session: false,
-  }),
-  (req, res) => {
-    const user = req.user as any;
+router.get("/google/callback", (req, res, next) => {
+  passport.authenticate(
+    "google",
+    { session: false },
+    (err: any, user: any, info: any) => {
+      // send failures back to the login page so the frontend can show them
+      if (err || !user) {
+        const code =
+          info?.message === "google_email_exists"
+            ? "google_email_exists"
+            : "google_failed";
+        return res.redirect(`${FRONTEND_URL}/login?error=${code}`);
+      }
 
-    const token = jwt.sign(
-      { userId: user.id, username: user.username },
-      JWT_SECRET,
-      { expiresIn: TOKEN_EXPIRES_IN },
-    );
+      const token = jwt.sign(
+        { userId: user.id, username: user.username },
+        JWT_SECRET,
+        { expiresIn: TOKEN_EXPIRES_IN },
+      );
 
-    // redirect to frontend with token
-    res.redirect(
-      `${FRONTEND_URL}/auth/callback?token=${token}&userId=${user.id}`,
-    );
-  },
-);
+      // redirect to frontend with token
+      res.redirect(
+        `${FRONTEND_URL}/auth/callback?token=${token}&userId=${user.id}`,
+      );
+    },
+  )(req, res, next);
+});
 
 /**
  * @swagger
