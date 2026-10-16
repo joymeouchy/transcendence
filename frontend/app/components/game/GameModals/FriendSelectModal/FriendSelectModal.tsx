@@ -40,10 +40,6 @@ export default function FriendSelectModal({
 
 				setFriends(data);
 			} catch (error) {
-				console.error(
-					"Failed to load friends:",
-					error
-				);
 				setFriends([]);
 			} finally {
 				setLoading(false);

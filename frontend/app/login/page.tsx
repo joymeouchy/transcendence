@@ -49,7 +49,6 @@ export default function LoginPage() {
       router.push("/home");
 
     } catch (err: any) {
-      console.error(err);
 
     } finally {
       setIsLoading(false);

@@ -72,7 +72,6 @@ export function AuthProvider({
     setUser(currentUser);
 
   } catch (error) {
-    console.error("Failed to fetch user:", error);
     setUser(null);
   }
 };

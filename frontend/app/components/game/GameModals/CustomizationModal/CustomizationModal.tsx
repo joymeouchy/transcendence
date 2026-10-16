@@ -39,7 +39,6 @@ export default function CustomizationModal({ isOpen, onBack, onSave }: Props) {
         const current = await customizationService.getMyTheme();
         setSelectedTheme(current.name);
       } catch (error) {
-        console.error("Failed loading themes", error);
       } finally {
         setLoading(false);
       }
@@ -47,20 +46,13 @@ export default function CustomizationModal({ isOpen, onBack, onSave }: Props) {
     loadThemes();
   }, [isOpen]);
   const handleSave = async () => {
-    console.log("Selected:", selectedTheme);
     if (!selectedTheme) return;
     try {
       setSaving(true);
       const updated = await customizationService.updateTheme(selectedTheme);
-
-      console.log("Updated:", updated);
-
       const current = await customizationService.getMyTheme();
-
-      console.log("Current:", current);
       onSave(updated);
     } catch (error) {
-      console.error("Failed updating theme", error);
     } finally {
       setSaving(false);
     }

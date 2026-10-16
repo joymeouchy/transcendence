@@ -32,7 +32,6 @@ export default function ProfilePage() {
         const data = await FriendshipService.getFriends(user.id);
         setFriends(data);
       } catch (error) {
-        console.error("Failed to load friends:", error);
       } finally {
         setLoadingFriends(false);
       }

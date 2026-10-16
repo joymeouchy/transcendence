@@ -15,10 +15,6 @@ export default function ProfileHeader({ username, avatarUrl }: Props) {
         alt="Avatar"
         width={72}
         height={72}
-        onLoad={() => console.log("loaded")}
-        onError={(e) => {
-          console.log("failed", e.currentTarget.src);
-        }}
       />
 
       <div className={styles.info}>

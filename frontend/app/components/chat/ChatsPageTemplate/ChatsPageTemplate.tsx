@@ -56,7 +56,6 @@ export default function ChatsPageTemplate({
 
         setMessages(messagesData);
       } catch (error) {
-        console.error("Failed to load messages:", error);
         setMessages([]);
       } finally {
         setMessagesLoading(false);
@@ -129,7 +128,6 @@ export default function ChatsPageTemplate({
     try {
       await MessagesService.sendMessage(selectedFriend.id, content);
     } catch (error) {
-      console.error("Failed to send message:", error);
 
       setMessages((prev) =>
         prev.filter((message) => message.id !== tempMessage.id)

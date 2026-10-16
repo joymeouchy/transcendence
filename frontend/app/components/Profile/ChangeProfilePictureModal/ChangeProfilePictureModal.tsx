@@ -92,11 +92,6 @@ export default function ChangeProfilePictureModal({
       );
 
       setShowSuccess(true);
-
-      console.log(
-        "Avatar updated:",
-        avatarUrl
-      );
     } catch (err: any) {
       setError(
         err?.response?.data?.error ??

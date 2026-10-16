@@ -40,7 +40,6 @@ export default function DesktopCustomizationModal({
 
 			onClose();
 		} catch (error) {
-			console.error("Failed to update wallpaper:", error);
 		} finally {
 			setIsSaving(false);
 		}

@@ -43,10 +43,6 @@ export default function GamePage() {
 				setTheme(currentTheme);
 
 			} catch (error) {
-				console.error(
-					"Failed to load theme:",
-					error
-				);
 			}
 		};
 
@@ -57,12 +53,10 @@ export default function GamePage() {
 
 	useEffect(() => {
 		if (!socket.connected) {
-			console.log("Connecting socket...");
 			socket.connect();
 		}
 
 		return () => {
-			console.log("Leaving game page - disconnecting socket");
 			socket.disconnect();
 		};
 	}, []);

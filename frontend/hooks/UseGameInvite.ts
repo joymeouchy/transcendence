@@ -17,10 +17,6 @@ export default function useGameInvite() {
 		const handleInviteReceived = (
 			data: IncomingInvite
 		) => {
-			console.log(
-				"Friend invite received:",
-				data
-			);
 
 			setIncomingInvite(data);
 		};
@@ -28,10 +24,6 @@ export default function useGameInvite() {
 		const handleInviteCancelled = (data: {
 			fromUserId: number;
 		}) => {
-			console.log(
-				"Invite cancelled:",
-				data
-			);
 
 			setIncomingInvite((current) => {
 				if (

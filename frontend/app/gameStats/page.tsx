@@ -52,7 +52,6 @@ export default function GameStatsPage() {
         const matchesData = await UserService.getMatches();
         setMatches(matchesData);
       } catch (error) {
-        console.error("Failed to load match history:", error);
       } finally {
         setMatchesLoading(false);
       }
@@ -78,7 +77,6 @@ export default function GameStatsPage() {
 
         setLeaderboard(leaderboardData);
       } catch (error) {
-        console.error("Failed to load leaderboard:", error);
       } finally {
         setLeaderboardLoading(false);
       }
