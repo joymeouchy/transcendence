@@ -363,13 +363,21 @@ const handleRematchFailed = () => {
   }
 
   function declineRematch() {
-    if (!room) return;
+	if (!room) return;
 
-    socket.emit("decline_rematch", { room });
+	socket.emit("decline_rematch", { room });
 
-    setRematchRequested(false);
-    setRematchDeclined(false);
-  }
+	setRematchRequested(false);
+	setRematchDeclined(false);
+
+	setWinner("");
+	setScoreLeft(0);
+	setScoreRight(0);
+	setOpponentName("");
+	setRoom("");
+
+	setModalState("select");
+}
 
   function findAnotherPlayer() {
     setOpponentDisconnected(false);
