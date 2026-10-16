@@ -1,7 +1,5 @@
 **what joy needs:**
 --if player disconnected, emit `leave_game` (check SOCKET_EVENT.md)
---fix the user rematch thing
---add 404 page
 --change styling of "signing in" after google signin page
 --add login sound after google page
 --fix rematch delined x button
