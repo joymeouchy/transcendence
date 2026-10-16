@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../urls";
 
+export const USERNAME_MIN_LENGTH = 3;
+export const USERNAME_MAX_LENGTH = 20;
+
 export interface AuthRequest<P = Record<string, string>> extends Request<P> {
   userId?: number;
 }
@@ -53,3 +56,17 @@ export const validatePassword = (password: unknown): string | null => {
   return null;
 };
 
+// username rules shared by register and the change-username route.
+// expects the already trimmed username. returns an error message, or null if valid.
+export const validateUsername = (username: unknown): string | null => {
+  if (typeof username !== "string" || username.length === 0) {
+    return "Username is required";
+  }
+  if (
+    username.length < USERNAME_MIN_LENGTH ||
+    username.length > USERNAME_MAX_LENGTH
+  ) {
+    return `Username must be ${USERNAME_MIN_LENGTH}-${USERNAME_MAX_LENGTH} characters`;
+  }
+  return null;
+};

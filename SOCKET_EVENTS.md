@@ -24,7 +24,7 @@ the server tell two tabs of the same account apart from two different accounts.
 | `decline_rematch` | `{ room: string }` | Decline a rematch |
 
 **INVITES**
-| `invite_friend` | `{ friendId: number }` | Invite a specific friend to play. Fails with `invite_error` if you're already in a game, the friend is offline, the friend is already in a game, you already have a pending invite (to them or to anyone else), or they already have a pending invite from someone else |
+| `invite_friend` | `{ friendId: number }` | Invite a specific friend to play. Fails with `invite_error` if you invite yourself, you're already in a game, the friend is offline, the friend is already in a game, you already have a pending invite (to them or to anyone else), or they already have a pending invite from someone else |
 | `cancel_invite` | `{ friendId: number }` | Cancel an invite you sent before the friend responds |
 | `invite_response` | `{ fromUserId: number, accepted: boolean }` | Accept or decline an invite you received from `fromUserId` |
 
@@ -37,17 +37,17 @@ Messages are sent over REST, not a socket event: see `POST /messages` and `GET /
 |-------|---------|-------------|
 **MATCHMAKING**
 | `waiting` | none | You are in the queue waiting for opponent |
-| `already_waiting` | none | You are already in the queue, OR the account already has a match in queue/in progress (same user tried to queue from a second tab/window) |
-| `match_found` | `{ room: string, players: [string, string], avatars: { left: string \| null, right: string \| null } }` | Match found, game starting. `players`/`avatars` are both `[left, right]`-ordered pairs; avatar is whatever was in the DB when the socket connected (`null` if unset or not fetched yet) |
+| `already_waiting` | none | You are already in the queue, from this tab or another tab/window of the same account. Not sent if you're already in a match (that `join_queue` is silently ignored) |
+| `match_found` | `{ room: string, players: [string, string], avatars: { left: string \| null, right: string \| null } }` | Match found, game starting. `players`/`avatars` are both `[left, right]`-ordered pairs. Usernames and avatars are the current ones (a rename or new avatar shows up without reconnecting), avatar is `null` if unset |
 
 **GAMEPLAY**
 | `game_state` | `{ ball, paddles, scores, players, countdownEndsAt: number or null, pendingPowerUp: PendingPowerUp or null, activeEffects: { left, right }, dynamicConfig: { paddleHeights: { left, right }, ballSize } }` | Game state update (60fps). `countdownEndsAt` is set for the ~3s pre-match countdown (ball is held until it passes); `activeEffects[side]` is `{ type: PowerUpType, expiresAt } or null`; `dynamicConfig` reflects live paddle heights / ball size while a power-up effect is active |
 | `paddle_hit` | `{ side: "left" or "right" }` | Ball just bounced off the named side's paddle (used for sound effects) |
 
 **POWER-UPS**
-| `power_up_incoming` | `PendingPowerUp` = `{ type: PowerUpType, side: "left" or "right", applyAt: number }` | A power-up has been chosen and will self-activate at `applyAt` (~2s warning, no need to touch anything to trigger it) |
-| `power_up_activated` | `{ type: PowerUpType, side: "left" or "right" }` | The announced power-up just took effect |
-| `power_up_expired` | `{ type: PowerUpType, side: "left" or "right" }` | A power-up's effect just ended (5s, or 3s for `freeze`) |
+| `power_up_incoming` | `PendingPowerUp` = `{ type: PowerUpType, side: "left" or "right", applyAt: number }` | A power-up has been chosen and will self-activate at `applyAt` (~2s warning, no need to touch anything to trigger it).|
+| `power_up_activated` | `{ type: PowerUpType, side: "left" or "right" }` | The announced power-up just took effect. `side` is the collector, for `smallPaddle`/`freeze` the affected paddle is the other side |
+| `power_up_expired` | `{ type: PowerUpType, side: "left" or "right" }` | A power-up's effect just ended (5s, or 3s for `freeze`). `side` is the collector, same as in `power_up_activated` |
 
 **GAME END / CONNECTION**
 | `game_over` | `{ winnerSocketId: string, winnerId?: number, winnerUsername: string, scores: { left: number, right: number }, reason?: "disconnect" }` | Game ended (normal win or opponent disconnect): same shape for both, `reason` is only set for the disconnect case |
@@ -65,7 +65,7 @@ Messages are sent over REST, not a socket event: see `POST /messages` and `GET /
 | `rematch_failed` | none | Both players requested a rematch, but the other one disconnected before the new match could start |
 
 **INVITES**
-| `invite_received` | `{ fromUserId: number, fromUsername: string, fromAvatarUrl: string \| null }` | A friend invited you to play |
+| `invite_received` | `{ fromUserId: number, fromUsername: string, fromAvatarUrl: string \| null }` | A friend invited you to play. `fromAvatarUrl` is the inviter's avatar from when their socket connected, so it can be outdated if they changed it since |
 | `invite_cancelled` | `{ fromUserId: number }` | The invite from `fromUserId` was cancelled (they cancelled it, timed out, or disconnected) |
 | `invite_declined` | `{ friendId: number }` | `friendId` declined your invite (or disconnected before responding) |
 | `invite_timeout` | `{ friendId: number }` | `friendId` didn't respond within 30s |

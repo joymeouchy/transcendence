@@ -1,9 +1,10 @@
 import { Router } from "express";
 import jwt from "jsonwebtoken";
 import { FriendshipStatus } from "../generated/prisma/client";
-import { authHelper, AuthRequest } from "../src/helpers/auth_helpers";
+import { authHelper, AuthRequest, validateUsername } from "../src/helpers/auth_helpers";
 import { avatarUpload, uploadAvatar, deleteAvatar } from "../src/helpers/upload_helpers";
-import { isUserOnline } from "../src/online";
+import { getIo } from "../src/io";
+import { isUserOnline, onlineUsers } from "../src/online";
 import prisma from "../src/prisma";
 
 const router = Router();
@@ -422,21 +423,35 @@ router.get("/leaderboard", authHelper, async (req: AuthRequest, res) => {
  * /users/username:
  *   patch:
  *     summary: Update username
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: 3-20 characters, leading and trailing spaces are trimmed
  *     responses:
  *       200:
  *         description: Username updated
  *       400:
- *         description: Username already taken
+ *         description: Username missing, not 3-20 characters, or already taken
  *       401:
  *         description: No token provided
  */
 router.patch("/username", authHelper, async (req: AuthRequest, res) => {
   try {
     const userId = req.userId!;
-    const { username } = req.body;
+    const username =
+      typeof req.body.username === "string" ? req.body.username.trim() : "";
 
-    if (!username) {
-      return res.status(400).json({ error: "Username is required" });
+    const usernameError = validateUsername(username);
+    if (usernameError) {
+      return res.status(400).json({ error: usernameError });
     }
 
     // check if username is already taken
@@ -451,6 +466,13 @@ router.patch("/username", authHelper, async (req: AuthRequest, res) => {
     const updated = await prisma.user.update({
       where: { id: userId },
       data: { username },
+    });
+
+    // the sockets keep the username they connected with, so update them too.
+    // otherwise match_found and invites keep showing the old name
+    onlineUsers.get(userId)?.forEach((socketId) => {
+      const socket = getIo().sockets.sockets.get(socketId);
+      if (socket) socket.data.username = updated.username;
     });
 
     res.json({ message: "Username updated", username: updated.username });
