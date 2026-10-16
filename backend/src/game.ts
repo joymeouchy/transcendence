@@ -215,6 +215,12 @@ function scheduleNextPowerUp(io: Server, room: string) {
     const game = games[room];
     if (!game) return;
 
+    // paused on a disconnect: skip this power-up and try again later
+    if (!gameIntervals[room]) {
+      scheduleNextPowerUp(io, room);
+      return;
+    }
+
     const type =
       POWER_UP_TYPES[Math.floor(Math.random() * POWER_UP_TYPES.length)]!;
     const side: "left" | "right" = Math.random() < 0.5 ? "left" : "right";
@@ -223,13 +229,19 @@ function scheduleNextPowerUp(io: Server, room: string) {
     game.pendingPowerUp = { type, side, applyAt };
     io.to(room).emit("power_up_incoming", game.pendingPowerUp);
 
-    setTimeout(() => {
+    const activate = () => {
       const game = games[room];
       if (!game) return;
+      // paused on a disconnect after it was announced: hold it until the match resumes
+      if (!gameIntervals[room]) {
+        setTimeout(activate, POWER_UP_WARNING_MS);
+        return;
+      }
       game.pendingPowerUp = null;
       applyPowerUp(game, side, type, io, room);
       io.to(room).emit("power_up_activated", { type, side });
-    }, POWER_UP_WARNING_MS);
+    };
+    setTimeout(activate, POWER_UP_WARNING_MS);
 
     scheduleNextPowerUp(io, room);
   }, delay);

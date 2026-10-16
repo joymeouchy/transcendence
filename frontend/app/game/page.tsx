@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CustomizationTheme, customizationService, } from "@/services/Customization.services";
 import { socket } from "@/lib/socket";
+import { tokenStorage } from "@/lib/token";
 import { gameThemes } from "@/app/data/game/gameCustomization";
 import { API_URL } from "@/lib/api";
 import GameCanvas from "../components/game/GameCanvas";
@@ -57,7 +58,14 @@ export default function GamePage() {
 		}
 
 		return () => {
+			// disconnecting is what drops us from the queue or ends the match on the server
 			socket.disconnect();
+
+			// if the user is signed out, we don't want to reconnect
+			// because we won't have a valid token
+			if (tokenStorage.get()) {
+				socket.connect();
+			}
 		};
 	}, []);
 	const handleCustomize = () => {

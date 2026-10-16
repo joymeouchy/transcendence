@@ -213,6 +213,17 @@ io.on("connection", (socket) => {
       resumeGame(io, room);
       io.to(room).emit("player_reconnected");
       console.log("Recovered session, resumed game in room:", room);
+    } else {
+      // still in a match room but the game is gone: the opponent left (or the
+      // grace period ran out) while we were away, so tell the client to reset
+      for (const r of socket.rooms) {
+        if (r.startsWith("match-")) {
+          socket.leave(r);
+          socket.emit("game_abandoned");
+          console.log("Recovered session, game already gone in room:", r);
+          break;
+        }
+      }
     }
   }
 

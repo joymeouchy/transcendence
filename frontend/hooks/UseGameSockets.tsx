@@ -370,6 +370,8 @@ const handleRematchFailed = () => {
   }
 
   function resetGame() {
+    // drop the paused match on the server before clearing local state
+    if (opponentDisconnected) socket.emit("leave_game");
     setWinner("");
     setOpponentName("");
     setScoreLeft(0);
