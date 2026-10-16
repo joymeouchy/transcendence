@@ -41,21 +41,12 @@ export function GameInviteProvider({
 		const handleInviteReceived = (
 			data: IncomingInvite
 		) => {
-			console.log(
-				"Friend invite received:",
-				data
-			);
-
 			setIncomingInvite(data);
 		};
 
 		const handleInviteCancelled = (data: {
 			fromUserId: number;
 		}) => {
-			console.log(
-				"Invite cancelled:",
-				data
-			);
 
 			setIncomingInvite((current) => {
 				if (

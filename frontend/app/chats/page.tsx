@@ -24,7 +24,6 @@ export default function ChatsPage() {
 
         setFriends(friendsData);
       } catch (error) {
-        console.error("Failed to load friends:", error);
       } finally {
         setLoading(false);
       }

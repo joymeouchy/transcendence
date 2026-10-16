@@ -51,7 +51,6 @@ export default function ResetPasswordContent() {
 				router.push("/login");
 			}, 1500);
 		} catch (err) {
-			console.error("Reset password error:", err);
 			setAlertMessage(
 				"Unable to reset your password. The link may have expired."
 			);

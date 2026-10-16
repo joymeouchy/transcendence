@@ -2,9 +2,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 import DesktopLayout from "../components/DesktopLayout/DesktopLayout";
 import XPWindow from "../components/ui/XPWindow/XPWindow";
-import { useRouter } from "next/navigation";
 
 import styles from "./page.module.scss";
 
@@ -13,12 +14,10 @@ export default function PaintPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
+  const timeout = setTimeout(() => setIsLoading(false), 2000);
 
-    return () => clearTimeout(timeout);
-  }, []);
+  return () => clearTimeout(timeout);
+}, []);
 
   return (
     <DesktopLayout>

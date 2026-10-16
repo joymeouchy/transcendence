@@ -28,7 +28,6 @@ export default function AddFriendPanel({
 				const users = await UserService.search(friendUsername);
 				setSearchResults(users);
 			} catch (err) {
-				console.error("Search failed:", err);
 				setSearchResults([]);
 			}
 		}
@@ -48,7 +47,6 @@ export default function AddFriendPanel({
 			setSelectedUser(null);
 			setSearchResults([]);
 		} catch (err) {
-			console.error("Failed to send friend request:", err);
 		} finally {
 			setLoadingMessage(null);
 		}

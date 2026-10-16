@@ -80,9 +80,7 @@ export default function useGameSocket() {
   });
 
   useEffect(() => {
-    const handleConnect = () => {
-      console.log("Socket connected:", socket.id);
-    };
+    const handleConnect = () => {};
 
     const handleMatchFound = (data: {
       room: string;
@@ -92,7 +90,6 @@ export default function useGameSocket() {
         right: string | null;
       };
     }) => {
-      console.log("Match found!", data);
 
       setRoom(data.room);
 
@@ -157,8 +154,6 @@ const handleRematchFailed = () => {
       scores: { left: number; right: number };
       reason?: "disconnect";
     }) => {
-      console.log("GAME OVER DATA:", data);
-
       setOpponentDisconnected(false);
       setWinner(data.winnerUsername);
       setScoreLeft(data.scores.left);
@@ -171,8 +166,6 @@ const handleRematchFailed = () => {
       side: "left" | "right";
       applyAt: number;
     }) => {
-      console.log("Power up incoming:", data);
-
       setPendingPowerUp(data);
     };
 
@@ -250,7 +243,6 @@ const handleRematchFailed = () => {
 
   function joinQueue() {
     if (!socket.connected) {
-      console.warn("Socket not connected yet");
       return;
     }
 
@@ -261,11 +253,9 @@ const handleRematchFailed = () => {
 
   function inviteFriend(friend: Friend) {
     if (!socket.connected) {
-      console.warn("Socket not connected");
       return;
     }
 
-    // setInviteError("");
     setInvitedFriendId(friend.id);
     setInviteWaiting(true);
     setOpponentName(friend.username);
@@ -293,8 +283,6 @@ const handleRematchFailed = () => {
     }
   }
   const handleInviteDeclined = (data: { fromUserId: number }) => {
-    console.log("Invite declined:", data);
-
     setInviteWaiting(false);
     setInvitedFriendId(null);
     setOpponentName("");
@@ -303,8 +291,6 @@ const handleRematchFailed = () => {
   };
 
   const handleInviteTimeout = () => {
-    console.log("Invite timed out");
-
     setInviteWaiting(false);
     setInvitedFriendId(null);
     setOpponentName("");
@@ -313,22 +299,17 @@ const handleRematchFailed = () => {
   };
 
   const handleInviteError = (data: { message: string }) => {
-    console.log("Invite error:", data.message);
-
     setInviteWaiting(false);
     setInvitedFriendId(null);
-
     setMatchmakingStatus("inviteBusy");
     setModalState("matchmaking");
   };
 
   const handleOpponentDisconnected = () => {
-    console.log("Opponent disconnected");
     setOpponentDisconnected(true);
   };
 
   const handleOpponentReconnected = () => {
-    console.log("Opponent reconnected");
     setOpponentDisconnected(false);
   };
 

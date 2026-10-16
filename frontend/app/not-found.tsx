@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import "./not-found.scss";
+import "./globals.scss";
 
 export default function NotFound() {
   const router = useRouter();

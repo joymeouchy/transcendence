@@ -43,7 +43,6 @@ export default function GameCanvas({ theme, pendingPowerUp }: Props) {
   };
 
   useEffect(() => {
-    console.log("theme chosen is:", theme?.name);
     if (!theme) return;
 
     backgroundImg.current = new Image();
