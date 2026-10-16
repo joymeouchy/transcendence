@@ -60,6 +60,8 @@ let waitingPlayer: any = null;
 let matchId = 0;
 const socketToUser = new Map<string, number>(); // socketId → userId
 const rematches = new Map<string, string[]>(); // room → [socketIds who want rematch]
+// socketId → the match room it was playing in when it dropped, checked on recovery.
+const droppedFromRoom = new Map<string, string>();
 // "inviterId:inviteeId" → the pending friend invite between them
 const pendingInvites = new Map<
   string,
@@ -160,14 +162,15 @@ io.use(async (socket, next) => {
   const user = await prisma.user
     .findUnique({
       where: { id: decoded.userId },
-      select: { avatarUrl: true },
+      select: { avatarUrl: true, username: true },
     })
     .catch((err) => {
-      console.error("Failed to fetch avatar on connect:", err);
+      console.error("Failed to fetch user on connect:", err);
       return null;
     });
 
   socket.data.avatarUrl = user?.avatarUrl ?? null;
+  socket.data.username = user?.username ?? decoded.username;
 
   next();
 });
@@ -207,23 +210,21 @@ io.on("connection", (socket) => {
   }
 
   if (socket.recovered) {
+    const droppedRoom = droppedFromRoom.get(socket.id);
+    droppedFromRoom.delete(socket.id);
+
     const room = findRoomBySocket(socket.id);
     if (room) {
       cancelGameCleanup(room);
       resumeGame(io, room);
       io.to(room).emit("player_reconnected");
       console.log("Recovered session, resumed game in room:", room);
-    } else {
-      // still in a match room but the game is gone: the opponent left (or the
+    } else if (droppedRoom) {
+      // we dropped mid-match and the game is gone: the opponent left (or the
       // grace period ran out) while we were away, so tell the client to reset
-      for (const r of socket.rooms) {
-        if (r.startsWith("match-")) {
-          socket.leave(r);
-          socket.emit("game_abandoned");
-          console.log("Recovered session, game already gone in room:", r);
-          break;
-        }
-      }
+      socket.leave(droppedRoom);
+      socket.emit("game_abandoned");
+      console.log("Recovered session, game already gone in room:", droppedRoom);
     }
   }
 
