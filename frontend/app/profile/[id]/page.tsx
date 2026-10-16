@@ -48,7 +48,6 @@ export default function UserProfilePage() {
           }
         }
       } catch (error) {
-        console.error("Failed to load profile:", error);
       } finally {
         setLoading(false);
         setLoadingFriends(false);
@@ -65,7 +64,6 @@ export default function UserProfilePage() {
     try {
       await FriendshipService.sendRequest(currentUser.id, user.id);
     } catch (error) {
-      console.error("Failed to add friend:", error);
     }
   }
 
@@ -77,7 +75,6 @@ export default function UserProfilePage() {
       setIsFriend(false);
       setFriendshipId(null);
     } catch (error) {
-      console.error("Failed to remove friend:", error);
     }
   }
 

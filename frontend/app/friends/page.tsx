@@ -38,10 +38,6 @@ export default function FriendsPage() {
 				setFriends(friendsData);
 				setRequests(requestsData);
 			} catch (error) {
-				console.error(
-					"Failed to load friends page:",
-					error
-				);
 			} finally {
 				setLoading(false);
 			}
@@ -65,10 +61,6 @@ export default function FriendsPage() {
 			setFriends(friendsData);
 			setRequests(requestsData);
 		} catch (error) {
-			console.error(
-				"Failed to refresh friends:",
-				error
-			);
 		}
 	}
 
@@ -78,10 +70,6 @@ export default function FriendsPage() {
 
 			await refreshFriends();
 		} catch (error) {
-			console.error(
-				"Failed to accept request:",
-				error
-			);
 		}
 	}
 
@@ -95,10 +83,6 @@ export default function FriendsPage() {
 				)
 			);
 		} catch (error) {
-			console.error(
-				"Failed to reject request:",
-				error
-			);
 		}
 	}
 
@@ -117,10 +101,6 @@ export default function FriendsPage() {
 				)
 			);
 		} catch (error) {
-			console.error(
-				"Failed to remove friend:",
-				error
-			);
 		}
 	}
 
@@ -137,10 +117,6 @@ export default function FriendsPage() {
 
 			await refreshFriends();
 		} catch (error) {
-			console.error(
-				"Failed to send friend request:",
-				error
-			);
 		}
 	}
 

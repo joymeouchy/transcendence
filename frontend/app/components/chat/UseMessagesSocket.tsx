@@ -13,16 +13,8 @@ export default function useMessageSocket() {
 		const handleReceiveMessage = (
 			message: Message
 		) => {
-			console.log(
-				"Message received:",
-				message
-			);
-
 			setReceivedMessage(message);
 		};
-
-		console.log("useMessageSocket mounted");
-		console.log("Socket connected:", socket.connected);
 		socket.on(
 			"receive_message",
 			handleReceiveMessage

@@ -28,7 +28,6 @@ export default function FriendsListPanel({
       setRemovingFriendId(friendshipId);
       await onRemoveFriend?.(friendshipId);
     } catch (err) {
-      console.error("Failed to remove friend:", err);
     } finally {
       setRemovingFriendId(null);
     }
