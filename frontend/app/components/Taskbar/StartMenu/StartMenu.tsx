@@ -5,7 +5,7 @@ import StartMenuColumn from "./StartMenuColumn";
 import StartMenuItem from "./StartMenuItem/StartMenuItem";
 
 import { images } from "@/lib/images";
-import { tokenStorage } from "@/lib/token";
+import { useAuth } from "@/context/AuthContext";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -29,6 +29,7 @@ export default function StartMenu({
   onClose,
 }: StartMenuProps) {
   const router = useRouter();
+  const { logout } = useAuth();
   const menuRef = useRef<HTMLDivElement>(null);
 
   const [showSignOutAlert, setShowSignOutAlert] = useState(false);
@@ -39,7 +40,8 @@ export default function StartMenu({
 
   const confirmSignOut = () => {
     playSound(sounds.shutdown);
-    tokenStorage.remove();
+    // logout clears the token and the user, which disconnects the socket so others see us offline
+    logout();
     router.push("/login");
   };
 

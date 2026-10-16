@@ -53,6 +53,7 @@ Messages are sent over REST, not a socket event: see `POST /messages` and `GET /
 | `game_over` | `{ winnerSocketId: string, winnerId?: number, winnerUsername: string, scores: { left: number, right: number }, reason?: "disconnect" }` | Game ended (normal win or opponent disconnect): same shape for both, `reason` is only set for the disconnect case |
 | `player_disconnected` | none | Opponent disconnected, grace period started |
 | `player_reconnected` | none | Opponent reconnected, game resumed |
+| `game_abandoned` | none | You reconnected after a drop, but your match no longer exists (the opponent left with `leave_game`, or the grace period ran out). Reset the game screen. No `game_over` is sent for this |
 
 **ONLINE**
 | `online_changed` | `{ userId: number, isOnline: boolean }` | Broadcast to every connected client whenever a user's online status actually flips (first tab connecting, or last tab disconnecting): not sent on every connect/disconnect, only on a real transition |
