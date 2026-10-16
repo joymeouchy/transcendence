@@ -10,6 +10,7 @@ interface Props {
 	avatarUrl: string | null;
 	onAccept: () => void;
 	onDecline: () => void;
+	onClose: () => void;
 }
 
 export default function InviteRequestModal({
@@ -18,11 +19,13 @@ export default function InviteRequestModal({
 	avatarUrl,
 	onAccept,
 	onDecline,
+	onClose,
 }: Props) {
 	return (
 		<XPModal
 			title="Game Invite"
 			isOpen={isOpen}
+			onClose={onClose}
 		>
 			<div className="invite-content">
 				{avatarUrl ? (

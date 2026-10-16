@@ -40,6 +40,7 @@ export default function GameInvitePopup() {
 			avatarUrl={incomingInvite?.fromAvatarUrl ?? null}
 			onAccept={handleAccept}
 			onDecline={handleDecline}
+			onClose={handleDecline}
 		/>
 	);
 }
