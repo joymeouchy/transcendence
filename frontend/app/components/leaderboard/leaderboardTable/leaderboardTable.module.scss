@@ -297,3 +297,78 @@
     #c4deef
   );
 }
+
+/* Loading skeleton rows */
+
+.skeletonRow {
+	cursor: default;
+	pointer-events: none;
+}
+
+.skeleton {
+	display: block;
+	height: 12px;
+	width: 60%;
+	border-radius: 3px;
+
+	background: linear-gradient(
+		90deg,
+		#dce5ed 25%,
+		#f3f7fa 50%,
+		#dce5ed 75%
+	);
+
+	background-size: 200% 100%;
+	animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonRow .rank .skeleton {
+	width: 18px;
+	margin: 0 auto;
+}
+
+.skeletonRow .player {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.skeletonRow .avatar.skeleton {
+	width: 30px;
+	height: 30px;
+	min-width: 30px;
+	padding: 0;
+	border: 1px solid #b8c8d6;
+	border-radius: var(--xp-radius-sm);
+	box-shadow: none;
+}
+
+.skeletonName {
+	display: block;
+	width: 65%;
+}
+
+.skeletonName .skeleton {
+	width: 100%;
+}
+
+.skeletonRow > .skeleton {
+	width: 24px;
+	margin: 0 auto;
+}
+
+@keyframes skeletonShimmer {
+	0% {
+		background-position: 200% 0;
+	}
+
+	100% {
+		background-position: -200% 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.skeleton {
+		animation: none;
+	}
+}

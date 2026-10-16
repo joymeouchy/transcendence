@@ -35,6 +35,7 @@ export default function GameOverModal({
     <XPModal
       title={rematchDeclined ? "Rematch Declined" : "Match Complete"}
       isOpen={isOpen}
+	    onClose={onExit}
     >
       <div className="game-over">
         {rematchDeclined ? (
