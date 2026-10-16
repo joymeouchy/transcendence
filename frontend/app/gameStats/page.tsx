@@ -93,13 +93,9 @@ export default function GameStatsPage() {
         title="Game Stats"
         onClose={() => router.push("/home")}
         isLoading={
-          activeTab === "history" ? matchesLoading : leaderboardLoading
+          activeTab === "history" ? matchesLoading : false
         }
-        loadingMessage={
-          activeTab === "history"
-            ? "Loading match history..."
-            : "Loading leaderboard..."
-        }
+        loadingMessage="Loading match history..."
       >
         <div className={styles.page}>
           <div className={styles.tabs}>

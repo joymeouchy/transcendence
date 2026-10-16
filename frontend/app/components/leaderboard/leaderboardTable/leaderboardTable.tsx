@@ -51,56 +51,73 @@ export default function LeaderboardTable({
 						<span>Win Rate</span>
 					</div>
 
-					{players.map((player) => {
-						const isCurrentUser = player.id === currentUserId;
-
-						return (
+					{loading ? (
+						Array.from({ length: 5 }).map((_, index) => (
 							<div
-								key={player.id}
-								className={`${styles.row} ${
-									isCurrentUser ? styles.currentUser : ""
-								}`}
-								role="link"
-								tabIndex={0}
-								onClick={() => router.push(`/profile/${player.id}`)}
-								onKeyDown={(e) => {
-									if (e.key === "Enter" || e.key === " ") {
-										e.preventDefault();
-										router.push(`/profile/${player.id}`);
-									}
-								}}
+								key={index}
+								className={`${styles.row} ${styles.skeletonRow}`}
 							>
-								<span className={styles.rank}>{player.rank}</span>
+								<span className={styles.rank}>
+									<span className={styles.skeleton} />
+								</span>
 
 								<div className={styles.player}>
-									{player.avatarUrl ? (
-										<img
-											src={player.avatarUrl}
-											alt=""
-											className={styles.avatar}
-										/>
-									) : (
-										<div className={styles.avatarFallback}>
-											{player.username.charAt(0).toUpperCase()}
-										</div>
-									)}
-
-									<span>{player.username}</span>
+									<span className={`${styles.avatar} ${styles.skeleton}`} />
+									<span className={styles.skeletonName}>
+										<span className={styles.skeleton} />
+									</span>
 								</div>
 
-								<span>{player.wins}</span>
-								<span>{player.losses}</span>
-								<strong>{player.winRate}%</strong>
+								<span className={styles.skeleton} />
+								<span className={styles.skeleton} />
+								<span className={styles.skeleton} />
 							</div>
-						);
-					})}
-				</div>
+						))
+					) : (
+						players.map((player) => {
+							const isCurrentUser = player.id === currentUserId;
 
-				{loading && (
-					<div className={styles.loadingOverlay}>
-						<span>Loading...</span>
-					</div>
-				)}
+							return (
+								<div
+									key={player.id}
+									className={`${styles.row} ${isCurrentUser ? styles.currentUser : ""
+										}`}
+									role="link"
+									tabIndex={0}
+									onClick={() => router.push(`/profile/${player.id}`)}
+									onKeyDown={(e) => {
+										if (e.key === "Enter" || e.key === " ") {
+											e.preventDefault();
+											router.push(`/profile/${player.id}`);
+										}
+									}}
+								>
+									<span className={styles.rank}>{player.rank}</span>
+
+									<div className={styles.player}>
+										{player.avatarUrl ? (
+											<img
+												src={player.avatarUrl}
+												alt=""
+												className={styles.avatar}
+											/>
+										) : (
+											<div className={styles.avatarFallback}>
+												{player.username.charAt(0).toUpperCase()}
+											</div>
+										)}
+
+										<span>{player.username}</span>
+									</div>
+
+									<span>{player.wins}</span>
+									<span>{player.losses}</span>
+									<strong>{player.winRate}%</strong>
+								</div>
+							);
+						})
+					)}
+				</div>
 			</div>
 		</div>
 	);

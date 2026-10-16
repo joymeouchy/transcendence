@@ -28,6 +28,7 @@ export default function Leaderboard({
 			<div className={styles.podium}>
 				<LeaderboardPodium
 					players={players}
+					loading = {loading}
 				/>
 
 				<MyStats
