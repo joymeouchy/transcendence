@@ -87,6 +87,7 @@ export function GameInviteProvider({
 		fromUserId: number,
 		accepted: boolean
 	) {
+		console.log(`[INVITE ${new Date().toISOString().slice(11, 23)}] emitting invite_response`, socket.id, { fromUserId, accepted });
 		if (!socket.connected) return;
 
 		socket.emit("invite_response", {
