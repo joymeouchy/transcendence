@@ -1,0 +1,78 @@
+// ============================================================
+// XP MIXINS: the chrome Tailwind is bad at (bevels, gradients,
+// glossy faces). Layout and spacing belong in Tailwind classes.
+// Usage: `@use "mixins" as m;` then `@include m.xp-gradient(...)`.
+// ============================================================
+
+@use "tokens" as t;
+
+// Vertical two-stop gradient used by every XP bar and button face.
+// $from / $to are token names, e.g. xp-gradient(light-blue, blue).
+@mixin xp-gradient($from, $to, $direction: to bottom) {
+  background: linear-gradient($direction, t.color($from), t.color($to));
+}
+
+// Same gradient but with raw colors (for one-off translucent stops).
+@mixin xp-gradient-raw($from, $to, $direction: to bottom) {
+  background: linear-gradient($direction, $from, $to);
+}
+
+// Raised XP bevel: light top/left edge, dark bottom/right edge.
+@mixin xp-bevel-border($light: t.color(border-light), $dark: t.color(border-dark), $width: 1px) {
+  border-top: $width solid $light;
+  border-left: $width solid $light;
+  border-right: $width solid $dark;
+  border-bottom: $width solid $dark;
+}
+
+// Sunken bevel (text fields, wells): the raised one flipped.
+@mixin xp-bevel-inset($light: t.color(border-light), $dark: t.color(border-dark), $width: 1px) {
+  @include xp-bevel-border($dark, $light, $width);
+}
+
+// Blue window title bar: gradient, white bold text, dark bottom rule.
+@mixin xp-titlebar {
+  @include xp-gradient(light-blue, blue);
+  color: t.color(white);
+  border-bottom: 1px solid t.shade(0.25);
+  user-select: none;
+}
+
+// Glossy raised button face (XPButton and plain dialog buttons).
+@mixin xp-button-face {
+  @include xp-gradient(white, button-face);
+  @include xp-bevel-border;
+  border-radius: t.radius(sm);
+  color: t.color(text);
+  font-family: t.font(main);
+  box-shadow: inset 1px 1px t.tint(0.75);
+  cursor: pointer;
+  user-select: none;
+}
+
+// Classic XP keyboard-focus ring: dotted, drawn inside the control.
+@mixin xp-focus-ring($color: t.color(black), $offset: -4px) {
+  outline: 1px dotted $color;
+  outline-offset: $offset;
+}
+
+// Frosted-glass card used on the login/landing screens.
+@mixin xp-glass($bg: 0.12, $border: 0.2, $blur: 10px) {
+  background: t.tint($bg);
+  border: 1px solid t.tint($border);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+}
+
+// Subtle lift on hover, pressed back on active.
+@mixin xp-press($lift: 1px) {
+  transition: filter 0.15s ease, transform 0.1s ease;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY($lift);
+  }
+}

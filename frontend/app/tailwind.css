@@ -1,0 +1,94 @@
+/*
+ * Tailwind v4 entry. Plain CSS on purpose: v4 must not go through Sass.
+ *
+ * - Preflight (Tailwind's global reset) is intentionally NOT imported:
+ *   it would restyle every button/heading/img and break the XP look.
+ * - @theme holds NO values. It only maps Tailwind names onto the --xp-*
+ *   vars that xp-theme.scss generates from styles/_tokens.scss, so the
+ *   palette is defined once (in SCSS) and shared by both systems.
+ */
+
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@theme inline {
+  /* Only design-system colors, sizes and radii: bg-red-500 won't compile. */
+  --color-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --font-*: initial;
+
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* palette */
+  --color-xp-blue: var(--xp-blue);
+  --color-xp-dark-blue: var(--xp-dark-blue);
+  --color-xp-light-blue: var(--xp-light-blue);
+  --color-xp-sidebar: var(--xp-sidebar);
+  --color-xp-selection: var(--xp-selection);
+  --color-xp-highlight: var(--xp-highlight);
+  --color-xp-link: var(--xp-link);
+  --color-xp-focus: var(--xp-focus);
+  --color-xp-blue-deep: var(--xp-blue-deep);
+  --color-xp-app-bg: var(--xp-app-bg);
+  --color-xp-start: var(--xp-start);
+  --color-xp-start-dark: var(--xp-start-dark);
+  --color-xp-window-bg: var(--xp-window-bg);
+  --color-xp-panel-bg: var(--xp-panel-bg);
+  --color-xp-button-face: var(--xp-button-face);
+  --color-xp-classic-face: var(--xp-classic-face);
+  --color-xp-border-light: var(--xp-border-light);
+  --color-xp-border-dark: var(--xp-border-dark);
+  --color-xp-text: var(--xp-text);
+  --color-xp-white: var(--xp-white);
+  --color-xp-black: var(--xp-black);
+  --color-xp-gray-dark: var(--xp-gray-dark);
+  --color-xp-gray: var(--xp-gray);
+  --color-xp-gray-mid: var(--xp-gray-mid);
+  --color-xp-gray-light: var(--xp-gray-light);
+  --color-xp-close: var(--xp-close);
+  --color-xp-close-dark: var(--xp-close-dark);
+  --color-xp-error: var(--xp-error);
+
+  /* typography */
+  --font-xp: var(--xp-font-main);
+  --font-xp-mono: var(--xp-font-mono);
+
+  --text-xp-3xs: var(--xp-font-size-3xs);
+  --text-xp-2xs: var(--xp-font-size-2xs);
+  --text-xp-xs: var(--xp-font-size-xs);
+  --text-xp-sm: var(--xp-font-size-sm);
+  --text-xp-base: var(--xp-font-size-base);
+  --text-xp-md: var(--xp-font-size-md);
+  --text-xp-lg: var(--xp-font-size-lg);
+  --text-xp-xl: var(--xp-font-size-xl);
+  --text-xp-2xl: var(--xp-font-size-2xl);
+  --text-xp-3xl: var(--xp-font-size-3xl);
+  --text-xp-4xl: var(--xp-font-size-4xl);
+  --text-xp-5xl: var(--xp-font-size-5xl);
+  --text-xp-6xl: var(--xp-font-size-6xl);
+
+  /* spacing (Tailwind's default 4px numeric scale stays available too) */
+  --spacing-xp-2xs: var(--xp-space-2xs);
+  --spacing-xp-xs: var(--xp-space-xs);
+  --spacing-xp-sm: var(--xp-space-sm);
+  --spacing-xp-md: var(--xp-space-md);
+  --spacing-xp-lg: var(--xp-space-lg);
+  --spacing-xp-xl: var(--xp-space-xl);
+  --spacing-xp-2xl: var(--xp-space-2xl);
+  --spacing-xp-3xl: var(--xp-space-3xl);
+
+  /* radii */
+  --radius-xp-2xs: var(--xp-radius-2xs);
+  --radius-xp-xs: var(--xp-radius-xs);
+  --radius-xp-sm: var(--xp-radius-sm);
+  --radius-xp-md: var(--xp-radius-md);
+  --radius-xp-lg: var(--xp-radius-lg);
+  --radius-xp-xl: var(--xp-radius-xl);
+  --radius-xp-2xl: var(--xp-radius-2xl);
+
+  --shadow-xp-window: var(--xp-window-shadow);
+}
