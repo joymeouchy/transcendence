@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import clsx from "clsx";
 import styles from "./ChatInput.module.scss";
 
 interface Props {
@@ -24,8 +25,12 @@ export default function ChatInput({
 	}
 
 	return (
-		<div className={styles.input}>
+		<div className="flex w-full shrink-0 items-end gap-1.5 border-t border-xp-groupbox-border bg-xp-tint-blue p-1.75">
 			<textarea
+				className={clsx(
+					styles.textarea,
+					"max-h-25 min-h-5.5 min-w-0 flex-1 resize-none overflow-y-auto rounded-xp-2xs px-1.5 py-1 font-xp text-xp-sm leading-[15px] outline-none",
+				)}
 				value={value}
 				onChange={(e) =>
 					setValue(e.target.value)
@@ -43,6 +48,10 @@ export default function ChatInput({
 			/>
 
 			<button
+				className={clsx(
+					styles.send,
+					"h-6 min-w-13.75 shrink-0 px-2.5 py-0.75 font-xp text-xp-sm whitespace-nowrap text-xp-ink",
+				)}
 				onClick={handleSend}
 				disabled={!value.trim()}
 			>

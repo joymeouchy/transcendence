@@ -8,8 +8,6 @@ import MessageList, {
 } from "../MessageList/MessageList";
 import ChatInput from "../ChatInput/ChatInput";
 
-import styles from "./ChatPanel.module.scss";
-
 interface Props {
 	user: Friend;
 	currentUserId: number;
@@ -26,7 +24,7 @@ export default function ChatPanel({
 	onSendMessage,
 }: Props) {
 	return (
-		<div className={styles.panel}>
+		<div className="flex size-full min-h-0 flex-col">
 			<ChatHeader user={user} />
 
 			<MessageList
