@@ -90,7 +90,6 @@ export default function useGameSocket() {
         right: string | null;
       };
     }) => {
-
       setRoom(data.room);
 
       const [leftPlayer, rightPlayer] = data.players;
@@ -132,21 +131,38 @@ export default function useGameSocket() {
       setRematchDeclined(true);
     };
 
-const handleRematchFailed = () => {
-  setWaitingRematch(false);
-  setRematchRequested(false);
-  setRematchDeclined(false);
-  setOpponentDisconnected(false);
+    const handleRematchFailed = () => {
+      setWaitingRematch(false);
+      setRematchRequested(false);
+      setRematchDeclined(false);
+      setOpponentDisconnected(false);
 
-  setWinner("");
-  setScoreLeft(0);
-  setScoreRight(0);
-  setOpponentName("");
-  setRoom("");
+      setWinner("");
+      setScoreLeft(0);
+      setScoreRight(0);
+      setOpponentName("");
+      setRoom("");
 
-  setModalState("select");
-};
+      setModalState("select");
+    };
 
+    const handleGameAbandoned = () => {
+      // Match no longer exists server-side: reset locally, emit nothing.
+      setOpponentDisconnected(false);
+      setWinner("");
+      setScoreLeft(0);
+      setScoreRight(0);
+      setOpponentName("");
+      setRoom("");
+      setWaitingRematch(false);
+      setRematchRequested(false);
+      setRematchDeclined(false);
+      setPendingPowerUp(null);
+      setActiveEffects({ left: null, right: null });
+      setPlayerSide("left");
+      previousScore.current = { left: 0, right: 0 };
+      setModalState("select");
+    };
     const handleGameOver = (data: {
       winnerSocketId: string;
       winnerId: number;
@@ -210,6 +226,7 @@ const handleRematchFailed = () => {
     socket.on("invite_error", handleInviteError);
     socket.on("player_disconnected", handleOpponentDisconnected);
     socket.on("player_reconnected", handleOpponentReconnected);
+    socket.on("game_abandoned", handleGameAbandoned);
 
     return () => {
       socket.off("connect", handleConnect);
@@ -228,6 +245,8 @@ const handleRematchFailed = () => {
       socket.off("invite_error", handleInviteError);
       socket.off("player_disconnected", handleOpponentDisconnected);
       socket.off("player_reconnected", handleOpponentReconnected);
+      socket.off("game_abandoned", handleGameAbandoned);
+
     };
   }, [user]);
 
@@ -344,21 +363,21 @@ const handleRematchFailed = () => {
   }
 
   function declineRematch() {
-	if (!room) return;
+    if (!room) return;
 
-	socket.emit("decline_rematch", { room });
+    socket.emit("decline_rematch", { room });
 
-	setRematchRequested(false);
-	setRematchDeclined(false);
+    setRematchRequested(false);
+    setRematchDeclined(false);
 
-	setWinner("");
-	setScoreLeft(0);
-	setScoreRight(0);
-	setOpponentName("");
-	setRoom("");
+    setWinner("");
+    setScoreLeft(0);
+    setScoreRight(0);
+    setOpponentName("");
+    setRoom("");
 
-	setModalState("select");
-}
+    setModalState("select");
+  }
 
   function findAnotherPlayer() {
     setOpponentDisconnected(false);
