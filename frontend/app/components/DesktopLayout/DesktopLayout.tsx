@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { desktopThemes } from "../DesktopCustomizationModal/desktopCustomization";
 import { images } from "@/lib/images";
 
+import clsx from "clsx";
 import "./DesktopLayout.scss";
 
 type DesktopLayoutProps = {
@@ -30,11 +31,12 @@ export default function DesktopLayout({
 		images.windowsDefaultWallpaper;
 
 	return (
-		<div className="xp-desktop">
+		<div className="relative isolate flex h-screen w-screen overflow-hidden">
 			<div
-				className={`xp-desktop-wallpaper ${
-					loading ? "is-loading" : ""
-				}`}
+				className={clsx(
+					"xp-desktop-wallpaper pointer-events-none absolute -inset-3.5 -z-1 bg-cover bg-center bg-no-repeat",
+					loading && "is-loading",
+				)}
 				style={{
 					backgroundImage: `url(${wallpaper})`,
 				}}
@@ -42,7 +44,7 @@ export default function DesktopLayout({
 
 			<Sidebar />
 
-			<main className="xp-desktop-content">
+			<main className="flex min-w-0 flex-1 items-start overflow-auto p-10">
 				{children}
 			</main>
 

@@ -62,13 +62,14 @@ export const gameStatsItem = {
 export const marvinItem = {
   image: images.marvin,
   label: "Marvin",
-  position: "marvin",
+  // Tailwind classes placing the icon on the desktop
+  position: "top-[75%] left-[82%]",
 };
 
 export const deepThoughtItem = {
   image: images.deepthought,
   label: "Deep Thought",
-  position: "deep-thought",
+  position: "top-[15%] left-[60%]",
 };
 
 export const paintItem = {
