@@ -1,4 +1,5 @@
 @use "tokens" as t;
+@use "mixins" as m;
 
 .xp-start {
   display: flex;
@@ -14,23 +15,18 @@
   color: t.color(white);
   font-weight: bold;
 
-  background: linear-gradient(
-    to bottom,
-    t.color(start),
-    t.color(start-dark)
-  );
-
+  @include m.xp-gradient(start, start-dark);
   border-right: 1px solid t.shade(0.25);
 
   transition: filter 0.15s ease, transform 0.1s ease;
-}
 
-.xp-start:hover {
-  filter: brightness(1.1);
-}
+  &:hover {
+    filter: brightness(1.1);
+  }
 
-.xp-start:active,
-.xp-start.active {
-  filter: brightness(0.9);
-  transform: translateY(1px);
+  &:active,
+  &.active {
+    filter: brightness(0.9);
+    transform: translateY(1px);
+  }
 }

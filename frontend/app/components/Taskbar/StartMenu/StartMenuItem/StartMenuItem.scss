@@ -19,30 +19,28 @@
   outline: none;
 
   transition: background 0.1s ease, color 0.1s ease;
-}
 
-.xp-start-menu-item img {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-}
+  img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
 
-/* normal hover */
-.xp-start-menu-item:hover {
-  background: t.color(selection);
-  color: t.color(white);
-}
+  &:hover {
+    background: t.color(selection);
+    color: t.color(white);
+  }
 
-/* danger variant */
-.xp-start-menu-item--danger {
-  gap: 1px;
-  padding: 0px 0px;
-  color: t.color(white);
-}
+  // Sign-out entry in the blue footer: white text, dotted focus on hover
+  &--danger {
+    gap: 1px;
+    padding: 0px 0px;
+    color: t.color(white);
 
-/* override hover completely */
-.xp-start-menu-item--danger:hover {
-  background: transparent;
-  outline: 1px dotted t.tint(0.8);
-  outline-offset: -2px;
+    &:hover {
+      background: transparent;
+      outline: 1px dotted t.tint(0.8);
+      outline-offset: -2px;
+    }
+  }
 }
