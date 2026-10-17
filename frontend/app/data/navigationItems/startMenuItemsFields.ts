@@ -3,7 +3,6 @@ import {
   profileItem,
   gameItem,
   customizationItem,
-  achievementsItem,
   termsOfServicesItem,
   privacyPolicyItem,
   friendshipsItem,
