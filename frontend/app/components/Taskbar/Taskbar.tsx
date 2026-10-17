@@ -11,7 +11,7 @@ export default function Taskbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="xp-taskbar">
+    <div className="xp-taskbar fixed inset-x-0 bottom-0 z-1000 flex h-10 items-center justify-between p-0 font-xp text-xp-md text-xp-white">
 
       <StartButton
         open={open}
