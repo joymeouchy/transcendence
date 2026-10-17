@@ -33,12 +33,7 @@ export const friendshipsItem = {
 export const customizationItem = {
   image: images.customization,
   label: "Customize",
-};
-
-export const achievementsItem = {
-  image: images.achievements,
-  label: "Achievements",
-  href: "/achievements",
+  position: "top-[30%] left-[40%]",
 };
 
 export const privacyPolicyItem = {
