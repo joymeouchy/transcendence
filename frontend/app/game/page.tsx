@@ -104,14 +104,14 @@ export default function GamePage() {
 
 	return (
 		<div
-			className="game-page"
+			className="game-page relative isolate flex h-screen w-full items-center justify-center overflow-hidden bg-xp-app-bg"
 			style={{
 				"--game-background-image": `url("${backgroundImage}")`,
 			} as React.CSSProperties}
 		>
-			<div className="game-page__background" />
+			<div className="game-page__background pointer-events-none absolute -inset-5 -z-1 bg-cover bg-center bg-no-repeat" />
 
-			<div className="game-container">
+			<div className="relative flex w-[min(78vw,calc((100vh_-_100px)*4/3))] min-w-0 shrink items-center justify-center gap-4 max-[1100px]:flex-col max-[1100px]:gap-0">
 
 				<PlayerInfo
 					side={game.playerSide}

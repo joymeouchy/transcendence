@@ -7,7 +7,10 @@ import {
 } from "@/services/Customization.services";
 import { gameThemes } from "@/app/data/game/gameCustomization";
 import { API_URL } from "@/lib/api";
+import clsx from "clsx";
 import "./CustomizationModal.scss";
+
+const paddleClass = "absolute top-1/2 h-12.5 w-3 -translate-y-1/2 object-contain";
 
 type Props = {
   isOpen: boolean;
@@ -66,8 +69,8 @@ export default function CustomizationModal({ isOpen, onBack, onSave }: Props) {
       isLoading={loading || saving}
       loadingMessage={saving ? "Saving theme..." : "Loading themes..."}
     >
-      <div className="customization">
-        <div className="theme-list">
+      <div className="flex h-auto max-h-[75vh] min-h-0 flex-col gap-2.5">
+        <div className="grid max-h-80 min-h-0 flex-initial grid-cols-2 content-start items-start gap-2.5 overflow-x-hidden overflow-y-auto pt-1 pr-2 pb-1 pl-1 [@media(max-height:700px)]:max-h-60">
           {themes.map((theme) => {
             const background = getAssetUrl(
               theme.backgroundImageUrl ?? gameThemes.classic.background
@@ -84,36 +87,37 @@ export default function CustomizationModal({ isOpen, onBack, onSave }: Props) {
             return (
               <button
                 key={theme.id}
-                className={`theme-card ${
-                  selectedTheme === theme.name ? "selected" : ""
-                }`}
+                className={clsx(
+                  "game-theme-card flex h-auto cursor-pointer flex-col items-center justify-start gap-2 self-start rounded-xp-lg bg-transparent p-2.5 text-xp-black",
+                  selectedTheme === theme.name && "selected",
+                )}
                 onClick={() => setSelectedTheme(theme.name)}
                 disabled={saving}
               >
-                <div className="theme-preview">
+                <div className="relative aspect-22/13 h-auto w-45 max-w-full shrink-0 overflow-hidden rounded-xp-md bg-xp-black [@media(max-height:700px)]:w-37.5">
                   <img
-                    className="preview-background"
+                    className="absolute inset-0 size-full object-cover"
                     src={background}
                     alt="background"
                   />
                   <img
-                    className="preview-paddle left"
+                    className={clsx(paddleClass, "left-3.75")}
                     src={leftPaddle}
                     alt="left paddle"
                   />
                   <img
-                    className="preview-paddle right"
+                    className={clsx(paddleClass, "right-3.75")}
                     src={rightPaddle}
                     alt="right paddle"
                   />
-                  <img className="preview-ball" src={ball} alt="ball" />
+                  <img className="absolute top-1/2 left-1/2 size-5 -translate-x-1/2 -translate-y-1/2 object-contain" src={ball} alt="ball" />
                 </div>
-                <span>{theme.name}</span>
+                <span className="font-bold text-xp-black">{theme.name}</span>
               </button>
             );
           })}
         </div>
-        <div className="customization_actions">
+        <div className="mt-1.5 flex shrink-0 justify-end gap-2.5">
           <button onClick={handleSave} disabled={saving}>
             {saving ? "Saving..." : "Save"}
           </button>

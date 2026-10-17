@@ -208,3 +208,36 @@
   background: linear-gradient(to bottom, map.get($m, top), map.get($m, bottom));
   border-color: map.get($m, light) map.get($m, dark) map.get($m, dark) map.get($m, light);
 }
+
+// Selectable picture card (wallpaper / game theme pickers).
+// $idle-when-disabled: no hover feedback on disabled cards.
+@mixin xp-pick-card($transition, $idle-when-disabled: false) {
+  $enabled: "";
+  @if $idle-when-disabled {
+    $enabled: ":not(:disabled)";
+  }
+
+  border: 2px solid transparent;
+  transition: $transition;
+
+  &:hover#{$enabled} {
+    border-color: t.color(pick-hover);
+    transform: translateY(-2px);
+  }
+
+  &.selected {
+    border-color: t.color(pick);
+    background: t.alpha(pick, 0.15);
+    box-shadow: 0 0 8px t.alpha(pick, 0.35);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &:disabled:hover {
+    transform: none;
+    border-color: transparent;
+  }
+}
