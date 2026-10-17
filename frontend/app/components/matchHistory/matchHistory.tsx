@@ -10,8 +10,6 @@ import MatchStats from "./matchStats/matchStats";
 import MatchHistoryChart from "./matchHistoryChart/matchHistoryChart";
 import MatchList from "./matchList/matchList";
 
-import styles from "./matchHistory.module.scss";
-
 export type MatchFilter =
 	| "all"
 	| "win"
@@ -39,11 +37,11 @@ export default function MatchHistory({
 	}, [matches, filter]);
 
 	return (
-		<div className={styles.page}>
+		<div className="flex w-full min-h-0 min-w-0 flex-col font-xp">
 			<MatchStats matches={matches} />
 
-			<div className={styles.dashboard}>
-				<div className={styles.matchHistory}>
+			<div className="grid min-h-0 min-w-0 flex-1 grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-xp-md overflow-hidden max-[800px]:grid-cols-[1fr] max-[800px]:overflow-x-hidden max-[800px]:overflow-y-auto">
+				<div className="flex min-h-0 min-w-0 flex-col overflow-hidden max-[800px]:min-h-80">
 					<MatchList
 						matches={filteredMatches}
 						filter={filter}
@@ -51,7 +49,7 @@ export default function MatchHistory({
 					/>
 				</div>
 
-				<div className={styles.rightColumn}>
+				<div className="flex min-h-0 min-w-0 flex-col gap-xp-md overflow-hidden max-[800px]:min-h-80">
 					<MatchHistoryChart
 						matches={matches}
 					/>

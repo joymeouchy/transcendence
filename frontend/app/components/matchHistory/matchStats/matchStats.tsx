@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import { MatchHistory } from "@/services/user.services";
 
+import clsx from "clsx";
 import styles from "./matchStats.module.scss"
 
 interface Props {
@@ -43,50 +44,33 @@ export default function MatchStats({
 	}, [matches]);
 
 	return (
-		<div className={styles.stats}>
-			<div className={styles.statBox}>
-				<span className={styles.label}>
-					MATCHES
-				</span>
+		<div className="mb-xp-md grid min-w-0 grid-cols-4 gap-xp-sm max-[650px]:grid-cols-2 max-[400px]:gap-xp-xs">
+			<StatBox label="MATCHES" value={stats.total} />
+			<StatBox label="WINS" value={stats.wins} color="text-xp-win" />
+			<StatBox label="LOSSES" value={stats.losses} color="text-xp-danger" />
+			<StatBox label="WIN RATE" value={`${stats.winRate}%`} />
+		</div>
+	);
+}
 
-				<span className={styles.value}>
-					{stats.total}
-				</span>
-			</div>
+function StatBox({
+	label,
+	value,
+	color = "text-xp-blue",
+}: {
+	label: string;
+	value: number | string;
+	color?: string;
+}) {
+	return (
+		<div className={clsx(styles.statBox, "flex min-h-16.25 flex-col items-center justify-center rounded-xp-sm p-xp-sm font-xp max-[400px]:min-h-14.5 max-[400px]:p-1.5")}>
+			<span className="mb-1 text-xp-xs font-bold whitespace-nowrap text-xp-slate max-[400px]:text-xp-2xs">
+				{label}
+			</span>
 
-			<div className={styles.statBox}>
-				<span className={styles.label}>
-					WINS
-				</span>
-
-				<span
-					className={`${styles.value} ${styles.win}`}
-				>
-					{stats.wins}
-				</span>
-			</div>
-
-			<div className={styles.statBox}>
-				<span className={styles.label}>
-					LOSSES
-				</span>
-
-				<span
-					className={`${styles.value} ${styles.loss}`}
-				>
-					{stats.losses}
-				</span>
-			</div>
-
-			<div className={styles.statBox}>
-				<span className={styles.label}>
-					WIN RATE
-				</span>
-
-				<span className={styles.value}>
-					{stats.winRate}%
-				</span>
-			</div>
+			<span className={clsx("text-xp-3xl leading-none font-bold max-[400px]:text-xp-2xl", color)}>
+				{value}
+			</span>
 		</div>
 	);
 }

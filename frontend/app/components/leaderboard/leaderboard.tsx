@@ -4,8 +4,6 @@ import LeaderboardTable from "./leaderboardTable/leaderboardTable";
 import { LeaderboardPlayer } from "@/services/user.services";
 import MyStats from "./MyStats/myStats";
 
-import styles from "./leaderboard.module.scss";
-
 type LeaderboardScope = "all" | "friends";
 
 type LeaderboardProps = {
@@ -24,8 +22,8 @@ export default function Leaderboard({
 	loading,
 }: LeaderboardProps) {
 	return (
-		<div className={styles.leaderboard}>
-			<div className={styles.podium}>
+		<div className="grid w-full min-w-0 grid-cols-[280px_minmax(0,1fr)] gap-xp-md max-[750px]:grid-cols-[1fr] max-[480px]:gap-xp-sm">
+			<div>
 				<LeaderboardPodium
 					players={players}
 					loading = {loading}
@@ -37,7 +35,7 @@ export default function Leaderboard({
 				/>
 			</div>
 
-			<div className={styles.table}>
+			<div className="w-full min-w-0">
 				<LeaderboardTable
 					players={players}
 					currentUserId={currentUserId}
