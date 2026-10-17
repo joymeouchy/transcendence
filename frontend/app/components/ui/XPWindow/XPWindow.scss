@@ -1,145 +1,39 @@
-/* xp-window.scss */
+@use "tokens" as t;
+@use "mixins" as m;
 
-.xp-window-outline {
-	background: var(--xp-blue);
-
-	padding: 2px;
-
-	border-radius: var(--xp-radius-md);
-
-	font-family: var(--xp-font-main);
-
-	color: var(--xp-text);
-
-	overflow: hidden;
-
-	box-shadow: var(--xp-window-shadow);
-}
+// Layout lives in XPWindow.tsx (Tailwind). SCSS draws the Luna chrome.
 
 .xp-window {
-	background: var(--xp-window-bg);
-
-	border-radius: calc(var(--xp-radius-md) - 2px);
-
-	overflow: hidden;
-		z-index: 10;
-			position: relative;
-
-	min-width: 300px;
-
-	/* Allow the window to fit on the screen */
-	max-width: 90vw;
-	max-height: 85vh;
-
-	display: flex;
-	flex-direction: column;
+  // inner corner = outer radius minus the 2px blue frame
+  border-radius: t.radius(md) - 2px;
 }
-
-/* TITLE BAR */
 
 .xp-titlebar {
-	height: 32px;
-
-	flex-shrink: 0;
-
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-
-	padding: 0 var(--xp-space-sm);
-
-	background: linear-gradient(
-		to bottom,
-		var(--xp-light-blue),
-		var(--xp-blue)
-	);
-
-	color: white;
-
-	border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-
-	user-select: none;
+  @include m.xp-titlebar;
 }
 
+// Also used by the auth forms' headings for the same embossed look.
 .xp-title {
-	font-size: 13px;
-	font-weight: bold;
-
-	text-shadow: 1px 1px rgba(0, 0, 0, 0.35);
+  text-shadow: 1px 1px t.shade(0.35);
 }
-
-/* CLOSE BUTTON */
 
 .xp-close-btn {
-	width: 22px;
-	height: 22px;
+  @include m.xp-gradient(close, close-dark);
+  border: 1px solid t.shade(0.35);
+  border-radius: t.radius(sm);
+  box-shadow: inset 1px 1px t.tint(0.35);
 
-	display: flex;
-	align-items: center;
-	justify-content: center;
+  transition: filter 0.15s ease, transform 0.1s ease;
 
-	background: linear-gradient(
-		to bottom,
-		#ff846e,
-		#d9544f
-	);
+  &:hover {
+    filter: brightness(1.08);
+  }
 
-	border: 1px solid rgba(0, 0, 0, 0.35);
-
-	border-radius: var(--xp-radius-sm);
-
-	color: white;
-
-	font-size: 11px;
-	font-weight: bold;
-
-	cursor: pointer;
-
-	box-shadow:
-		inset 1px 1px rgba(255, 255, 255, 0.35);
-
-	transition:
-		filter 0.15s ease,
-		transform 0.1s ease;
-
-	&:hover {
-		filter: brightness(1.08);
-	}
-
-	&:active {
-		transform: translateY(1px);
-	}
+  &:active {
+    transform: translateY(1px);
+  }
 }
-
-/* CONTENT */
-
-
-/* CONTENT */
 
 .xp-content {
-  background: var(--xp-window-bg);
-
-  padding: var(--xp-space-md);
-
-  font-size: 13px;
-
-  border-top: 1px solid rgba(255, 255, 255, 0.65);
-
-  /* Layout */
-  flex: 1;
-  min-height: 0;
-
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  /* Allow the loading overlay to cover the content */
-  position: relative;
-}
-
-/* TITLE ACTIONS */
-
-.xp-title-actions {
-	display: flex;
-	align-items: center;
-	gap: 4px;
+  border-top: 1px solid t.tint(0.65);
 }

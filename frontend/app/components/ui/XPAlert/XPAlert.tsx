@@ -2,7 +2,7 @@
 
 import XPModal from "../XPModal/XPModal";
 
-import styles from "./XPAlert.module.scss";
+import clsx from "clsx";
 
 interface Props {
 	isOpen: boolean;
@@ -32,17 +32,19 @@ export default function XPAlert({
 			isOpen={isOpen}
 			onClose={onClose}
 		>
-			<div className={styles.alert}>
-				<div className={styles.message}>
+			<div className="flex min-w-62.5 flex-col items-center gap-5 p-5">
+				<div className="text-center">
 					{message}
 				</div>
 
 				<div
-					className={`${styles.actions} ${!showCancel ? styles.center : ""
-						}`}
+					className={clsx(
+						"flex w-45",
+						showCancel ? "justify-between" : "justify-center",
+					)}
 				>
 					<button
-						className={styles.button}
+						className="min-w-17.5 cursor-pointer px-4 py-1"
 						onClick={handleConfirm}
 					>
 						OK
@@ -50,7 +52,7 @@ export default function XPAlert({
 
 					{showCancel && (
 						<button
-							className={styles.button}
+							className="min-w-17.5 cursor-pointer px-4 py-1"
 							onClick={onClose}
 						>
 							Cancel

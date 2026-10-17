@@ -42,10 +42,28 @@ $colors: (
   "text": #000000,
   "white": #ffffff,
   "black": #000000,
-  "gray-dark": #222222,
-  "gray": #666666,
-  "gray-mid": #808080,
-  "gray-light": #cccccc,
+
+  // Neutral scale (exact legacy values, darkest = highest number)
+  "gray-950": #111111,
+  "gray-900": #222222,
+  "gray-800": #333333,
+  "gray-700": #555555,
+  "gray-600": #666666,
+  "gray-550": #707070,
+  "gray-500": #777777,
+  "gray-450": #808080,
+  "gray-400": #888888,
+  "gray-350": #999999,
+  "gray-300": #aaaaaa,
+  "gray-250": #b5b5b5,
+  "gray-200": #c0c0c0,
+  "gray-150": #cccccc,
+  "gray-125": #d0d0d0,
+  "gray-100": #d7d7d7,
+  "gray-75": #e0e0e0,
+  "gray-50": #eeeeee,
+  "gray-25": #f0f0f0,
+  "gray-10": #f5f5f5,
 
   // Close button / errors
   "close": #ff846e,
@@ -107,8 +125,9 @@ $shadows: (
 // ---------- ACCESSORS ----------
 // Throw at compile time on a typo instead of silently emitting nothing.
 @function _get($map, $key, $kind) {
-  // `blue`/`white` unquoted are Sass colors, not strings: use their name.
-  @if meta.type-of($key) == "color" {
+  // Unquoted `blue` is a Sass color and `2xs` a number with unit "xs":
+  // turn both back into their written name.
+  @if meta.type-of($key) == "color" or meta.type-of($key) == "number" {
     $key: meta.inspect($key);
   }
   @if not map.has-key($map, $key) {

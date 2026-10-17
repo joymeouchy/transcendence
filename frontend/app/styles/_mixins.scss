@@ -43,8 +43,6 @@
   @include xp-gradient(white, button-face);
   @include xp-bevel-border;
   border-radius: t.radius(sm);
-  color: t.color(text);
-  font-family: t.font(main);
   box-shadow: inset 1px 1px t.tint(0.75);
   cursor: pointer;
   user-select: none;
