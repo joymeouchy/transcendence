@@ -83,17 +83,23 @@
 }
 
 // Flat pale-blue toolbar button (Add / Remove / Accept / View stats).
-@mixin xp-tool-button {
+// $idle-when-disabled: no hover/press feedback while disabled.
+@mixin xp-tool-button($idle-when-disabled: false) {
+  $enabled: "";
+  @if $idle-when-disabled {
+    $enabled: ":not(:disabled)";
+  }
+
   background: t.color(tint-blue);
   border: 1px solid t.color(border-dark);
   border-radius: t.radius(sm);
   cursor: pointer;
 
-  &:hover {
+  &:hover#{$enabled} {
     background: t.color(row-hover);
   }
 
-  &:active {
+  &:active#{$enabled} {
     background: t.color(row-active);
   }
 

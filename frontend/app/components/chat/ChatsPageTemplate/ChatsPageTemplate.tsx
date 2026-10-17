@@ -10,6 +10,7 @@ import ChatPanel from "../../chat/ChatPanel/ChatPanel";
 
 import { Friend, UserProfile } from "@/types/types.dto";
 
+import clsx from "clsx";
 import styles from "./ChatsPageTemplate.module.scss";
 import { Message } from "@/types/messages";
 import { MessagesService } from "@/services/messages.services";
@@ -142,8 +143,8 @@ export default function ChatsPageTemplate({
         isLoading={loading}
         loadingMessage="Loading chats..."
       >
-        <div className={styles.page}>
-          <div className={styles.friendsPanel}>
+        <div className="flex h-100 w-150 max-w-full gap-2.5 overflow-hidden p-1.25 font-xp max-[600px]:h-[70dvh] max-[600px]:min-h-87.5 max-[600px]:w-full max-[600px]:flex-col">
+          <div className="h-full w-50 shrink-0 max-[600px]:h-32.5 max-[600px]:w-full max-[600px]:border-b max-[600px]:border-xp-groupbox-border">
             <FriendsListPanel
               friends={friends}
               selectedFriendId={selectedFriend?.id}
@@ -152,7 +153,12 @@ export default function ChatsPageTemplate({
             />
           </div>
 
-          <div className={styles.chatPanel}>
+          <div
+            className={clsx(
+              styles.chatPanel,
+              "h-full min-h-0 min-w-0 flex-1 overflow-hidden rounded-xp-sm bg-xp-window-bg max-[600px]:h-auto max-[600px]:w-full",
+            )}
+          >
             {selectedFriend ? (
               <ChatPanel
                 user={selectedFriend}
@@ -162,7 +168,7 @@ export default function ChatsPageTemplate({
                 onSendMessage={handleSendMessage}
               />
             ) : (
-              <div className={styles.empty}>
+              <div>
                 Select a friend to start chatting
               </div>
             )}

@@ -1,63 +1,6 @@
-.page {
-	display: flex;
+@use "mixins" as m;
 
-	width: 600px;
-	max-width: 100%;
-	height: 400px;
-
-	gap: 10px;
-	padding: 5px;
-
-	font-family: var(--xp-font-main);
-	box-sizing: border-box;
-	overflow: hidden;
-}
-
-.friendsPanel {
-	width: 200px;
-	height: 100%;
-	flex-shrink: 0;
-}
-
+// Layout lives in ChatsPageTemplate.tsx (Tailwind). SCSS: etched chat frame.
 .chatPanel {
-	flex: 1;
-	min-width: 0;
-	min-height: 0;
-	height: 100%;
-
-	border: 1px solid #8a9aaa;
-	border-radius: var(--xp-radius-sm);
-	background: var(--xp-window-bg);
-
-	box-shadow:
-		inset 1px 1px rgba(255, 255, 255, 0.9),
-		0 1px 2px rgba(0, 0, 0, 0.12);
-
-	box-sizing: border-box;
-	overflow: hidden;
-}
-
-@media (max-width: 600px) {
-	.page {
-		width: 100%;
-		height: 70dvh;
-		min-height: 350px;
-		flex-direction: column;
-	}
-
-	.friendsPanel {
-		width: 100%;
-		height: 130px;
-		flex-shrink: 0;
-
-		border-right: none;
-		border-bottom: 1px solid #8a9aaa;
-	}
-
-	.chatPanel {
-		width: 100%;
-		height: auto;
-		flex: 1;
-		min-height: 0;
-	}
+	@include m.xp-groupbox;
 }
