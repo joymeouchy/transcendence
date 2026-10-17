@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -8,47 +7,51 @@ import DesktopIcon from "../Sidebar/DesktopIcon/DesktopIcon";
 import { floatingIcons } from "@/app/data/navigationItems/FloatingIconsFields";
 import DeepThoughtModal from "../deepThoughtModal/deepThoughtModal";
 import MarvinModal from "../marvinModal/marvinModal";
+import DesktopCustomizationModal from "../DesktopCustomizationModal/DesktopCustomizationModal";
 
 export default function FloatingIcons() {
-    const router = useRouter();
+  const router = useRouter();
 
-    const [deepThoughtOpen, setDeepThoughtOpen] = useState(false);
-    const [marvinOpen, setMarvinOpen] = useState(false);
+  const [deepThoughtOpen, setDeepThoughtOpen] = useState(false);
+  const [marvinOpen, setMarvinOpen] = useState(false);
+  const [CustomizeOpen, setCustomizeOpen] = useState(false);
 
-    return (
-        <>
-            <div className="pointer-events-none absolute inset-0 z-1">
-                {floatingIcons.map((icon) => (
-                    <div
-                        key={icon.label}
-                        className={`pointer-events-auto absolute ${icon.position}`}
-                    >
-                        <DesktopIcon
-                            image={icon.image}
-                            label={icon.label}
-                            onClick={() => {
-                                if (icon.label === "Deep Thought") {
-                                    setDeepThoughtOpen(true);
-                                }
+  return (
+    <>
+      <div className="pointer-events-none absolute inset-0 z-1">
+        {floatingIcons.map((icon) => (
+          <div
+            key={icon.label}
+            className={`pointer-events-auto absolute ${icon.position}`}
+          >
+            <DesktopIcon
+              image={icon.image}
+              label={icon.label}
+              onClick={() => {
+                if (icon.label === "Deep Thought") {
+                  setDeepThoughtOpen(true);
+                }
 
-                                if (icon.label === "Marvin") {
-                                    setMarvinOpen(true);
-                                }
-                            }}
-                        />
-                    </div>
-                ))}
-            </div>
+                if (icon.label === "Marvin") {
+                  setMarvinOpen(true);
+                }
 
-            <DeepThoughtModal
-                isOpen={deepThoughtOpen}
-                onClose={() => setDeepThoughtOpen(false)}
+                if (icon.label === "Customize") {
+                  setCustomizeOpen(true);
+                }
+              }}
             />
+          </div>
+        ))}
+      </div>
 
-            <MarvinModal
-                isOpen={marvinOpen}
-                onClose={() => setMarvinOpen(false)}
-            />
-        </>
-    );
+      <DeepThoughtModal
+        isOpen={deepThoughtOpen}
+        onClose={() => setDeepThoughtOpen(false)}
+      />
+
+      <MarvinModal isOpen={marvinOpen} onClose={() => setMarvinOpen(false)} />
+      <DesktopCustomizationModal isOpen={CustomizeOpen} onClose={() => setCustomizeOpen(false)} />
+    </>
+  );
 }
