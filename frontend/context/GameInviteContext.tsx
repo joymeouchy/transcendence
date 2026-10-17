@@ -1,129 +1,108 @@
 "use client";
 
-import {
-	createContext,
-	useContext,
-	useEffect,
-	useState,
-} from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 
 import { socket } from "@/lib/socket";
 
 export type IncomingInvite = {
-	fromUserId: number;
-	fromUsername: string;
-	fromAvatarUrl: string | null;
-	winningScore: number;
+  fromUserId: number;
+  fromUsername: string;
+  fromAvatarUrl: string | null;
+  winningScore: number;
 };
 
 type GameInviteContextType = {
-	incomingInvite: IncomingInvite | null;
-	respondToInvite: (
-		fromUserId: number,
-		accepted: boolean
-	) => void;
-	clearIncomingInvite: () => void;
+  incomingInvite: IncomingInvite | null;
+  isJoiningGame: boolean;
+  respondToInvite: (fromUserId: number, accepted: boolean) => void;
+  clearIncomingInvite: () => void;
+  clearJoiningGame: () => void;
 };
 
-const GameInviteContext =
-	createContext<GameInviteContextType | undefined>(
-		undefined
-	);
+const GameInviteContext = createContext<GameInviteContextType | undefined>(
+  undefined
+);
 
 export function GameInviteProvider({
-	children,
+  children,
 }: {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-	const [incomingInvite, setIncomingInvite] =
-		useState<IncomingInvite | null>(null);
+  const [incomingInvite, setIncomingInvite] = useState<IncomingInvite | null>(
+    null
+  );
+  const [isJoiningGame, setIsJoiningGame] = useState(false);
 
-	useEffect(() => {
-		const handleInviteReceived = (
-			data: IncomingInvite
-		) => {
-			setIncomingInvite(data);
-		};
+  useEffect(() => {
+    const handleInviteReceived = (data: IncomingInvite) => {
+      setIncomingInvite(data);
+    };
 
-		const handleInviteCancelled = (data: {
-			fromUserId: number;
-		}) => {
+    const handleInviteCancelled = (data: { fromUserId: number }) => {
+      setIncomingInvite((current) => {
+        if (current?.fromUserId === data.fromUserId) {
+          return null;
+        }
 
-			setIncomingInvite((current) => {
-				if (
-					current?.fromUserId ===
-					data.fromUserId
-				) {
-					return null;
-				}
+        return current;
+      });
+    };
 
-				return current;
-			});
-		};
+    socket.on("invite_received", handleInviteReceived);
 
-		socket.on(
-			"invite_received",
-			handleInviteReceived
-		);
+    socket.on("invite_cancelled", handleInviteCancelled);
 
-		socket.on(
-			"invite_cancelled",
-			handleInviteCancelled
-		);
+    return () => {
+      socket.off("invite_received", handleInviteReceived);
 
-		return () => {
-			socket.off(
-				"invite_received",
-				handleInviteReceived
-			);
+      socket.off("invite_cancelled", handleInviteCancelled);
+    };
+  }, []);
 
-			socket.off(
-				"invite_cancelled",
-				handleInviteCancelled
-			);
-		};
-	}, []);
+  function respondToInvite(fromUserId: number, accepted: boolean) {
+    if (!socket.connected) return;
 
-	function respondToInvite(
-		fromUserId: number,
-		accepted: boolean
-	) {
-		if (!socket.connected) return;
+    if (accepted) {
+      setIsJoiningGame(true);
+    }
 
-		socket.emit("invite_response", {
-			fromUserId,
-			accepted,
-		});
+    socket.emit("invite_response", {
+      fromUserId,
+      accepted,
+    });
 
-		setIncomingInvite(null);
-	}
+    setIncomingInvite(null);
+  }
 
-	function clearIncomingInvite() {
-		setIncomingInvite(null);
-	}
+  const clearJoiningGame = useCallback(() => {
+  setIsJoiningGame(false);
+}, []);
 
-	return (
-		<GameInviteContext.Provider
-			value={{
-				incomingInvite,
-				respondToInvite,
-				clearIncomingInvite,
-			}}
-		>
-			{children}
-		</GameInviteContext.Provider>
-	);
+  function clearIncomingInvite() {
+    setIncomingInvite(null);
+  }
+
+  return (
+    <GameInviteContext.Provider
+      value={{
+        incomingInvite,
+        isJoiningGame,
+        respondToInvite,
+        clearIncomingInvite,
+        clearJoiningGame,
+      }}
+    >
+      {children}
+    </GameInviteContext.Provider>
+  );
 }
 
 export function useGameInvite() {
-	const context =
-		useContext(GameInviteContext);
+  const context = useContext(GameInviteContext);
 
-	if (!context) {
-		throw new Error(
-			"useGameInvite must be used inside GameInviteProvider"
-		);
-	}
+  if (!context) {
+    throw new Error("useGameInvite must be used inside GameInviteProvider");
+  }
 
-	return context;
+  return context;
 }

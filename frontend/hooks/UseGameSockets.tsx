@@ -22,7 +22,7 @@ type ModalState =
 export default function useGameSocket() {
   const { user } = useAuth();
 
-  const { incomingInvite, respondToInvite } = useGameInvite();
+  const { incomingInvite, respondToInvite, clearJoiningGame } = useGameInvite();
 
   const [modalState, setModalState] = useState<ModalState>("select");
 
@@ -90,6 +90,7 @@ export default function useGameSocket() {
         right: string | null;
       };
     }) => {
+      clearJoiningGame();
       setRoom(data.room);
 
       const [leftPlayer, rightPlayer] = data.players;
@@ -246,9 +247,8 @@ export default function useGameSocket() {
       socket.off("player_disconnected", handleOpponentDisconnected);
       socket.off("player_reconnected", handleOpponentReconnected);
       socket.off("game_abandoned", handleGameAbandoned);
-
     };
-  }, [user]);
+  }, [user, clearJoiningGame]);
 
   const leaveGame = () => {
     if (!socket.connected || !room) return;
