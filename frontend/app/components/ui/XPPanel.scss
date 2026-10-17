@@ -1,8 +1,0 @@
-@use "tokens" as t;
-@use "mixins" as m;
-
-// Layout lives in XPPanel.tsx (Tailwind). SCSS: raised bevel.
-.xp-panel {
-  @include m.xp-bevel-border(t.tint(0.9), t.color(border-dark));
-  box-shadow: inset 1px 1px t.shade(0.05);
-}

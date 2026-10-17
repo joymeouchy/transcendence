@@ -42,5 +42,5 @@ export default function GameInvitePopup() {
 			onDecline={handleDecline}
 			onClose={handleDecline}
 		/>
-	);
+	); 
 }

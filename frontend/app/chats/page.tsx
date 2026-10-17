@@ -18,9 +18,10 @@ export default function ChatsPage() {
   useEffect(() => {
     if (!user) return;
 
+    const userId = user.id;
     async function loadFriends() {
       try {
-        const friendsData = await FriendshipService.getFriends(user.id);
+        const friendsData = await FriendshipService.getFriends(userId);
 
         setFriends(friendsData);
       } catch (error) {

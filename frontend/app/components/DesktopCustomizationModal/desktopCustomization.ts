@@ -38,6 +38,11 @@ export const desktopThemes: DesktopTheme[] = [
 		background: images.windowsStoneHengeWallpaper,
 	},
 	{
+		id: "sabahoooo",
+		name: "sabahoooo",
+		background: images.windowsSabahoWallpaper,
+	},
+	{
 		id: "tulips",
 		name: "Tulips",
 		background: images.windowsTulipsWallpaper,

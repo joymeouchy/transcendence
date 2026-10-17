@@ -71,14 +71,9 @@ Reusable components: they take props and are used in two or more places. Counts 
 
 ## 4. Honest gaps
 
-- **Unused primitives:** `XPButton` and `XPPanel` are converted but have no consumers, so they are not claimed above.
-- **Unstyled game dialogs:** Matchmaking, OpponentDisconnected, Rematch, Rules and FriendInvite have no styles at all; they render browser-default content inside `XPModal`. Most dialog buttons are native `<button>`s, not `XPButton`. Switching them would change the look, so it wasn't done.
 - **One-off font sizes:** seven sizes are arbitrary Tailwind values (`text-[15px]`, `[17px]`, `[19px]`, `[21px]`, `[25px]`, `[26px]`, `[64px]`), not tokens.
-- **Breakpoints:** they are ad-hoc numbers (420–1100px), not tokens. Tailwind's `max-[Npx]` means `width < N`, where the old CSS meant `≤ N`, so it differs only at exactly N px.
-- **Chart colors:** the Recharts line colors (`#008000`, `#cc0000`) stay in JS, because SVG attributes can't read CSS variables.
 - **Leaderboard gap:** the left column has no gap because `leaderboard.tsx` uses an undefined `styles.podium`. That look was preserved, not fixed.
 - **Pre-existing issues, not styling, left untouched:**
-  - `next build` fails at type-check on `app/chats/page.tsx:23` (`user` possibly null), on `main` too.
   - eslint reports 97 problems (98 on `main`).
   - `AuthRedirect` sends logged-out users away from `/forgot-password` and `/reset-password`.
   - `StartMenu`'s `onClose` prop is unused.
