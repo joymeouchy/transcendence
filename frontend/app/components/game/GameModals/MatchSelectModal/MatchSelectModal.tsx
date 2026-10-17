@@ -35,7 +35,7 @@ export default function MatchSelectModal({
         onClose={onBack}
         headerButton={
           <button
-            className="xp-header-icon-btn"
+            className="xp-header-icon-btn flex size-7 cursor-pointer items-center justify-center border-none bg-transparent p-0"
             onClick={() =>
               setShowRules(true)
             }
@@ -43,11 +43,12 @@ export default function MatchSelectModal({
             <img
               src="/info_icon.png"
               alt="Rules"
+              className="size-12.5 object-contain"
             />
           </button>
         }
       >
-        <div className="match-select">
+        <div className="flex w-[min(90vw,420px)] flex-col items-center gap-3.75 text-center max-[450px]:w-[90vw]">
 
           <div className="match-select__header">
             <p>
@@ -60,7 +61,7 @@ export default function MatchSelectModal({
             </span>
           </div>
 
-          <div className="mode-buttons">
+          <div className="flex w-full flex-row items-center justify-center gap-2 max-[450px]:flex-col">
 
             <button
               onClick={onStartOnline}

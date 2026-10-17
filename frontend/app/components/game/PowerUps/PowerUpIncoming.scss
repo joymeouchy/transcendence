@@ -1,126 +1,46 @@
+@use "tokens" as t;
+@use "mixins" as m;
+
+// Layout lives in PowerUpPowerUpIncoming.tsx (Tailwind). SCSS: the XP
+// notification balloon chrome and its animations.
+
 .power-up-warning {
-  position: absolute;
-  top: 20px;
-  left: 50%;
+  // centering stays a transform: the float animation below drives the
+  // separate `translate` property, which a Tailwind translate would use too
   transform: translateX(-50%);
-  z-index: 20;
 
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  min-width: 290px;
-  padding: 8px;
-
-  background: #ece9d8;
-  border: 1px solid var(--xp-focus);
+  background: t.color(classic-face);
+  border: 1px solid t.color(focus);
   border-radius: 5px;
-
-  color: #222;
-  font-family: Tahoma, Verdana, sans-serif;
-  font-size: 11px;
-
   box-shadow:
-    inset 1px 1px 0 #fff,
-    inset -1px -1px 0 #aca899,
-    2px 3px 8px rgba(0, 0, 0, 0.4);
+    inset 1px 1px 0 t.color(white),
+    inset -1px -1px 0 t.color(classic-edge),
+    2px 3px 8px t.shade(0.4);
 
   animation: xp-power-up-float 2.5s ease-in-out infinite;
 }
 
 .power-up-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  width: 42px;
-  height: 42px;
-
-  background: linear-gradient(135deg, #fff, #dbeafe 45%, #7db5ef);
-  border: 1px solid #7f9db9;
-  border-radius: 3px;
-
+  background: linear-gradient(135deg, t.color(white), t.color(powerup-glow) 45%, t.color(powerup-sky));
+  border: 1px solid t.color(border-dark);
+  border-radius: t.radius(xs);
   box-shadow:
-    inset 1px 1px 0 #fff,
-    inset -1px -1px 0 #b5cbe2;
-
-  font-size: 24px;
+    inset 1px 1px 0 t.color(white),
+    inset -1px -1px 0 t.color(powerup-edge);
 
   span {
     animation: xp-power-up-spark 1.2s ease-in-out infinite alternate;
   }
 }
 
-.power-up-info {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-.power-up-label {
-  color: var(--xp-focus);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.power-up-name {
-  color: #222;
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: capitalize;
-}
-
-.power-up-target {
-  color: #555;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
 .power-up-countdown {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  width: 46px;
-  height: 46px;
-
-  background: linear-gradient(
-    180deg,
-    #5ba7f7,
-    var(--xp-focus) 48%,
-    #0054b8
-  );
-
-  border: 1px solid #003c74;
-  border-radius: 3px;
-
+  background: linear-gradient(180deg, t.color(powerup-bright), t.color(focus) 48%, t.color(powerup-deep));
+  border: 1px solid t.color(navy);
+  border-radius: t.radius(xs);
   box-shadow:
-    inset 1px 1px 0 rgba(255, 255, 255, 0.65),
-    inset -1px -1px 0 rgba(0, 0, 80, 0.3);
-
-  color: #fff;
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
-}
-
-.countdown-number {
-  font-size: 21px;
-  font-weight: 700;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.countdown-unit {
-  margin-top: 3px;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+    inset 1px 1px 0 t.tint(0.65),
+    inset -1px -1px 0 t.alpha(ink-dark, 0.3);
+  text-shadow: 1px 1px 1px t.shade(0.3);
 }
 
 @keyframes xp-power-up-float {
@@ -140,36 +60,6 @@
 
   to {
     transform: scale(1.1);
-  }
-}
-
-@media (max-width: 480px) {
-  .power-up-warning {
-    top: 10px;
-    gap: 8px;
-    min-width: 0;
-    width: max-content;
-    max-width: calc(100% - 20px);
-    padding: 7px;
-  }
-
-  .power-up-icon {
-    width: 34px;
-    height: 34px;
-    font-size: 20px;
-  }
-
-  .power-up-label {
-    font-size: 9px;
-  }
-
-  .power-up-name {
-    font-size: 12px;
-  }
-
-  .power-up-countdown {
-    width: 40px;
-    height: 40px;
   }
 }
 

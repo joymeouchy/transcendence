@@ -9,7 +9,6 @@ import {
 	FriendshipService,
 } from "@/services/friendships.service";
 
-import "./FriendSelectModal.scss";
 
 type Props = {
 	isOpen: boolean;
@@ -55,21 +54,21 @@ export default function FriendSelectModal({
 			isOpen={isOpen}
 			onClose={onClose}
 		>
-			<div className="friend-select">
-				<div className="friend-select__header">
-					<p>Choose a friend</p>
-					<span>
+			<div className="flex min-w-105 flex-col gap-4 p-5">
+				<div className="flex flex-col gap-1">
+					<p className="m-0 text-xp-xl font-bold">Choose a friend</p>
+					<span className="text-xp-md text-xp-gray-700">
 						Select an online friend to play against.
 					</span>
 				</div>
 
-				<div className="friend-list">
+				<div className="flex max-h-75 flex-col gap-2 overflow-y-auto p-1">
 					{loading ? (
-						<p className="friend-list__empty">
+						<p className="my-5 text-center text-xp-md text-xp-gray-600">
 							Loading friends...
 						</p>
 					) : friends.length === 0 ? (
-						<p className="friend-list__empty">
+						<p className="my-5 text-center text-xp-md text-xp-gray-600">
 							You don't have any friends yet.
 						</p>
 					) : (
@@ -78,16 +77,16 @@ export default function FriendSelectModal({
 							.map((friend) => (
 								<div
 									key={friend.id}
-									className="friend-item"
+									className="flex items-center justify-between border border-xp-gray-300 bg-xp-gray-50 px-2.5 py-2"
 								>
-									<div className="friend-item__info">
+									<div className="flex min-w-0 items-center">
 
-										<div className="friend-item__details">
-											<span className="friend-item__name">
+										<div className="flex flex-col gap-0.5">
+											<span className="text-xp-lg font-bold">
 												{friend.username}
 											</span>
 
-											<span className="friend-item__status">
+											<span className="text-xp-sm text-xp-gray-700">
 												<span
 													className={
 														friend.isOnline
@@ -103,6 +102,7 @@ export default function FriendSelectModal({
 									</div>
 
 									<button
+										className="ml-5 min-w-15 cursor-pointer px-3 py-1 disabled:cursor-not-allowed disabled:opacity-50"
 										disabled={!friend.isOnline}
 										onClick={() =>
 											onSelectFriend(friend)
@@ -115,8 +115,8 @@ export default function FriendSelectModal({
 					)}
 				</div>
 
-				<div className="friend-select__buttons">
-					<button onClick={onClose}>
+				<div className="mt-1 flex justify-end">
+					<button className="min-w-17.5 cursor-pointer px-4 py-1" onClick={onClose}>
 						Back
 					</button>
 				</div>

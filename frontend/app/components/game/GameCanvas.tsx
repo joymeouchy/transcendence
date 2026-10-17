@@ -5,7 +5,6 @@ import PowerUpIncoming from "./PowerUps/PowerUpPowerUpIncoming";
 
 import { socket } from "../../../lib/socket";
 import { API_URL } from "@/lib/api";
-import "./GameCanvas.scss";
 
 import { GameStateSend, pongConfig } from "@/types/game_types";
 import { gameThemes } from "@/app/data/game/gameCustomization";
@@ -218,8 +217,9 @@ export default function GameCanvas({ theme, pendingPowerUp }: Props) {
   }, []);
 
   return (
-    <div className="canvas-wrapper">
+    <div className="relative aspect-4/3 w-full overflow-hidden border-4 border-xp-game-border bg-xp-game-bg">
       <canvas
+        className="block size-full"
         ref={canvasRef}
         width={pongConfig.canvasWidth}
         height={pongConfig.canvasHeight}

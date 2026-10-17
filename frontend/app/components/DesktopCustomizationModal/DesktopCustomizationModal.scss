@@ -1,36 +1,13 @@
 @use "tokens" as t;
+@use "mixins" as m;
 
 // Wallpaper picker. Layout lives in the .tsx (Tailwind); SCSS keeps the
 // card states. Scoped under .desktop-theme-card so it can't collide with
 // the game's theme picker.
 .desktop-theme-card {
-  border: 2px solid transparent;
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    border-color: t.color(pick-hover);
-    transform: translateY(-2px);
-  }
-
-  &.selected {
-    border-color: t.color(pick);
-    background: t.alpha(pick, 0.15);
-    box-shadow: 0 0 8px t.alpha(pick, 0.35);
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-  }
-
-  &:disabled:hover {
-    transform: none;
-    border-color: transparent;
-  }
+  @include m.xp-pick-card(
+    (border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease)
+  );
 }
 
 .desktop-customization-actions {
