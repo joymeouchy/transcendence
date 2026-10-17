@@ -43,7 +43,7 @@ the server tell two tabs of the same account apart from two different accounts.
 
 | Event | Payload | Description |
 |-------|---------|-------------|
-| `invite_friend` | `{ friendId: number }` | Invite a specific friend to play. Fails with `invite_error` if you invite yourself, you're already in a game, the friend is offline, the friend is already in a game, you already have a pending invite (to them or to anyone else), or they already have a pending invite from someone else. |
+| `invite_friend` | `{ friendId: number, winningScore?: number }` | Invite a specific friend to play. `winningScore` is the max score of the match, one of `WINNING_SCORE_OPTIONS` (3, 5, 7, 11); it defaults to 5 if omitted. Fails with `invite_error` if `winningScore` isn't an allowed value, you invite yourself, you're already in a game, the friend is offline, the friend is already in a game, you already have a pending invite (to them or to anyone else), or they already have a pending invite from someone else. |
 | `cancel_invite` | `{ friendId: number }` | Cancel an invite you sent before the friend responds. |
 | `invite_response` | `{ fromUserId: number, accepted: boolean }` | Accept or decline an invite you received from `fromUserId`. |
 
@@ -61,7 +61,7 @@ Messages are sent over REST, not a socket event: see `POST /messages` and `GET /
 |-------|---------|-------------|
 | `waiting` | none | You are in the queue, waiting for an opponent. |
 | `already_waiting` | none | You are already in the queue, from this tab or another tab/window of the same account. Not sent if you're already in a match (that `join_queue` is silently ignored). |
-| `match_found` | `{ room: string, players: [string, string], avatars: { left: string \| null, right: string \| null } }` | Match found, game starting. `players` and `avatars` are both `[left, right]`-ordered. Usernames and avatars are the current ones (a rename or new avatar shows up without reconnecting); an avatar is `null` if unset. |
+| `match_found` | `{ room: string, players: [string, string], avatars: { left: string \| null, right: string \| null }, winningScore: number }` | Match found, game starting. `winningScore` is the score needed to win: always 5 for random matchmaking, the invite's value for friend matches, and the same value as the previous match for a rematch. `players` and `avatars` are both `[left, right]`-ordered. Usernames and avatars are the current ones (a rename or new avatar shows up without reconnecting); an avatar is `null` if unset. |
 
 ### Gameplay
 
@@ -125,7 +125,7 @@ Messages are sent over REST, not a socket event: see `POST /messages` and `GET /
 
 | Event | Payload | Description |
 |-------|---------|-------------|
-| `invite_received` | `{ fromUserId: number, fromUsername: string, fromAvatarUrl: string \| null }` | A friend invited you to play. `fromAvatarUrl` is the inviter's avatar from when their socket connected, so it can be outdated if they changed it since. |
+| `invite_received` | `{ fromUserId: number, fromUsername: string, fromAvatarUrl: string \| null, winningScore: number }` | A friend invited you to play, to `winningScore` points. `fromAvatarUrl` is the inviter's avatar from when their socket connected, so it can be outdated if they changed it since. |
 | `invite_cancelled` | `{ fromUserId: number }` | The invite from `fromUserId` was cancelled (they cancelled it, it timed out, or they disconnected). |
 | `invite_declined` | `{ friendId: number }` | `friendId` declined your invite (or disconnected before responding). |
 | `invite_timeout` | `{ friendId: number }` | `friendId` didn't respond within 30 s. |
@@ -149,6 +149,9 @@ type PendingPowerUp = {
   side: "left" | "right"; // the collector
   applyAt: number;        // timestamp (ms) when it activates
 };
+
+// max scores allowed in invite_friend (shared/game_types.ts)
+const WINNING_SCORE_OPTIONS = [3, 5, 7, 11];
 ```
 
 `bigPaddle`, `smallBall` and `paddleSpeedBoost` buff the collector; `smallPaddle` and `freeze` debuff the opponent instead.

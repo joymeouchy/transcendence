@@ -19,6 +19,7 @@ import {
   cancelGameCleanup,
   abandonPausedGame,
 } from "./game";
+import { pongConfig, isValidWinningScore } from "../../shared/game_types";
 import passport from "./OAuth";
 import userRoutes from "../routes/users";
 import friendshipRoutes from "../routes/friendships";
@@ -65,9 +66,12 @@ const droppedFromRoom = new Map<string, string>();
 // "inviterId:inviteeId" → the pending friend invite between them
 const pendingInvites = new Map<
   string,
-  { inviterSocketId: string; timeout: NodeJS.Timeout }
+  { inviterSocketId: string; timeout: NodeJS.Timeout; winningScore: number }
 >();
 const INVITE_TIMEOUT_MS = 30000;
+// room → max score chosen in the friend invite, kept after the match ends so
+// a rematch is played to the same score. Only non-default scores are stored.
+const roomWinningScores = new Map<string, number>();
 
 // true if any of the user's sockets/tabs is currently playing a match
 function isUserBusy(userId: number): boolean {
@@ -301,6 +305,7 @@ io.on("connection", (socket) => {
           left: leftAvatar,
           right: rightAvatar,
         },
+        winningScore: pongConfig.winningScore,
       });
 
       // start game loop
@@ -344,9 +349,12 @@ io.on("connection", (socket) => {
       socket.to(room).emit("rematch_accepted");
       rematches.delete(room);
 
-      // create new room
+      // create new room, played to the same max score as the previous match
       const newRoom = `match-${matchId++}`;
       const [player1, player2] = players;
+      const winningScore =
+        roomWinningScores.get(room) ?? pongConfig.winningScore;
+      roomWinningScores.delete(room);
 
       if (!player1 || !player2) return;
 
@@ -372,9 +380,16 @@ io.on("connection", (socket) => {
             left: leftAvatar,
             right: rightAvatar,
           },
+          winningScore,
         });
 
-        startGame(io, newRoom, player1, player2, socketToUser);
+        if (winningScore !== pongConfig.winningScore) {
+          roomWinningScores.set(newRoom, winningScore);
+        }
+        startGame(io, newRoom, player1, player2, socketToUser, {
+          ...pongConfig,
+          winningScore,
+        });
         console.log("Rematch started in room:", newRoom);
       } else {
         // one of them disconnected between requesting and matching
@@ -395,6 +410,7 @@ io.on("connection", (socket) => {
     const { room } = data;
 
     rematches.delete(room);
+    roomWinningScores.delete(room);
     socket.to(room).emit("rematch_declined");
   });
 
@@ -414,81 +430,96 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("invite_friend", ({ friendId }: { friendId: number }) => {
-    const inviterId = socketToUser.get(socket.id);
-    if (!inviterId) return;
+  socket.on(
+    "invite_friend",
+    ({ friendId, winningScore }: { friendId: number; winningScore?: number }) => {
+      const inviterId = socketToUser.get(socket.id);
+      if (!inviterId) return;
 
-    if (inviterId === friendId) {
-      socket.emit("invite_error", { message: "You can't invite yourself." });
-      return;
-    }
+      // optional: missing means the default, anything outside the allowed list is rejected
+      const matchWinningScore = winningScore ?? pongConfig.winningScore;
+      if (!isValidWinningScore(matchWinningScore)) {
+        socket.emit("invite_error", { message: "Invalid max score." });
+        return;
+      }
 
-    if (isUserBusy(inviterId)) {
-      socket.emit("invite_error", { message: "You're already in a game." });
-      return;
-    }
+      if (inviterId === friendId) {
+        socket.emit("invite_error", { message: "You can't invite yourself." });
+        return;
+      }
 
-    const friendSockets = onlineUsers.get(friendId);
-    if (!friendSockets || friendSockets.size === 0) {
-      socket.emit("invite_error", { message: "Your friend is offline." });
-      return;
-    }
+      if (isUserBusy(inviterId)) {
+        socket.emit("invite_error", { message: "You're already in a game." });
+        return;
+      }
 
-    if (isUserBusy(friendId)) {
-      socket.emit("invite_error", {
-        message: "Your friend is already in a game.",
-      });
-      return;
-    }
+      const friendSockets = onlineUsers.get(friendId);
+      if (!friendSockets || friendSockets.size === 0) {
+        socket.emit("invite_error", { message: "Your friend is offline." });
+        return;
+      }
 
-    const key = `${inviterId}:${friendId}`;
-    if (pendingInvites.has(key)) {
-      socket.emit("invite_error", {
-        message: "You already invited this friend.",
-      });
-      return;
-    }
-
-    for (const pendingKey of pendingInvites.keys()) {
-      // one outgoing invite at a time: if two friends both accepted, only one
-      // match could start and the other friend would be left hanging
-      if (pendingKey.startsWith(`${inviterId}:`)) {
+      if (isUserBusy(friendId)) {
         socket.emit("invite_error", {
-          message: "You already have a pending invite.",
+          message: "Your friend is already in a game.",
         });
         return;
       }
 
-      // the invitee's popup only shows one invite at a time, so a second one
-      // from someone else would hide the first and leave that inviter waiting
-      if (pendingKey.endsWith(`:${friendId}`)) {
+      const key = `${inviterId}:${friendId}`;
+      if (pendingInvites.has(key)) {
         socket.emit("invite_error", {
-          message: "Your friend already has a pending invite.",
+          message: "You already invited this friend.",
         });
         return;
       }
-    }
 
-    const timeout = setTimeout(() => {
-      pendingInvites.delete(key);
-      socket.emit("invite_timeout", { friendId });
+      for (const pendingKey of pendingInvites.keys()) {
+        // one outgoing invite at a time: if two friends both accepted, only one
+        // match could start and the other friend would be left hanging
+        if (pendingKey.startsWith(`${inviterId}:`)) {
+          socket.emit("invite_error", {
+            message: "You already have a pending invite.",
+          });
+          return;
+        }
+
+        // the invitee's popup only shows one invite at a time, so a second one
+        // from someone else would hide the first and leave that inviter waiting
+        if (pendingKey.endsWith(`:${friendId}`)) {
+          socket.emit("invite_error", {
+            message: "Your friend already has a pending invite.",
+          });
+          return;
+        }
+      }
+
+      const timeout = setTimeout(() => {
+        pendingInvites.delete(key);
+        socket.emit("invite_timeout", { friendId });
+        for (const friendSocketId of friendSockets) {
+          io.to(friendSocketId).emit("invite_cancelled", {
+            fromUserId: inviterId,
+          });
+        }
+      }, INVITE_TIMEOUT_MS);
+
+      pendingInvites.set(key, {
+        inviterSocketId: socket.id,
+        timeout,
+        winningScore: matchWinningScore,
+      });
+
       for (const friendSocketId of friendSockets) {
-        io.to(friendSocketId).emit("invite_cancelled", {
+        io.to(friendSocketId).emit("invite_received", {
           fromUserId: inviterId,
+          fromUsername: socket.data.username,
+          fromAvatarUrl: socket.data.avatarUrl,
+          winningScore: matchWinningScore,
         });
       }
-    }, INVITE_TIMEOUT_MS);
-
-    pendingInvites.set(key, { inviterSocketId: socket.id, timeout });
-
-    for (const friendSocketId of friendSockets) {
-      io.to(friendSocketId).emit("invite_received", {
-        fromUserId: inviterId,
-        fromUsername: socket.data.username,
-        fromAvatarUrl: socket.data.avatarUrl,
-      });
-    }
-  });
+    },
+  );
 
   socket.on("cancel_invite", ({ friendId }: { friendId: number }) => {
     const inviterId = socketToUser.get(socket.id);
@@ -577,9 +608,16 @@ io.on("connection", (socket) => {
         room,
         players: [inviterSocket.data.username, socket.data.username],
         avatars: { left: leftAvatar, right: rightAvatar },
+        winningScore: pending.winningScore,
       });
 
-      startGame(io, room, inviterSocket.id, socket.id, socketToUser);
+      if (pending.winningScore !== pongConfig.winningScore) {
+        roomWinningScores.set(room, pending.winningScore);
+      }
+      startGame(io, room, inviterSocket.id, socket.id, socketToUser, {
+        ...pongConfig,
+        winningScore: pending.winningScore,
+      });
       console.log("Friend match started in room:", room);
     },
   );
