@@ -1,20 +1,8 @@
 @use "tokens" as t;
 @use "mixins" as m;
 
+// Layout lives in StartButton.tsx (Tailwind). SCSS only paints the button.
 .xp-start {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0 18px;
-  height: 100%;
-
-  cursor: pointer;
-  user-select: none;
-
-  color: t.color(white);
-  font-weight: bold;
-
   @include m.xp-gradient(start, start-dark);
   border-right: 1px solid t.shade(0.25);
 

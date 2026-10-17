@@ -17,9 +17,9 @@ export default function TaskbarClock() {
 
   if (!time) {
     return (
-      <div className="xp-clock">
+      <div className="px-2.5 text-right text-xp-base leading-[1.1] text-xp-white">
         <div>--:-- --</div>
-        <div className="xp-date">--/--/----</div>
+        <div className="text-xp-xs opacity-85">--/--/----</div>
       </div>
     );
   }
@@ -36,9 +36,9 @@ export default function TaskbarClock() {
   });
 
   return (
-    <div className="xp-clock">
+    <div className="px-2.5 text-right text-xp-base leading-[1.1] text-xp-white">
       <div>{formattedTime}</div>
-      <div className="xp-date">{formattedDate}</div>
+      <div className="text-xp-xs opacity-85">{formattedDate}</div>
     </div>
   );
 }

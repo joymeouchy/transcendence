@@ -1,7 +1,7 @@
-import "./StartMenu.scss";
 import StartMenuItem from "./StartMenuItem/StartMenuItem";
 import DesktopCustomizationModal from "../../DesktopCustomizationModal/DesktopCustomizationModal";
 import { useState } from "react";
+import clsx from "clsx";
 
 type StartMenuItemType = {
   image: string;
@@ -21,7 +21,7 @@ export default function StartMenuColumn({
 }: Props) {
   const [customizationOpen, setCustomizationOpen] = useState(false);
   return (
-    <div className={`xp-start-menu-column ${className}`}>
+    <div className={clsx("flex min-w-0 flex-1 flex-col gap-1.5", className)}>
       {items.map((item) => (
         <StartMenuItem
           key={item.label}

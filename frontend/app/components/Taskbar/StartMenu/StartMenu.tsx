@@ -49,23 +49,23 @@ export default function StartMenu({
     <>
       {open && (
         <div
-          className="xp-start-menu"
+          className="xp-start-menu fixed bottom-10 left-2.5 z-1000 flex h-80 w-70 flex-col overflow-hidden rounded-xp-sm bg-xp-window-bg p-0 font-xp text-xp-md text-xp-text shadow-xp-window"
           ref={menuRef}
         >
-          <div className="xp-start-menu-top">
+          <div className="xp-start-menu-top flex min-h-10 w-full items-center gap-2 px-2.5 py-2 text-xp-white">
           </div>
 
-          <div className="xp-start-menu-body">
-            <div className="xp-start-menu-left">
+          <div className="flex h-full w-full flex-1 flex-row overflow-hidden">
+            <div className="xp-start-menu-left flex min-w-0 flex-1 flex-col gap-1.5 p-2.5">
               <StartMenuColumn items={startMenuItemsLeft} />
             </div>
 
-            <div className="xp-start-menu-right">
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5 p-2.5">
               <StartMenuColumn items={startMenuItemsRight} />
             </div>
           </div>
 
-          <div className="xp-start-menu-bottom">
+          <div className="xp-start-menu-bottom flex w-full justify-end p-2">
             <StartMenuItem
               image={images.shutdown}
               label="Sign out"

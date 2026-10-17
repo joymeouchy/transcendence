@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import "./StartButton.scss";
 
 type StartButtonProps = {
@@ -11,7 +12,10 @@ export default function StartButton({
 }: StartButtonProps) {
   return (
     <button
-      className={`xp-start ${open ? "active" : ""}`}
+      className={clsx(
+        "xp-start flex h-full cursor-pointer items-center justify-center px-4.5 font-bold text-xp-white select-none",
+        open && "active",
+      )}
       onClick={onClick}
       aria-pressed={open}
       type="button"
