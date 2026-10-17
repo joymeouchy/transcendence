@@ -270,7 +270,7 @@ export default function useGameSocket() {
     setModalState("matchmaking");
   }
 
-  function inviteFriend(friend: Friend) {
+  function inviteFriend(friend: Friend, winningScore: number) {
     if (!socket.connected) {
       return;
     }
@@ -281,7 +281,7 @@ export default function useGameSocket() {
     setMatchmakingStatus("waitingFriend");
     setModalState("matchmaking");
 
-    socket.emit("invite_friend", { friendId: friend.id });
+    socket.emit("invite_friend", { friendId: friend.id, winningScore });
   }
 
   function cancelInvite() {

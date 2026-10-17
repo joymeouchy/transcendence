@@ -8,12 +8,13 @@ import {
 	Friend,
 	FriendshipService,
 } from "@/services/friendships.service";
+import { pongConfig, WINNING_SCORE_OPTIONS } from "@/types/game_types";
 
 
 type Props = {
 	isOpen: boolean;
 	onClose: () => void;
-	onSelectFriend: (friend: Friend) => void;
+	onSelectFriend: (friend: Friend, winningScore: number) => void;
 };
 
 export default function FriendSelectModal({
@@ -25,6 +26,7 @@ export default function FriendSelectModal({
 
 	const [friends, setFriends] = useState<Friend[]>([]);
 	const [loading, setLoading] = useState(false);
+	const [winningScore, setWinningScore] = useState(pongConfig.winningScore);
 
 	useEffect(() => {
 		if (!isOpen || !user?.id) return;
@@ -60,6 +62,30 @@ export default function FriendSelectModal({
 					<span className="text-xp-md text-xp-gray-700">
 						Select an online friend to play against.
 					</span>
+				</div>
+
+				<div
+					role="radiogroup"
+					aria-label="Max score"
+					className="flex flex-wrap items-center gap-3 text-xp-md"
+				>
+					<span className="font-bold">Max score:</span>
+					{WINNING_SCORE_OPTIONS.map((score) => (
+						<label
+							key={score}
+							className="flex cursor-pointer items-center gap-1"
+						>
+							<input
+								type="radio"
+								name="winningScore"
+								value={score}
+								checked={winningScore === score}
+								onChange={() => setWinningScore(score)}
+							/>
+							{score}
+							{score === pongConfig.winningScore && " (default)"}
+						</label>
+					))}
 				</div>
 
 				<div className="flex max-h-75 flex-col gap-2 overflow-y-auto p-1">
@@ -105,7 +131,7 @@ export default function FriendSelectModal({
 										className="ml-5 min-w-15 cursor-pointer px-3 py-1 disabled:cursor-not-allowed disabled:opacity-50"
 										disabled={!friend.isOnline}
 										onClick={() =>
-											onSelectFriend(friend)
+											onSelectFriend(friend, winningScore)
 										}
 									>
 										Play

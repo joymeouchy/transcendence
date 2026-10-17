@@ -68,6 +68,13 @@ export const pongConfig: GameConfig = {
   gameName: "pong",
 };
 
+// max scores a player can pick when inviting a friend (random matchmaking always uses the default)
+export const WINNING_SCORE_OPTIONS = [3, 5, 7, 11] as const;
+
+export function isValidWinningScore(value: unknown): value is number {
+  return (WINNING_SCORE_OPTIONS as readonly unknown[]).includes(value);
+}
+
 export type PowerUpType =
   | "bigPaddle"
   | "smallPaddle"
