@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CustomizationTheme, customizationService, } from "@/services/Customization.services";
 import { socket } from "@/lib/socket";
 import { tokenStorage } from "@/lib/token";
@@ -22,6 +22,8 @@ export default function GamePage() {
 
 	const [theme, setTheme] =
 		useState<CustomizationTheme | null>(null);
+	const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
 
 	const [activeEffects, setActiveEffects] = useState<{
 		left: {
@@ -53,11 +55,18 @@ export default function GamePage() {
 
 
 	useEffect(() => {
-		if (!socket.connected) {
-			socket.connect();
-		}
+	// Strict Mode re-mount: cancel the pending disconnect from the fake unmount
+	if (leaveTimer.current) {
+		clearTimeout(leaveTimer.current);
+		leaveTimer.current = null;
+	}
 
-		return () => {
+	if (!socket.connected) {
+		socket.connect();
+	}
+
+	return () => {
+		leaveTimer.current = setTimeout(() => {
 			// disconnecting is what drops us from the queue or ends the match on the server
 			socket.disconnect();
 
@@ -66,8 +75,9 @@ export default function GamePage() {
 			if (tokenStorage.get()) {
 				socket.connect();
 			}
-		};
-	}, []);
+		}, 0);
+	};
+}, []);
 	const handleCustomize = () => {
 		game.setModalState("customization");
 	};
