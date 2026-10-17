@@ -1,4 +1,5 @@
 import Image from "next/image";
+import clsx from "clsx";
 import styles from "./ProfileHeader.module.scss";
 import { images } from "@/lib/images";
 
@@ -9,7 +10,12 @@ type Props = {
 
 export default function ProfileHeader({ username, avatarUrl }: Props) {
   return (
-    <div className={styles.header}>
+    <div
+      className={clsx(
+        styles.header,
+        "flex items-center gap-xp-md rounded-xp-sm p-xp-md font-xp max-[500px]:gap-xp-sm max-[500px]:p-2.5",
+      )}
+    >
       <img
         src={avatarUrl || images.defaultUserIcon}
         alt="Avatar"
@@ -17,8 +23,8 @@ export default function ProfileHeader({ username, avatarUrl }: Props) {
         height={72}
       />
 
-      <div className={styles.info}>
-        <h1 className={styles.username}>{username}</h1>
+      <div className="flex min-w-0 flex-col">
+        <h1 className="m-0 truncate font-xp text-xp-2xl font-bold text-xp-ink max-[500px]:text-xp-xl">{username}</h1>
       </div>
     </div>
   );
