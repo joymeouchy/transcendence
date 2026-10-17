@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { authService } from "@/services/auth.services";
 
 import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
+import AuthField from "../components/auth/AuthField";
+import AuthButton from "../components/auth/AuthButton";
+import AuthLink from "../components/auth/AuthLink";
 import XPAlert from "../components/ui/XPAlert/XPAlert";
 
 export default function ResetPasswordContent() {
@@ -62,67 +64,48 @@ export default function ResetPasswordContent() {
 	return (
 		<AuthLayout>
 			<AuthPanel>
-				<form onSubmit={handleSubmit} className="xp-form">
-					<h3 className="xp-title">Reset Password</h3>
+				<form onSubmit={handleSubmit} className="xp-form flex flex-col items-stretch gap-2.5">
+					<h3 className="xp-title text-xp-md font-bold">Reset Password</h3>
 
-					<div className="xp-field">
-						<label
-							htmlFor="password"
-							className="xp-label"
-						>
-							New Password
-						</label>
+					<AuthField
+						id="password"
+						label="New Password"
+						type="password"
+						placeholder="New password"
+						value={password}
+						onChange={(e) =>
+							setPassword(e.target.value)
+						}
+						required
+						disabled={isLoading}
+					/>
 
-						<input
-							id="password"
-							type="password"
-							placeholder="New password"
-							value={password}
-							onChange={(e) =>
-								setPassword(e.target.value)
-							}
-							className="xp-input"
-							required
-							disabled={isLoading}
-						/>
-					</div>
+					<AuthField
+						id="confirmPassword"
+						label="Confirm Password"
+						type="password"
+						placeholder="Confirm password"
+						value={confirmPassword}
+						onChange={(e) =>
+							setConfirmPassword(e.target.value)
+						}
+						required
+						disabled={isLoading}
+					/>
 
-					<div className="xp-field">
-						<label
-							htmlFor="confirmPassword"
-							className="xp-label"
-						>
-							Confirm Password
-						</label>
-
-						<input
-							id="confirmPassword"
-							type="password"
-							placeholder="Confirm password"
-							value={confirmPassword}
-							onChange={(e) =>
-								setConfirmPassword(e.target.value)
-							}
-							className="xp-input"
-							required
-							disabled={isLoading}
-						/>
-					</div>
-
-					<button
+					<AuthButton
 						type="submit"
-						className="xp-submit"
 						disabled={isLoading}
 					>
 						{isLoading
 							? "Resetting..."
 							: "Reset Password"}
-					</button>
+					</AuthButton>
 				</form>
 
-				<Link href="/login" className="xp-link">
+				<AuthLink href="/login">
 					Back to login
-				</Link>
+				</AuthLink>
 			</AuthPanel>
 
 			<XPAlert

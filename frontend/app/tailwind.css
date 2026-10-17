@@ -34,6 +34,14 @@
   --color-xp-link: var(--xp-link);
   --color-xp-focus: var(--xp-focus);
   --color-xp-app-bg: var(--xp-app-bg);
+  --color-xp-login-bg-top: var(--xp-login-bg-top);
+  --color-xp-login-bg-bottom: var(--xp-login-bg-bottom);
+  --color-xp-login-bar: var(--xp-login-bar);
+  --color-xp-login-bar-dark: var(--xp-login-bar-dark);
+  --color-xp-input-border: var(--xp-input-border);
+  --color-xp-pressed: var(--xp-pressed);
+  --color-xp-go: var(--xp-go);
+  --color-xp-go-border: var(--xp-go-border);
   --color-xp-start: var(--xp-start);
   --color-xp-start-dark: var(--xp-start-dark);
   --color-xp-window-bg: var(--xp-window-bg);

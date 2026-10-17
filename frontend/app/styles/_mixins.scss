@@ -58,8 +58,9 @@
 @mixin xp-glass($bg: 0.12, $border: 0.2, $blur: 10px) {
   background: t.tint($bg);
   border: 1px solid t.tint($border);
+  // unprefixed only: the build adds -webkit- itself, and a hand-written
+  // prefix after it makes the minifier drop the standard property
   backdrop-filter: blur($blur);
-  -webkit-backdrop-filter: blur($blur);
 }
 
 // Subtle lift on hover, pressed back on active.
