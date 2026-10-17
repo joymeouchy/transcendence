@@ -28,7 +28,7 @@ export default function XPModal({
 
   return (
     <div
-      className="xp-modal-overlay"
+      className="xp-modal-overlay fixed inset-0 z-9999 flex items-center justify-center p-xp-lg"
       onClick={() => onClose?.()}
     >
       <div

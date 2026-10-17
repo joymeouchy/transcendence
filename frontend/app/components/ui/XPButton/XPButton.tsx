@@ -1,5 +1,6 @@
 // XPButton.tsx
 
+import clsx from "clsx";
 import "./XPButton.scss";
 
 type XPButtonProps = {
@@ -26,7 +27,10 @@ export default function XPButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`xp-button ${className}`}
+      className={clsx(
+        "xp-button inline-flex min-w-18.75 items-center justify-center px-3 py-1 font-xp text-xp-base text-xp-text",
+        className,
+      )}
     >
       {children}
     </button>
