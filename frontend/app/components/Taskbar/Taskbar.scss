@@ -1,3 +1,5 @@
+@use "tokens" as t;
+
 .xp-taskbar {
   position: fixed;
   bottom: 0;
@@ -14,16 +16,16 @@
 
   background: linear-gradient(
     to bottom,
-    var(--xp-blue),
-    var(--xp-dark-blue)
+    t.color(blue),
+    t.color(dark-blue)
   );
 
-  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  border-top: 1px solid t.tint(0.35);
 
-  color: white;
+  color: t.color(white);
 
-  font-family: var(--xp-font-main);
-  font-size: 13px;
+  font-family: t.font(main);
+  font-size: t.size(md);
 
   z-index: 1000;
 }
@@ -46,11 +48,11 @@
 
   background: linear-gradient(
     to bottom,
-    #3a6ff7,
-    #1f4fbf
+    t.color(light-blue),
+    t.color(blue-deep)
   );
 
-  border-right: 1px solid rgba(0, 0, 0, 0.25);
+  border-right: 1px solid t.shade(0.25);
 
   font-weight: bold;
 
@@ -85,21 +87,21 @@
 
   padding: 0 10px;
 
-  border-radius: 3px;
+  border-radius: t.radius(xs);
 
-  background: rgba(255, 255, 255, 0.12);
+  background: t.tint(0.12);
 
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid t.tint(0.18);
 
   cursor: pointer;
 
-  font-size: 12px;
+  font-size: t.size(base);
 
   transition: background 0.15s ease;
 }
 
 .xp-taskbar-app:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: t.tint(0.2);
 }
 
 .xp-taskbar-right {
@@ -116,13 +118,13 @@
 
   line-height: 1.1;
 
-  font-size: 12px;
+  font-size: t.size(base);
 
-  color: white;
+  color: t.color(white);
 }
 
 .xp-date {
-  font-size: 10px;
+  font-size: t.size(xs);
 
   opacity: 0.85;
 }

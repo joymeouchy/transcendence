@@ -13,7 +13,7 @@
   padding: 8px;
 
   background: #ece9d8;
-  border: 1px solid var(--primary);
+  border: 1px solid var(--xp-focus);
   border-radius: 5px;
 
   color: #222;
@@ -61,7 +61,7 @@
 }
 
 .power-up-label {
-  color: var(--primary);
+  color: var(--xp-focus);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -94,7 +94,7 @@
   background: linear-gradient(
     180deg,
     #5ba7f7,
-    var(--primary) 48%,
+    var(--xp-focus) 48%,
     #0054b8
   );
 
