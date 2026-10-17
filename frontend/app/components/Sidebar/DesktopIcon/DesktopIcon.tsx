@@ -19,7 +19,7 @@ export default function DesktopIcon({
 }: DesktopIconProps) {
 	const content = (
 		<>
-			<img src={image} alt={label} className="size-15 shrink-0 object-contain" />
+			<img src={image} alt={label} className="size-17 shrink-0 object-contain" />
 			<span>{label}</span>
 		</>
 	);
