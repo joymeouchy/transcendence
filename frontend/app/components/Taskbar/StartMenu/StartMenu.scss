@@ -1,4 +1,5 @@
 @use "tokens" as t;
+@use "mixins" as m;
 
 .xp-start-menu {
   position: fixed;
@@ -13,11 +14,7 @@
 
   background: t.color(window-bg);
 
-  border-top: 1px solid t.color(border-light);
-  border-left: 1px solid t.color(border-light);
-
-  border-right: 1px solid t.color(border-dark);
-  border-bottom: 1px solid t.color(border-dark);
+  @include m.xp-bevel-border;
 
   border-radius: t.radius(sm);
 
@@ -49,21 +46,17 @@
   padding: 8px 10px;
   min-height: 40px;
 
-  background: linear-gradient(
-    to bottom,
-    t.color(light-blue),
-    t.color(blue)
-  );
+  @include m.xp-gradient(light-blue, blue);
 
   color: t.color(white);
 
   border-bottom: 1px solid t.shade(0.25);
-}
 
-.xp-start-menu-top img {
-  width: 24px;
-  height: 24px;
-  border-radius: t.radius(xs);
+  img {
+    width: 24px;
+    height: 24px;
+    border-radius: t.radius(xs);
+  }
 }
 
 
@@ -128,10 +121,10 @@
   user-select: none;
 
   transition: background 0.15s ease;
-}
 
-.xp-start-menu-item:hover {
-  background: t.alpha(blue, 0.15);
+  &:hover {
+    background: t.alpha(blue, 0.15);
+  }
 }
 
 .xp-start-menu-bottom {
@@ -143,11 +136,7 @@
   display: flex;
   justify-content: flex-end;
 
-  background: linear-gradient(
-    to bottom,
-    t.color(light-blue),
-    t.color(blue)
-  );
+  @include m.xp-gradient(light-blue, blue);
 
   border-top: 1px solid t.shade(0.25);
 }
