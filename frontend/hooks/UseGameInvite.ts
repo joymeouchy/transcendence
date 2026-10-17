@@ -13,7 +13,29 @@ export type IncomingInvite = {
 export default function useGameInvite() {
 	const [incomingInvite, setIncomingInvite] =
 		useState<IncomingInvite | null>(null);
+const [isJoiningGame, setIsJoiningGame] = useState(false);
 
+function respondToInvite(
+  fromUserId: number,
+  accepted: boolean
+) {
+  if (!socket.connected) return;
+
+  if (accepted) {
+    setIsJoiningGame(true);
+  }
+
+  socket.emit("invite_response", {
+    fromUserId,
+    accepted,
+  });
+
+  setIncomingInvite(null);
+}
+
+function clearJoiningGame() {
+  setIsJoiningGame(false);
+}
 	useEffect(() => {
 		const handleInviteReceived = (
 			data: IncomingInvite
@@ -61,20 +83,6 @@ export default function useGameInvite() {
 		};
 	}, []);
 
-	function respondToInvite(
-		fromUserId: number,
-		accepted: boolean
-	) {
-		if (!socket.connected) return;
-
-		socket.emit("invite_response", {
-			fromUserId,
-			accepted,
-		});
-
-		setIncomingInvite(null);
-	}
-
 	function clearIncomingInvite() {
 		setIncomingInvite(null);
 	}
@@ -83,5 +91,7 @@ export default function useGameInvite() {
 		incomingInvite,
 		respondToInvite,
 		clearIncomingInvite,
+		isJoiningGame,
+		clearJoiningGame,
 	};
 }
