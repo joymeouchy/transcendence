@@ -17,10 +17,19 @@ import XPWindow from "../components/ui/XPWindow/XPWindow";
 import MatchHistory from "../components/matchHistory/matchHistory";
 import Leaderboard from "../components/leaderboard/leaderboard";
 
+import clsx from "clsx";
 import styles from "./gameStats.module.scss";
 
 type GameStatsTab = "history" | "leaderboard";
 export type LeaderboardScope = "all" | "friends";
+
+const tabClass = (active: boolean) =>
+  clsx(
+    styles.tab,
+    active && styles["tab--active"],
+    "cursor-pointer rounded-t-xp-sm px-4 py-1.5 font-xp text-xp-base",
+    active ? "relative top-px font-bold text-xp-ink" : "font-normal text-xp-white",
+  );
 
 export default function GameStatsPage() {
   const router = useRouter();
@@ -95,28 +104,24 @@ export default function GameStatsPage() {
         }
         loadingMessage="Loading match history..."
       >
-        <div className={styles.page}>
-          <div className={styles.tabs}>
+        <div className="flex w-full min-h-0 min-w-0 flex-col font-xp">
+          <div className={clsx(styles.tabs, "mb-3 flex shrink-0 items-end gap-0.75")}>
             <button
-              className={
-                activeTab === "history" ? styles.activeTab : styles.tab
-              }
+              className={tabClass(activeTab === "history")}
               onClick={() => setActiveTab("history")}
             >
               Match History
             </button>
 
             <button
-              className={
-                activeTab === "leaderboard" ? styles.activeTab : styles.tab
-              }
+              className={tabClass(activeTab === "leaderboard")}
               onClick={() => setActiveTab("leaderboard")}
             >
               Leaderboard
             </button>
           </div>
 
-          <div className={styles.content}>
+          <div className="min-h-0 w-full min-w-0 flex-1 overflow-visible">
             {activeTab === "history" && <MatchHistory matches={matches} />}
 
             {activeTab === "leaderboard" && (

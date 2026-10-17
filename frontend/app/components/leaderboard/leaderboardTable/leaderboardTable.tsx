@@ -1,8 +1,11 @@
 "use client";
 
+import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { LeaderboardPlayer } from "@/services/user.services";
 import styles from "./leaderboardTable.module.scss";
+import XPCard from "../../ui/XPCard/XPCard";
+import XPSkeleton from "../../ui/XPSkeleton/XPSkeleton";
 
 type LeaderboardScope = "all" | "friends";
 
@@ -14,6 +17,13 @@ type LeaderboardTableProps = {
 	loading: boolean;
 };
 
+// shared grid for the header and every row
+const gridClass =
+	"grid min-w-107.5 grid-cols-[40px_minmax(120px,1fr)_45px_45px_75px] items-center gap-x-1.5";
+
+const avatarClass =
+	"flex size-7.5 shrink-0 items-center justify-center rounded-xp-sm border border-xp-border-dark bg-xp-white text-xp-base font-bold text-xp-blue";
+
 export default function LeaderboardTable({
 	players,
 	currentUserId,
@@ -23,29 +33,37 @@ export default function LeaderboardTable({
 }: LeaderboardTableProps) {
 	const router = useRouter();
 
+	const tabClass = (active: boolean) =>
+		clsx(
+			styles.tab,
+			active && styles["tab--active"],
+			"cursor-pointer rounded-t-xp-sm px-3 py-1.25 font-xp text-xp-sm",
+			active ? "font-bold text-xp-white" : "text-xp-gray-900",
+		);
+
 	return (
-		<div className={styles.container}>
-			<div className={styles.tabs}>
+		<XPCard>
+			<div className="mb-xp-sm flex items-end gap-0.5">
 				<button
-					className={scope === "all" ? styles.activeTab : styles.tab}
+					className={tabClass(scope === "all")}
 					onClick={() => onScopeChange("all")}
 				>
 					All Players
 				</button>
 
 				<button
-					className={scope === "friends" ? styles.activeTab : styles.tab}
+					className={tabClass(scope === "friends")}
 					onClick={() => onScopeChange("friends")}
 				>
 					Friends
 				</button>
 			</div>
 
-			<div className={styles.tableWrapper}>
-				<div className={styles.table}>
-					<div className={styles.header}>
-						<span className={styles.rank}>#</span>
-						<span className={styles.player}>Player</span>
+			<div className={clsx(styles.tableWrapper, "relative max-h-75 w-full overflow-auto")}>
+				<div className="w-full min-w-125 overflow-x-auto overflow-y-hidden rounded-xp-sm border border-xp-groupbox-border">
+					<div className={clsx(styles.header, gridClass, "cursor-pointer px-2 py-1.5 text-xp-sm font-bold text-xp-white")}>
+						<span className="text-center text-xp-gray-700">#</span>
+						<span className="flex min-w-0 items-center gap-2">Player</span>
 						<span>W</span>
 						<span>L</span>
 						<span>Win Rate</span>
@@ -55,22 +73,22 @@ export default function LeaderboardTable({
 						Array.from({ length: 5 }).map((_, index) => (
 							<div
 								key={index}
-								className={`${styles.row} ${styles.skeletonRow}`}
+								className={clsx(styles.row, gridClass, "pointer-events-none min-h-10 cursor-default px-2 py-1.25 text-xp-sm text-xp-gray-900")}
 							>
-								<span className={styles.rank}>
-									<span className={styles.skeleton} />
+								<span className="text-center text-xp-gray-700">
+									<XPSkeleton className="mx-auto h-3 w-4.5 rounded-xp-xs" />
 								</span>
 
-								<div className={styles.player}>
-									<span className={`${styles.avatar} ${styles.skeleton}`} />
-									<span className={styles.skeletonName}>
-										<span className={styles.skeleton} />
+								<div className="flex min-w-0 items-center gap-2">
+									<XPSkeleton className="size-7.5 min-w-7.5 shrink-0 rounded-xp-sm border border-xp-scroll-edge p-0" />
+									<span className="block w-[65%]">
+										<XPSkeleton className="h-3 w-full rounded-xp-xs" />
 									</span>
 								</div>
 
-								<span className={styles.skeleton} />
-								<span className={styles.skeleton} />
-								<span className={styles.skeleton} />
+								<XPSkeleton className="mx-auto h-3 w-6 rounded-xp-xs" />
+								<XPSkeleton className="mx-auto h-3 w-6 rounded-xp-xs" />
+								<XPSkeleton className="mx-auto h-3 w-6 rounded-xp-xs" />
 							</div>
 						))
 					) : (
@@ -80,8 +98,12 @@ export default function LeaderboardTable({
 							return (
 								<div
 									key={player.id}
-									className={`${styles.row} ${isCurrentUser ? styles.currentUser : ""
-										}`}
+									className={clsx(
+										styles.row,
+										isCurrentUser && clsx(styles.currentUser, "font-bold"),
+										gridClass,
+										"min-h-10 cursor-pointer px-2 py-1.25 text-xp-sm text-xp-gray-900",
+									)}
 									role="link"
 									tabIndex={0}
 									onClick={() => router.push(`/profile/${player.id}`)}
@@ -92,33 +114,33 @@ export default function LeaderboardTable({
 										}
 									}}
 								>
-									<span className={styles.rank}>{player.rank}</span>
+									<span className={clsx("text-center", isCurrentUser ? "text-xp-blue" : "text-xp-gray-700")}>{player.rank}</span>
 
-									<div className={styles.player}>
+									<div className="flex min-w-0 items-center gap-2">
 										{player.avatarUrl ? (
 											<img
 												src={player.avatarUrl}
 												alt=""
-												className={styles.avatar}
+												className={clsx(styles.avatar, avatarClass, "object-cover")}
 											/>
 										) : (
-											<div className={styles.avatarFallback}>
+											<div className={clsx(styles.avatar, avatarClass)}>
 												{player.username.charAt(0).toUpperCase()}
 											</div>
 										)}
 
-										<span>{player.username}</span>
+										<span className="truncate">{player.username}</span>
 									</div>
 
 									<span>{player.wins}</span>
 									<span>{player.losses}</span>
-									<strong>{player.winRate}%</strong>
+									<strong className="text-xp-blue">{player.winRate}%</strong>
 								</div>
 							);
 						})
 					)}
 				</div>
 			</div>
-		</div>
+		</XPCard>
 	);
 }

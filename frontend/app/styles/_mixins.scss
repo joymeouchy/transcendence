@@ -4,6 +4,7 @@
 // Usage: `@use "mixins" as m;` then `@include m.xp-gradient(...)`.
 // ============================================================
 
+@use "sass:map";
 @use "tokens" as t;
 
 // Vertical two-stop gradient used by every XP bar and button face.
@@ -110,15 +111,100 @@
 }
 
 // Zebra list row: white, tinted every $stripe row, light-blue on hover.
-@mixin xp-list-row($stripe: odd, $divider: t.color(row-border)) {
+@mixin xp-list-row($stripe: odd, $divider: t.color(row-border), $edge: bottom, $stripe-color: t.color(row-alt)) {
   background: t.color(white);
-  border-bottom: 1px solid $divider;
+  border-#{$edge}: 1px solid $divider;
 
   &:nth-child(#{$stripe}) {
-    background: t.color(row-alt);
+    background: $stripe-color;
   }
 
   &:hover {
     background: t.color(row-hover);
   }
+}
+
+// Floating card (stats panels): faint dark edge. Pair with Tailwind
+// `rounded-xp-sm bg-xp-window-bg shadow-xp-window`.
+@mixin xp-card {
+  border: 1px solid t.shade(0.2);
+}
+
+// Blue rounded title pill; $raised adds the glossy edge + drop shadow.
+@mixin xp-title-pill($raised: false) {
+  @include xp-gradient(light-blue, blue);
+  text-shadow: 1px 1px t.shade(0.35);
+
+  @if $raised {
+    box-shadow:
+      inset 1px 1px t.tint(0.4),
+      0 1px 2px t.shade(0.15);
+  }
+}
+
+// Classic XP scrollbar (WebKit/Blink). $direction: gradient axis of the
+// thumb; $both-axes also styles the horizontal bar.
+@mixin xp-scrollbar($direction: to bottom, $both-axes: true) {
+  &::-webkit-scrollbar {
+    width: 14px;
+
+    @if $both-axes {
+      height: 14px;
+    }
+  }
+
+  &::-webkit-scrollbar-track {
+    background: t.color(scroll-track);
+    border-left: 1px solid t.color(scroll-edge);
+
+    @if $both-axes {
+      border-top: 1px solid t.color(scroll-edge);
+    }
+  }
+
+  &::-webkit-scrollbar-thumb {
+    @include xp-gradient(scroll-thumb, scroll-thumb-dark, $direction);
+    border: 1px solid t.color(border-dark);
+    border-radius: t.radius(2xs);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    @include xp-gradient(scroll-thumb-hover, scroll-thumb-hover-dark, $direction);
+  }
+}
+
+// Shimmering placeholder block; pairs with xp-shimmer-keyframes($name)
+// emitted once at the root of the same stylesheet.
+@mixin xp-shimmer($name) {
+  background: linear-gradient(
+    90deg,
+    t.color(skeleton) 25%,
+    t.color(skeleton-shine) 50%,
+    t.color(skeleton) 75%
+  );
+  background-size: 200% 100%;
+  animation: $name 1.4s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@mixin xp-shimmer-keyframes($name) {
+  @keyframes #{$name} {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
+    }
+  }
+}
+
+// One podium step per medal from the $medals map (gold/silver/bronze).
+@mixin xp-podium-step($medal) {
+  $m: map.get(t.$medals, $medal);
+  background: linear-gradient(to bottom, map.get($m, top), map.get($m, bottom));
+  border-color: map.get($m, light) map.get($m, dark) map.get($m, dark) map.get($m, light);
 }

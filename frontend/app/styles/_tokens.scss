@@ -48,10 +48,30 @@ $colors: (
   "row-active": #c9e3f7,
   "row-border": #d8e2ea,
   "divider-soft": #e1e8ee,
+  "row-stripe": #eef6fc,
+  "row-selected": #cce8ff,
+  "button-face-cool": #d9e8f3,
+  "tab-hover": #e7f3ff,
+  "tab-active": #e8f4ff,
+  "slate": #536575,
+  "steel": #9aa8b5,
+
+  // Loading skeletons
+  "skeleton": #dce5ed,
+  "skeleton-shine": #f3f7fa,
+
+  // XP scrollbars
+  "scroll-track": #e5edf4,
+  "scroll-edge": #b8c8d6,
+  "scroll-thumb": #dcebf5,
+  "scroll-thumb-dark": #b7d3e7,
+  "scroll-thumb-hover": #e7f3fb,
+  "scroll-thumb-hover-dark": #c4deef,
 
   // Status / feedback
   "online": #00c853,
   "online-dark": #00a000,
+  "win": #16821b,
   "offline": #9e9e9e,
   "danger": #c62828,
   "danger-bright": #ff0000,
@@ -104,6 +124,14 @@ $colors: (
   "close": #ff846e,
   "close-dark": #d9544f,
   "error": #e34840,
+);
+
+// Podium blocks: SCSS-only chrome (gradient, bevel edges, label color).
+// Not exported to CSS vars/Tailwind: only the podium mixin reads it.
+$medals: (
+  "gold": (top: #fff7a8, bottom: #e5bd32, light: #fffde0, dark: #806515, text: #a47a00),
+  "silver": (top: #f4f4f4, bottom: #bfc4ca, light: #ffffff, dark: #707070, text: #666666),
+  "bronze": (top: #f0b27a, bottom: #c97832, light: #ffe0c0, dark: #784318, text: #96501f),
 );
 
 // ---------- TYPOGRAPHY ----------
