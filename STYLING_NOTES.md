@@ -68,12 +68,3 @@ Reusable components: they take props and are used in two or more places. Counts 
 | `ProfilePageTemplate` | user, friends, isOwnProfile, … | 2: own profile, `/profile/[id]` |
 | `LegalDocument` | title, updated, children | 2: privacy, terms |
 | `AuthIcon` | src, alt, width, height, className | 2: landing page tiles |
-
-## 4. Honest gaps
-
-- **One-off font sizes:** seven sizes are arbitrary Tailwind values (`text-[15px]`, `[17px]`, `[19px]`, `[21px]`, `[25px]`, `[26px]`, `[64px]`), not tokens.
-- **Leaderboard gap:** the left column has no gap because `leaderboard.tsx` uses an undefined `styles.podium`. That look was preserved, not fixed.
-- **Pre-existing issues, not styling, left untouched:**
-  - eslint reports 97 problems (98 on `main`).
-  - `AuthRedirect` sends logged-out users away from `/forgot-password` and `/reset-password`.
-  - `StartMenu`'s `onClose` prop is unused.
