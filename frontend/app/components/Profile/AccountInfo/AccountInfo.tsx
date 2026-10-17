@@ -1,5 +1,3 @@
-import styles from "./AccountInfo.module.scss";
-
 interface Props {
 	username: string;
 	email: string;
@@ -27,7 +25,7 @@ export default function AccountInfo({
 	];
 
 	return (
-		<div className={styles.infoGrid}>
+		<div className="flex flex-col gap-1.5 font-xp text-xp-base max-[600px]:gap-1.25 max-[600px]:text-xp-sm">
 			{info.map((item) => (
 				<div key={item.label}>
 					{item.label}: {item.value}

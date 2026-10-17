@@ -1,0 +1,10 @@
+@use "mixins" as m;
+
+// Layout lives in XPGroupBox.tsx (Tailwind). SCSS: etched box + title strip.
+.xp-groupbox {
+  @include m.xp-groupbox;
+}
+
+.xp-groupbox-title {
+  @include m.xp-section-title;
+}
