@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 
 import { authService } from "@/services/auth.services";
 
 import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
+import AuthField from "../components/auth/AuthField";
+import AuthButton from "../components/auth/AuthButton";
+import AuthLink from "../components/auth/AuthLink";
 import XPAlert from "../components/ui/XPAlert/XPAlert";
 
 
@@ -48,43 +50,34 @@ export default function ForgotPasswordPage() {
       <AuthPanel>
         <form
           onSubmit={handleSubmit}
-          className="xp-form"
+          className="xp-form flex flex-col items-stretch gap-2.5"
         >
-          <h3 className="xp-title">
+          <h3 className="xp-title text-xp-md font-bold">
             Forgot Password
           </h3>
-          <div className="xp-field">
-            <label className="xp-label">
-              Email
-            </label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
-              className="xp-input"
-              required
-              disabled={isLoading}
-            />
-          </div>
-          <button
+          <AuthField
+            label="Email"
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+            required
+            disabled={isLoading}
+          />
+          <AuthButton
             type="submit"
-            className="xp-submit"
             disabled={isLoading}
           >
             {isLoading
               ? "Sending..."
               : "Send Reset Link"}
-          </button>
+          </AuthButton>
         </form>
-        <Link
-          href="/login"
-          className="xp-link"
-        >
+        <AuthLink href="/login">
           Back to login
-        </Link>
+        </AuthLink>
       </AuthPanel>
 
       <XPAlert

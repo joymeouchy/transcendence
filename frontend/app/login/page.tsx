@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 
 import { authService } from "@/services/auth.services";
 import { useRouter } from "next/navigation";
@@ -12,6 +11,9 @@ import { loginFields } from "../data/auth/loginFields";
 
 import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
+import AuthField from "../components/auth/AuthField";
+import AuthButton from "../components/auth/AuthButton";
+import AuthLink from "../components/auth/AuthLink";
 
 
 
@@ -59,58 +61,48 @@ export default function LoginPage() {
       <AuthPanel>
         <form
           onSubmit={handleSubmit}
-          className="xp-form"
+          className="xp-form flex flex-col items-stretch gap-2.5"
         >
-          <h3 className="xp-title">
+          <h3 className="xp-title text-xp-md font-bold">
             Log In to Pong XP
           </h3>
 
           {loginFields.map((field) => (
-            <div
+            <AuthField
               key={field.key}
-              className="xp-field"
-            >
-              <label className="xp-label">
-                {field.label}
-              </label>
-
-              <input
-                type={field.type}
-                placeholder={field.placeholder}
-                value={
-                  formData[
-                  field.key as keyof typeof formData
-                  ]
-                }
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    [
-                      field.key as keyof typeof formData
-                    ]: e.target.value,
-                  }))
-                }
-                className="xp-input"
-                required={field.required}
-                disabled={isLoading}
-              />
-            </div>
+              label={field.label}
+              type={field.type}
+              placeholder={field.placeholder}
+              value={
+                formData[
+                field.key as keyof typeof formData
+                ]
+              }
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  [
+                    field.key as keyof typeof formData
+                  ]: e.target.value,
+                }))
+              }
+              required={field.required}
+              disabled={isLoading}
+            />
           ))}
 
 
-          <button
+          <AuthButton
             type="submit"
-            className="xp-submit"
             disabled={isLoading}
           >
             {isLoading
               ? "Logging in..."
               : "Log In"}
-          </button>
+          </AuthButton>
 
-          <button
+          <AuthButton
             type="button"
-            className="xp-submit"
             disabled={isLoading}
             onClick={
               authService.loginWithGoogle
@@ -119,22 +111,16 @@ export default function LoginPage() {
             {isLoading
               ? "Please wait..."
               : "Log In with Google instead"}
-          </button>
+          </AuthButton>
         </form>
 
-        <Link
-          href="/forgot-password"
-          className="xp-link"
-        >
+        <AuthLink href="/forgot-password">
           Forgot password?
-        </Link>
+        </AuthLink>
 
-        <Link
-          href="/register"
-          className="xp-link"
-        >
+        <AuthLink href="/register">
           Create a new account
-        </Link>
+        </AuthLink>
       </AuthPanel>
     </AuthLayout>
   );
