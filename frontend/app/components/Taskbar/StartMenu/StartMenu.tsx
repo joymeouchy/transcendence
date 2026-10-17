@@ -8,7 +8,7 @@ import { images } from "@/lib/images";
 import { useAuth } from "@/context/AuthContext";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { playSound, sounds } from "@/lib/sounds";
 
 import XPAlert from "../../ui/XPAlert/XPAlert";
@@ -30,7 +30,6 @@ export default function StartMenu({
 }: StartMenuProps) {
   const router = useRouter();
   const { logout } = useAuth();
-  const menuRef = useRef<HTMLDivElement>(null);
 
   const [showSignOutAlert, setShowSignOutAlert] = useState(false);
 
@@ -50,7 +49,6 @@ export default function StartMenu({
       {open && (
         <div
           className="xp-start-menu fixed bottom-10 left-2.5 z-1000 flex h-80 w-70 flex-col overflow-hidden rounded-xp-sm bg-xp-window-bg p-0 font-xp text-xp-md text-xp-text shadow-xp-window"
-          ref={menuRef}
         >
           <div className="xp-start-menu-top flex min-h-10 w-full items-center gap-2 px-2.5 py-2 text-xp-white">
           </div>
