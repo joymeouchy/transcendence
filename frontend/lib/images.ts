@@ -31,6 +31,7 @@ export const images = {
 	paint: "/paint.png",
 
 	windowsOneCatLeftWallpaper: "/wallpapers/catXP.jpg",
+	windowsSabahoWallpaper: "/wallpapers/sabahooo.jpg",
 	windowsOneCatRightWallpaper: "/wallpapers/catXP2.jpg",
 	windowsDogWallpaper: "/wallpapers/dogXP.jpg",
 	windowsAnime1Wallpaper: "/wallpapers/animeXP.jpg",

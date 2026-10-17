@@ -29,16 +29,6 @@
   user-select: none;
 }
 
-// Glossy raised button face (XPButton and plain dialog buttons).
-@mixin xp-button-face {
-  @include xp-gradient(white, button-face);
-  @include xp-bevel-border;
-  border-radius: t.radius(sm);
-  box-shadow: inset 1px 1px t.tint(0.75);
-  cursor: pointer;
-  user-select: none;
-}
-
 // Classic XP keyboard-focus ring: dotted, drawn inside the control.
 @mixin xp-focus-ring($color: t.color(black), $offset: -4px) {
   outline: 1px dotted $color;
