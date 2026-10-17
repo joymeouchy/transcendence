@@ -1,146 +1,44 @@
 @use "tokens" as t;
 @use "mixins" as m;
 
+// Layout lives in StartMenu.tsx / StartMenuColumn.tsx (Tailwind).
+// SCSS only draws the XP chrome: bevel, blue bars, column divider.
 .xp-start-menu {
-  position: fixed;
-  bottom: 40px;
-  left: 10px;
-
-  width: 280px;
-  height: 320px;
-
-  display: flex;
-  flex-direction: column;
-
-  background: t.color(window-bg);
-
   @include m.xp-bevel-border;
 
-  border-radius: t.radius(sm);
+  &-top,
+  &-bottom {
+    @include m.xp-gradient(light-blue, blue);
+  }
 
-  box-shadow: t.shadow(window);
+  &-top {
+    border-bottom: 1px solid t.shade(0.25);
 
-  font-family: t.font(main);
-  font-size: t.size(md);
-  color: t.color(text);
+    img {
+      width: 24px;
+      height: 24px;
+      border-radius: t.radius(xs);
+    }
+  }
 
-  overflow: hidden;
+  &-bottom {
+    border-top: 1px solid t.shade(0.25);
+  }
 
-  padding: 0;
-
-  z-index: 1000;
-
-  display: flex;
-  flex-direction: column;
-}
-
-
-.xp-start-menu-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  width: 100%;
-  box-sizing: border-box;
-
-  padding: 8px 10px;
-  min-height: 40px;
-
-  @include m.xp-gradient(light-blue, blue);
-
-  color: t.color(white);
-
-  border-bottom: 1px solid t.shade(0.25);
-
-  img {
-    width: 24px;
-    height: 24px;
-    border-radius: t.radius(xs);
+  &-left {
+    border-right: 1px solid t.tint(0.6);
+    box-shadow: 1px 0 0 t.shade(0.15);
   }
 }
 
-
-.xp-start-menu-body {
-  flex: 1;
-
-  display: flex;
-  flex-direction: row;
-
-  width: 100%;
-  height: 100%;
-
-  overflow: hidden;
-}
-
-.xp-start-menu-left,
-.xp-start-menu-right {
-  flex: 1;
-
-  min-width: 0; /* critical flex fix */
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 6px;
-
-  padding: 10px;
-
-  box-sizing: border-box;
-}
-
-.xp-start-menu-left {
-  border-right: 1px solid t.tint(0.6);
-
-  box-shadow: 1px 0 0 t.shade(0.15);
-}
-
-.xp-start-menu-column {
-  display: flex;
-  flex-direction: column;
-
-  flex: 1;
-
-  min-width: 0;
-
-  gap: 6px;
-
-  box-sizing: border-box;
-}
-
 .xp-start-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  padding: 4px 6px;
-
   border-radius: t.radius(sm);
-
-  cursor: pointer;
-
-  user-select: none;
-
   transition: background 0.15s ease;
 
   &:hover {
     background: t.alpha(blue, 0.15);
   }
 }
-
-.xp-start-menu-bottom {
-  width: 100%;
-  box-sizing: border-box;
-
-  padding: 8px;
-
-  display: flex;
-  justify-content: flex-end;
-
-  @include m.xp-gradient(light-blue, blue);
-
-  border-top: 1px solid t.shade(0.25);
-}
-
 
 .xp-start-menu-signout {
   display: flex;

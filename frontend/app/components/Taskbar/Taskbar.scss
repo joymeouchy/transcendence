@@ -1,28 +1,10 @@
 @use "tokens" as t;
 @use "mixins" as m;
 
+// Layout lives in Taskbar.tsx (Tailwind). SCSS only paints the XP bar.
 .xp-taskbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  height: 40px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 0;
-
   @include m.xp-gradient(blue, dark-blue);
   border-top: 1px solid t.tint(0.35);
-
-  color: t.color(white);
-  font-family: t.font(main);
-  font-size: t.size(md);
-
-  z-index: 1000;
 
   &-left,
   &-right {
@@ -61,20 +43,8 @@
 }
 
 .xp-start {
-  height: 100%;
-
-  display: flex;
-  align-items: center;
-
-  padding: 0 14px;
-
-  cursor: pointer;
-
   @include m.xp-gradient(light-blue, blue-deep);
   border-right: 1px solid t.shade(0.25);
-
-  font-weight: bold;
-  user-select: none;
 
   transition: filter 0.15s ease;
 
@@ -86,18 +56,4 @@
   &.active {
     filter: brightness(0.95);
   }
-}
-
-.xp-clock {
-  padding: 0 10px;
-
-  text-align: right;
-  line-height: 1.1;
-  font-size: t.size(base);
-  color: t.color(white);
-}
-
-.xp-date {
-  font-size: t.size(xs);
-  opacity: 0.85;
 }

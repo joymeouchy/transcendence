@@ -1,46 +1,24 @@
 @use "tokens" as t;
 
+// Layout/spacing/typography live in StartMenuItem.tsx (Tailwind + clsx
+// variants). SCSS keeps the interaction states.
 .xp-start-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  padding: 6px 8px;
-
-  border-radius: t.radius(xs);
-
-  cursor: pointer;
-
-  color: t.color(text);
-  text-decoration: none;
-
   background: transparent;
   border: none;
   outline: none;
+  border-radius: t.radius(xs);
 
   transition: background 0.1s ease, color 0.1s ease;
-
-  img {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-  }
 
   &:hover {
     background: t.color(selection);
     color: t.color(white);
   }
 
-  // Sign-out entry in the blue footer: white text, dotted focus on hover
-  &--danger {
-    gap: 1px;
-    padding: 0px 0px;
-    color: t.color(white);
-
-    &:hover {
-      background: transparent;
-      outline: 1px dotted t.tint(0.8);
-      outline-offset: -2px;
-    }
+  // Sign-out entry in the blue footer: dotted outline instead of a fill
+  &--danger:hover {
+    background: transparent;
+    outline: 1px dotted t.tint(0.8);
+    outline-offset: -2px;
   }
 }
