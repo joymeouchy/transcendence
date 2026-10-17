@@ -2,7 +2,6 @@
 
 import XPModal from "../../../ui/XPModal/XPModal";
 
-import "./GameOverModal.scss";
 
 type Props = {
   isOpen: boolean;
@@ -37,16 +36,16 @@ export default function GameOverModal({
       isOpen={isOpen}
 	    onClose={onExit}
     >
-      <div className="game-over">
+      <div className="flex flex-col items-center gap-3.75">
         {rematchDeclined ? (
           <>
-            <h2>Rematch Declined</h2>
+            <h2 className="m-0 text-xp-4xl">Rematch Declined</h2>
 
             <p className="rematch-declined-message">
               Your opponent declined your rematch request.
             </p>
 
-            <div className="buttons">
+            <div className="flex flex-row gap-1">
               <button onClick={onExit}>
                 Return to Main Menu
               </button>
@@ -54,15 +53,15 @@ export default function GameOverModal({
           </>
         ) : (
           <>
-            <h2>
+            <h2 className="m-0 text-xp-4xl">
               {won ? "You Won!" : `${winner} Won!`}
             </h2>
 
-            <div className="score">
+            <div className="text-xp-3xl font-bold">
               {scoreLeft} : {scoreRight}
             </div>
 
-            <div className="buttons">
+            <div className="flex flex-row gap-1">
               <button
                 onClick={onRematch}
                 disabled={waitingRematch}

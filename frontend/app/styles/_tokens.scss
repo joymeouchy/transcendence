@@ -25,6 +25,8 @@ $colors: (
   "link": #0000ee,
   "focus": #2563eb,
   "app-bg": #0f172a,
+  "navy": #003c74,
+  "ink-dark": #000050,
 
   // Login / welcome screen
   "login-bg-top": #3a6ea5,
@@ -75,6 +77,29 @@ $colors: (
   "offline": #9e9e9e,
   "danger": #c62828,
   "danger-bright": #ff0000,
+
+  // Pong game
+  "game-bg": #111827,
+  "game-border": #475569,
+
+  // XP balloon / power-up HUD
+  "classic-edge": #aca899,
+  "steel-blue": #9aabc0,
+  "luna-top": #3c91e8,
+  "luna-mid": #1671d9,
+  "luna-bottom": #0755ad,
+  "powerup-glow": #dbeafe,
+  "powerup-sky": #7db5ef,
+  "powerup-edge": #b5cbe2,
+  "powerup-bright": #5ba7f7,
+  "powerup-deep": #0054b8,
+
+  // Game invite dialog
+  "invite-bg": #f5f8fc,
+  "invite-ink": #1f4e8c,
+  "invite-name": #0b3d91,
+  "invite-avatar-top": #eaf3ff,
+  "invite-avatar-bottom": #d5e7fa,
 
   // Theme-picker selection
   "pick-hover": #5a9cff,
