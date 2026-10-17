@@ -1,4 +1,5 @@
 @use "tokens" as t;
+@use "mixins" as m;
 
 .xp-taskbar {
   position: fixed;
@@ -14,26 +15,49 @@
 
   padding: 0;
 
-  background: linear-gradient(
-    to bottom,
-    t.color(blue),
-    t.color(dark-blue)
-  );
-
+  @include m.xp-gradient(blue, dark-blue);
   border-top: 1px solid t.tint(0.35);
 
   color: t.color(white);
-
   font-family: t.font(main);
   font-size: t.size(md);
 
   z-index: 1000;
-}
 
-.xp-taskbar-left {
-  display: flex;
-  align-items: center;
-  height: 100%;
+  &-left,
+  &-right {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+
+  &-apps {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-left: 6px;
+  }
+
+  &-app {
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 10px;
+
+    border-radius: t.radius(xs);
+    background: t.tint(0.12);
+    border: 1px solid t.tint(0.18);
+
+    cursor: pointer;
+    font-size: t.size(base);
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: t.tint(0.2);
+    }
+  }
 }
 
 .xp-start {
@@ -46,85 +70,34 @@
 
   cursor: pointer;
 
-  background: linear-gradient(
-    to bottom,
-    t.color(light-blue),
-    t.color(blue-deep)
-  );
-
+  @include m.xp-gradient(light-blue, blue-deep);
   border-right: 1px solid t.shade(0.25);
 
   font-weight: bold;
-
   user-select: none;
 
   transition: filter 0.15s ease;
-}
 
-.xp-start:hover {
-  filter: brightness(1.1);
-}
+  &:hover {
+    filter: brightness(1.1);
+  }
 
-.xp-start:active,
-.xp-start.active {
-  filter: brightness(0.95);
-}
-
-.xp-taskbar-apps {
-  display: flex;
-  align-items: center;
-
-  gap: 4px;
-
-  padding-left: 6px;
-}
-
-.xp-taskbar-app {
-  height: 30px;
-
-  display: flex;
-  align-items: center;
-
-  padding: 0 10px;
-
-  border-radius: t.radius(xs);
-
-  background: t.tint(0.12);
-
-  border: 1px solid t.tint(0.18);
-
-  cursor: pointer;
-
-  font-size: t.size(base);
-
-  transition: background 0.15s ease;
-}
-
-.xp-taskbar-app:hover {
-  background: t.tint(0.2);
-}
-
-.xp-taskbar-right {
-  display: flex;
-  align-items: center;
-
-  height: 100%;
+  &:active,
+  &.active {
+    filter: brightness(0.95);
+  }
 }
 
 .xp-clock {
   padding: 0 10px;
 
   text-align: right;
-
   line-height: 1.1;
-
   font-size: t.size(base);
-
   color: t.color(white);
 }
 
 .xp-date {
   font-size: t.size(xs);
-
   opacity: 0.85;
 }
