@@ -1,0 +1,7 @@
+@use "mixins" as m;
+
+@include m.xp-shimmer-keyframes(xp-shimmer);
+
+.xp-skeleton {
+  @include m.xp-shimmer(xp-shimmer);
+}

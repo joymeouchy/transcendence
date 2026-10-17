@@ -6,6 +6,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 
 import { MatchHistory } from "@/services/user.services";
 
+import clsx from "clsx";
 import styles from "./MatchHistoryChart.module.scss"
 
 interface Props {
@@ -45,14 +46,14 @@ export default function MatchHistoryChart({
 	}, [matches]);
 
 	return (
-		<div className={styles.section}>
-			<div className={styles.sectionTitle}>
+		<div className="mb-xp-md min-w-0 max-[600px]:mb-xp-sm">
+			<div className={clsx(styles.sectionTitle, "mb-xp-sm rounded-xp-sm px-2 py-1.25 font-xp text-xp-base font-bold text-xp-white")}>
 				WINS / LOSSES OVER TIME
 			</div>
 
-			<div className={styles.chart}>
+			<div className={clsx(styles.frame, "min-h-72.5 w-full overflow-hidden rounded-xp-sm bg-xp-white p-xp-sm max-[600px]:min-h-60 max-[600px]:p-xp-xs")}>
 				{graphData.length === 0 ? (
-					<div className={styles.empty}>
+					<div className={clsx(styles.frame, "flex min-h-72.5 items-center justify-center rounded-xp-sm bg-xp-white p-xp-md font-xp text-xp-base text-xp-gray-600 max-[600px]:min-h-60")}>
 						No matches yet.
 					</div>
 				) : (

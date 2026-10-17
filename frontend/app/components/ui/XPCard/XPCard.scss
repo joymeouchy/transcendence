@@ -1,0 +1,10 @@
+@use "mixins" as m;
+
+// Layout lives in XPCard.tsx (Tailwind). SCSS: card edge + title pill.
+.xp-card {
+  @include m.xp-card;
+}
+
+.xp-card-title {
+  @include m.xp-title-pill;
+}
