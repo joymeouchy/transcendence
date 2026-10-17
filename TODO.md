@@ -14,4 +14,3 @@
 
 photo sources:
 https://www.deviantart.com/windowsaesthetics/art/Windows-HD-User-Account-Picture-Pack-843341713
-https://nextjs.org/docs/app/api-reference/file-conventions/proxy
