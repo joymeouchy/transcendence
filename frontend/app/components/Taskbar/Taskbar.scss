@@ -2,58 +2,8 @@
 @use "mixins" as m;
 
 // Layout lives in Taskbar.tsx (Tailwind). SCSS only paints the XP bar.
+// The Start button's look is owned by StartButton/StartButton.scss.
 .xp-taskbar {
   @include m.xp-gradient(blue, dark-blue);
   border-top: 1px solid t.tint(0.35);
-
-  &-left,
-  &-right {
-    display: flex;
-    align-items: center;
-    height: 100%;
-  }
-
-  &-apps {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding-left: 6px;
-  }
-
-  &-app {
-    height: 30px;
-
-    display: flex;
-    align-items: center;
-
-    padding: 0 10px;
-
-    border-radius: t.radius(xs);
-    background: t.tint(0.12);
-    border: 1px solid t.tint(0.18);
-
-    cursor: pointer;
-    font-size: t.size(base);
-    transition: background 0.15s ease;
-
-    &:hover {
-      background: t.tint(0.2);
-    }
-  }
-}
-
-.xp-start {
-  @include m.xp-gradient(light-blue, blue-deep);
-  border-right: 1px solid t.shade(0.25);
-
-  transition: filter 0.15s ease;
-
-  &:hover {
-    filter: brightness(1.1);
-  }
-
-  &:active,
-  &.active {
-    filter: brightness(0.95);
-  }
 }

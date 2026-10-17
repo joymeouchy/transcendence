@@ -1,8 +1,9 @@
 @use "tokens" as t;
 @use "mixins" as m;
 
-// Layout lives in StartMenu.tsx / StartMenuColumn.tsx (Tailwind).
-// SCSS only draws the XP chrome: bevel, blue bars, column divider.
+// Layout lives in StartMenu.tsx (Tailwind). SCSS only draws the XP
+// chrome: bevel, blue header/footer bars, column divider.
+// Menu entries are styled by StartMenuItem/StartMenuItem.scss.
 .xp-start-menu {
   @include m.xp-bevel-border;
 
@@ -13,12 +14,6 @@
 
   &-top {
     border-bottom: 1px solid t.shade(0.25);
-
-    img {
-      width: 24px;
-      height: 24px;
-      border-radius: t.radius(xs);
-    }
   }
 
   &-bottom {
@@ -29,41 +24,4 @@
     border-right: 1px solid t.tint(0.6);
     box-shadow: 1px 0 0 t.shade(0.15);
   }
-}
-
-.xp-start-menu-item {
-  border-radius: t.radius(sm);
-  transition: background 0.15s ease;
-
-  &:hover {
-    background: t.alpha(blue, 0.15);
-  }
-}
-
-.xp-start-menu-signout {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  background: transparent;
-  border: none;
-
-  color: t.color(white);
-
-  cursor: pointer;
-
-  font-size: t.size(lg);
-
-  font-family: t.font(main);
-}
-
-.xp-start-menu-signout-icon {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-}
-
-
-* {
-  box-sizing: border-box;
 }
