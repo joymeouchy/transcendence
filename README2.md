@@ -1,5 +1,5 @@
 *This project has been created as part of the 42 curriculum by jmeouchy and rdennaou.*
-
+//noes: the arrangement is 2 people. as required by our faculty/staff
 # PONG_XP
 
 ## Description
