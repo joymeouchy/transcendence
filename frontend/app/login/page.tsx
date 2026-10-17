@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 
 import { authService } from "@/services/auth.services";
 import { useRouter } from "next/navigation";
@@ -14,8 +14,7 @@ import AuthPanel from "../components/auth/AuthPanel";
 import AuthField from "../components/auth/AuthField";
 import AuthButton from "../components/auth/AuthButton";
 import AuthLink from "../components/auth/AuthLink";
-
-
+import GoogleAuthError from "../GoogleAuthError/GoogleAuthError";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -23,8 +22,7 @@ export default function LoginPage() {
     password: "",
   });
 
-  const [isLoading, setIsLoading] =
-    useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -36,22 +34,15 @@ export default function LoginPage() {
     }
   }, []);
 
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setIsLoading(true);
 
     try {
-      await login(
-        formData.email,
-        formData.password
-      );
+      await login(formData.email, formData.password);
       router.push("/home");
-
     } catch (err: any) {
-
     } finally {
       setIsLoading(false);
     }
@@ -59,13 +50,14 @@ export default function LoginPage() {
   return (
     <AuthLayout>
       <AuthPanel>
+        <Suspense fallback={null}>
+          <GoogleAuthError />
+        </Suspense>
         <form
           onSubmit={handleSubmit}
           className="xp-form flex flex-col items-stretch gap-2.5"
         >
-          <h3 className="xp-title text-xp-md font-bold">
-            Log In to Pong XP
-          </h3>
+          <h3 className="xp-title text-xp-md font-bold">Log In to Pong XP</h3>
 
           {loginFields.map((field) => (
             <AuthField
@@ -73,17 +65,11 @@ export default function LoginPage() {
               label={field.label}
               type={field.type}
               placeholder={field.placeholder}
-              value={
-                formData[
-                field.key as keyof typeof formData
-                ]
-              }
+              value={formData[field.key as keyof typeof formData]}
               onChange={(e) =>
                 setFormData((prev) => ({
                   ...prev,
-                  [
-                    field.key as keyof typeof formData
-                  ]: e.target.value,
+                  [field.key as keyof typeof formData]: e.target.value,
                 }))
               }
               required={field.required}
@@ -91,36 +77,22 @@ export default function LoginPage() {
             />
           ))}
 
-
-          <AuthButton
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading
-              ? "Logging in..."
-              : "Log In"}
+          <AuthButton type="submit" disabled={isLoading}>
+            {isLoading ? "Logging in..." : "Log In"}
           </AuthButton>
 
           <AuthButton
             type="button"
             disabled={isLoading}
-            onClick={
-              authService.loginWithGoogle
-            }
+            onClick={authService.loginWithGoogle}
           >
-            {isLoading
-              ? "Please wait..."
-              : "Log In with Google instead"}
+            {isLoading ? "Please wait..." : "Log In with Google instead"}
           </AuthButton>
         </form>
 
-        <AuthLink href="/forgot-password">
-          Forgot password?
-        </AuthLink>
+        <AuthLink href="/forgot-password">Forgot password?</AuthLink>
 
-        <AuthLink href="/register">
-          Create a new account
-        </AuthLink>
+        <AuthLink href="/register">Create a new account</AuthLink>
       </AuthPanel>
     </AuthLayout>
   );
