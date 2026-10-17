@@ -22,6 +22,9 @@ export default function AuthCallbackContent() {
 			localStorage.setItem("userId", userId);
 		}
 
+		// Picked up by AuthContext after the reload to play the login sound
+		sessionStorage.setItem("pendingLoginSound", "1");
+
 		window.location.replace("/home");
 	}, [router, searchParams]);
 
