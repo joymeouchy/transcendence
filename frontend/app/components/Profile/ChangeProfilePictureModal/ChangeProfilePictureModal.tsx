@@ -8,8 +8,6 @@ import XPAlert from "../../ui/XPAlert/XPAlert";
 import { UserService } from "@/services/user.services";
 import { useAuth } from "@/context/AuthContext";
 
-import styles from "./ChangeProfilePictureModal.module.scss";
-
 type ChangeProfilePictureModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -132,10 +130,11 @@ export default function ChangeProfilePictureModal({
         isOpen={isOpen}
         onClose={handleClose}
       >
-        <div className={styles.form}>
-          <label>
+        <div className="flex min-w-75 flex-col items-center gap-5 p-5">
+          <label className="flex flex-col items-center gap-2.5 text-xp-lg">
             Select Image
             <input
+              className="w-auto"
               type="file"
               accept="image/*"
               onChange={handleFileChange}
@@ -146,18 +145,19 @@ export default function ChangeProfilePictureModal({
             <img
               src={preview}
               alt="Preview"
-              className={styles.preview}
+              className="size-30 rounded-xp-sm object-cover"
             />
           )}
 
           {error && (
-            <p className={styles.error}>
+            <p>
               {error}
             </p>
           )}
 
-          <div className={styles.actions}>
+          <div className="mt-2.5 flex w-full items-center justify-center gap-5">
             <button
+              className="h-7.5 w-22.5 cursor-pointer text-xp-md"
               type="button"
               onClick={handleClose}
               disabled={loading}
@@ -166,6 +166,7 @@ export default function ChangeProfilePictureModal({
             </button>
 
             <button
+              className="h-7.5 w-22.5 cursor-pointer text-xp-md"
               type="button"
               onClick={handleReset}
               disabled={loading}
@@ -174,6 +175,7 @@ export default function ChangeProfilePictureModal({
             </button>
 
             <button
+              className="h-7.5 w-22.5 cursor-pointer text-xp-md"
               type="button"
               onClick={handleSubmit}
               disabled={loading}

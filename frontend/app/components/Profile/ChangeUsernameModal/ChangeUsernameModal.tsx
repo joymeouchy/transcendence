@@ -8,8 +8,6 @@ import XPAlert from "../../ui/XPAlert/XPAlert";
 import { UserService } from "@/services/user.services";
 import { useAuth } from "@/context/AuthContext";
 
-import styles from "./ChangeUsernameModal.module.scss";
-
 type ChangeUsernameModalProps = {
 	isOpen: boolean;
 	onClose: () => void;
@@ -86,7 +84,7 @@ export default function ChangeUsernameModal({
 				isOpen={isOpen}
 				onClose={handleClose}
 			>
-				<div className={styles.form}>
+				<div className="flex flex-col gap-3.75">
 					<label>
 						Username
 						<input
@@ -100,13 +98,14 @@ export default function ChangeUsernameModal({
 					</label>
 
 					{error && (
-						<p className={styles.error}>
+						<p className="text-xp-md text-xp-danger-bright">
 							{error}
 						</p>
 					)}
 
-					<div className={styles.actions}>
+					<div className="flex justify-end gap-2.5">
 						<button
+							className="cursor-pointer"
 							type="button"
 							onClick={handleClose}
 							disabled={loading}
@@ -115,6 +114,7 @@ export default function ChangeUsernameModal({
 						</button>
 
 						<button
+							className="cursor-pointer"
 							type="button"
 							onClick={handleSubmit}
 							disabled={loading}

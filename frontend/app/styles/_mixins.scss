@@ -63,15 +63,32 @@
   backdrop-filter: blur($blur);
 }
 
-// Subtle lift on hover, pressed back on active.
-@mixin xp-press($lift: 1px) {
-  transition: filter 0.15s ease, transform 0.1s ease;
+// Etched XP group box: thin border, inner highlight, soft drop shadow.
+@mixin xp-groupbox($border: t.color(groupbox-border)) {
+  border: 1px solid $border;
+  box-shadow:
+    inset 1px 1px t.tint(0.9),
+    0 1px 2px t.shade(0.12);
+}
 
-  &:hover:not(:disabled) {
-    filter: brightness(1.1);
+// Blue header strip at the top of a group box / panel.
+@mixin xp-section-title {
+  @include xp-gradient(light-blue, blue);
+  border-bottom: 1px solid t.shade(0.25);
+  text-shadow: 1px 1px t.shade(0.35);
+  box-shadow: inset 1px 1px t.tint(0.35);
+}
+
+// Zebra list row: white, tinted every $stripe row, light-blue on hover.
+@mixin xp-list-row($stripe: odd, $divider: t.color(row-border)) {
+  background: t.color(white);
+  border-bottom: 1px solid $divider;
+
+  &:nth-child(#{$stripe}) {
+    background: t.color(row-alt);
   }
 
-  &:active:not(:disabled) {
-    transform: translateY($lift);
+  &:hover {
+    background: t.color(row-hover);
   }
 }

@@ -6,8 +6,6 @@ import ChangePasswordModal from "../ChangePasswordModal/ChangePasswordModal";
 import ChangeProfilePictureModal from "../ChangeProfilePictureModal/ChangeProfilePictureModal";
 import ChangeUsernameModal from "../ChangeUsernameModal/ChangeUsernameModal";
 
-import styles from "./AccountActions.module.scss";
-
 interface AccountActionsProps {
   provider?: string;
   username: string;
@@ -35,7 +33,7 @@ export default function AccountActions({
 
   return (
     <>
-      <div className={styles.actions}>
+      <div className="flex flex-col gap-xp-sm max-[600px]:gap-xp-xs">
         {isOwnProfile ? (
           <>
             <button

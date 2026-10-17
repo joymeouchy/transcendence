@@ -7,8 +7,6 @@ import XPAlert from "../../ui/XPAlert/XPAlert";
 
 import { authService } from "@/services/auth.services";
 
-import styles from "./ChangePasswordModal.module.scss";
-
 type ChangePasswordModalProps = {
 	isOpen: boolean;
 	onClose: () => void;
@@ -94,10 +92,11 @@ export default function ChangePasswordModal({
 				isOpen={isOpen}
 				onClose={handleClose}
 			>
-				<div className={styles.form}>
-					<label>
+				<div className="flex flex-col gap-3.5">
+					<label className="flex flex-col gap-1.5 text-xp-md font-semibold">
 						Current Password
 						<input
+							className="p-2 text-xp-lg"
 							type="password"
 							value={currentPassword}
 							onChange={(e) =>
@@ -106,9 +105,10 @@ export default function ChangePasswordModal({
 						/>
 					</label>
 
-					<label>
+					<label className="flex flex-col gap-1.5 text-xp-md font-semibold">
 						New Password
 						<input
+							className="p-2 text-xp-lg"
 							type="password"
 							value={newPassword}
 							onChange={(e) =>
@@ -117,9 +117,10 @@ export default function ChangePasswordModal({
 						/>
 					</label>
 
-					<label>
+					<label className="flex flex-col gap-1.5 text-xp-md font-semibold">
 						Confirm New Password
 						<input
+							className="p-2 text-xp-lg"
 							type="password"
 							value={confirmPassword}
 							onChange={(e) =>
@@ -129,13 +130,14 @@ export default function ChangePasswordModal({
 					</label>
 
 					{error && (
-						<p className={styles.error}>
+						<p className="text-xp-md text-xp-danger">
 							{error}
 						</p>
 					)}
 
-					<div className={styles.actions}>
+					<div className="mt-2 flex justify-end gap-2.5">
 						<button
+							className="cursor-pointer px-4 py-2"
 							type="button"
 							onClick={handleClose}
 							disabled={loading}
@@ -144,6 +146,7 @@ export default function ChangePasswordModal({
 						</button>
 
 						<button
+							className="cursor-pointer px-4 py-2"
 							type="button"
 							onClick={handleSubmit}
 							disabled={loading}

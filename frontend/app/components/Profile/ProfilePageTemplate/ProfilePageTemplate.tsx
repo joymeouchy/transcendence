@@ -10,11 +10,17 @@ import FriendsPanel from "../FriendsPanel/FriendsPanel";
 
 import DesktopLayout from "../../DesktopLayout/DesktopLayout";
 import XPWindow from "../../ui/XPWindow/XPWindow";
+import XPGroupBox from "../../ui/XPGroupBox/XPGroupBox";
 
 import { Friend } from "@/services/friendships.service";
 import { UserProfile } from "@/types/types.dto";
 
+import clsx from "clsx";
 import styles from "./ProfilePageTemplate.module.scss";
+
+const pageClass =
+  "flex min-h-90 w-full min-w-0 gap-xp-md font-xp max-[900px]:flex-col max-[600px]:gap-xp-sm";
+const statusClass = "text-xp-base max-[600px]:text-xp-sm";
 
 interface ProfilePageTemplateProps {
   user?: UserProfile;
@@ -53,22 +59,20 @@ export default function ProfilePageTemplate({
           loadingProfile ? "Loading friends..." : "Loading user profile..."
         }
       >
-        <div className={styles.page}>
+        <div className={pageClass}>
           {!user ? (
             !loadingProfile && (
-              <div className={styles.loading}>Could not load user profile.</div>
+              <div>Could not load user profile.</div>
             )
           ) : (
-            <div className={styles.page}>
-              <aside className={styles.leftPanel}>
+            <div className={pageClass}>
+              <aside className="flex w-65 min-w-0 shrink-0 flex-col gap-xp-md max-[900px]:w-full max-[600px]:gap-xp-sm">
                 <ProfileHeader
                   username={user.username}
                   avatarUrl={user.avatarUrl}
                 />
 
-                <div className={styles.groupBox}>
-                  <div className={styles.groupTitle}>Account Actions</div>
-
+                <XPGroupBox title="Account Actions">
                   <AccountActions
                     provider={user.provider}
                     username={user.username}
@@ -77,24 +81,20 @@ export default function ProfilePageTemplate({
                     onAddFriend={onAddFriend}
                     onRemoveFriend={onRemoveFriend}
                   />
-                </div>
+                </XPGroupBox>
 
                 {canSeePrivateInfo && (
-                  <div className={styles.groupBox}>
-                    <div className={styles.groupTitle}>Status</div>
-
-                    <div className={styles.status}>
+                  <XPGroupBox title="Status">
+                    <div className={statusClass}>
                       {user.isOnline ? "🟢 Online" : "⚫ Offline"}
                     </div>
-                  </div>
+                  </XPGroupBox>
                 )}
               </aside>
 
-              <section className={styles.rightPanel}>
-                <div className={styles.topRow}>
-                  <div className={styles.groupBox}>
-                    <div className={styles.groupTitle}>Game Statistics</div>
-
+              <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-xp-md max-[900px]:w-full max-[600px]:gap-xp-sm">
+                <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-xp-md max-[900px]:grid-cols-[1fr]">
+                  <XPGroupBox title="Game Statistics">
                     <ProfileStats
                       wins={user.wins}
                       losses={user.losses}
@@ -103,38 +103,37 @@ export default function ProfilePageTemplate({
 
                     {isOwnProfile && (
                       <button
-                        className={styles.statsButton}
+                        className={clsx(
+                          styles.statsButton,
+                          "mt-xp-sm w-full cursor-pointer rounded-xp-sm px-2.5 py-1.25 font-xp text-xp-sm text-xp-ink",
+                        )}
                         onClick={() => router.push("/gameStats")}
                       >
                         View Full Stats
                       </button>
                     )}
-                  </div>
+                  </XPGroupBox>
 
                   {canSeePrivateInfo && (
-                    <div className={styles.groupBox}>
-                      <div className={styles.groupTitle}>Account Info</div>
-
+                    <XPGroupBox title="Account Info">
                       <AccountInfo
                         username={user.username}
                         email={user.email ?? ""}
                         totalMatches={user.totalMatches}
                       />
-                    </div>
+                    </XPGroupBox>
                   )}
                 </div>
 
-                <div className={styles.groupBox}>
-                  <div className={styles.groupTitle}>Friends</div>
-
+                <XPGroupBox title="Friends">
                   {canSeePrivateInfo ? (
                     <FriendsPanel friends={friends} loading={loadingFriends} />
                   ) : (
-                    <div className={styles.status}>
+                    <div className={statusClass}>
                       Add this user as a friend to see their friends.
                     </div>
                   )}
-                </div>
+                </XPGroupBox>
               </section>
             </div>
           )}
