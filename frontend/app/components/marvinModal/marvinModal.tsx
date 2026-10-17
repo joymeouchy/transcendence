@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import XPModal from "../ui/XPModal/XPModal";
+import clsx from "clsx";
 import styles from "./marvinModal.module.scss";
+
+const headingClass = "mb-xp-md text-center text-xp-xl font-bold";
+const descriptionClass = "mb-xp-md text-center text-xp-base";
+const actionsClass = "mt-xp-lg flex justify-end gap-2";
+const buttonClass = clsx(styles.button, "min-w-22.5 px-3.5 py-1.25 font-xp text-xp-base");
 import { MARVIN_CONFIG, marvinAnswers } from "./marvinConfig";
 
 type Stage = "ask" | "thinking" | "answer";
@@ -64,16 +70,16 @@ export default function MarvinModal({
 	const renderAsk = () => {
 		return (
 			<>
-				<div className={styles.heading}>
+				<div className={headingClass}>
 					{MARVIN_CONFIG.heading}
 				</div>
 
-				<p className={styles.description}>
+				<p className={descriptionClass}>
 					{MARVIN_CONFIG.askDescription}
 				</p>
 
 				<textarea
-					className={styles.input}
+					className={clsx(styles.input, "w-full resize-none border border-xp-gray-500 bg-xp-white p-1.5 font-xp text-xp-base outline-none")}
 					value={question}
 					onChange={(e) =>
 						setQuestion(e.target.value)
@@ -91,9 +97,9 @@ export default function MarvinModal({
 					rows={3}
 				/>
 
-				<div className={styles.actions}>
+				<div className={actionsClass}>
 					<button
-						className={styles.button}
+						className={buttonClass}
 						onClick={askMarvin}
 						disabled={!question.trim()}
 					>
@@ -106,20 +112,20 @@ export default function MarvinModal({
 
 	const renderThinking = () => {
 		return (
-			<div className={styles.thinking}>
-				<div className={styles.heading}>
+			<div className="text-center">
+				<div className={headingClass}>
 					{MARVIN_CONFIG.thinkingHeading}
 				</div>
 
-				<p className={styles.description}>
+				<p className={descriptionClass}>
 					{MARVIN_CONFIG.thinkingDescription}
 				</p>
 
-				<div className={styles.progressContainer}>
-					<div className={styles.progressBar} />
+				<div className="mt-xp-lg h-4.5 w-full border border-xp-gray-500 bg-xp-white p-0.5">
+					<div className={clsx(styles.progressBar, "h-full bg-xp-highlight")} />
 				</div>
 
-				<p className={styles.thinkingText}>
+				<p className="mt-2 text-xp-sm italic">
 					{MARVIN_CONFIG.thinkingText}
 				</p>
 			</div>
@@ -128,25 +134,25 @@ export default function MarvinModal({
 
 	const renderAnswer = () => {
 		return (
-			<div className={styles.result}>
-				<div className={styles.heading}>
+			<div className="text-center">
+				<div className={headingClass}>
 					{MARVIN_CONFIG.answerHeading}
 				</div>
 
-				<div className={styles.answer}>
+				<div className={clsx(styles.answer, "mx-0 my-xp-lg flex min-h-20 items-center justify-center bg-xp-gray-10 p-4 text-[15px] leading-normal italic")}>
 					"{answer}"
 				</div>
 
-				<div className={styles.actions}>
+				<div className={actionsClass}>
 					<button
-						className={styles.button}
+						className={buttonClass}
 						onClick={handleBack}
 					>
 						{MARVIN_CONFIG.askAgainButton}
 					</button>
 
 					<button
-						className={styles.button}
+						className={buttonClass}
 						onClick={handleClose}
 					>
 						{MARVIN_CONFIG.closeButton}
@@ -177,9 +183,9 @@ export default function MarvinModal({
 			title="Marvin"
 			isOpen={isOpen}
 			onClose={handleClose}
-			className={styles.modal}
+			className="w-105"
 		>
-			<div className={styles.content}>
+			<div className="p-xp-lg font-xp text-xp-black">
 				{renderContent()}
 			</div>
 		</XPModal>
