@@ -1,34 +1,7 @@
-.xp-icon {
-  width: 72px;
+@use "tokens" as t;
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-
-  background: transparent;
-  border: none;
-
-  cursor: pointer;
-
-  color: white;
-
-  font-family: Tahoma, sans-serif;
-  font-size: 14px;
-
-  text-align: center;
-  text-decoration: none;
-}
-
-.xp-icon img {
-  width: 60px;
-  height: 60px;
-
-  object-fit: contain;
-}
-
+// Layout lives in DesktopIcon.tsx (Tailwind). SCSS: selection highlight.
 .xp-icon:hover {
-  background: rgba(255,255,255,0.15);
-
-  border-radius: 4px;
+  background: t.tint(0.15);
+  border-radius: t.radius(sm);
 }
