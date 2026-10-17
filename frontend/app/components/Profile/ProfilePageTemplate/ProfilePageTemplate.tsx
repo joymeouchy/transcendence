@@ -105,7 +105,7 @@ export default function ProfilePageTemplate({
                       <button
                         className={clsx(
                           styles.statsButton,
-                          "mt-xp-sm w-full cursor-pointer rounded-xp-sm px-2.5 py-1.25 font-xp text-xp-sm text-xp-ink",
+                          "mt-xp-sm w-full px-2.5 py-1.25 font-xp text-xp-sm text-xp-ink",
                         )}
                         onClick={() => router.push("/gameStats")}
                       >

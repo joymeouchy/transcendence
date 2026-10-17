@@ -72,11 +72,35 @@
 }
 
 // Blue header strip at the top of a group box / panel.
-@mixin xp-section-title {
+@mixin xp-section-title($highlight: true) {
   @include xp-gradient(light-blue, blue);
   border-bottom: 1px solid t.shade(0.25);
   text-shadow: 1px 1px t.shade(0.35);
-  box-shadow: inset 1px 1px t.tint(0.35);
+
+  @if $highlight {
+    box-shadow: inset 1px 1px t.tint(0.35);
+  }
+}
+
+// Flat pale-blue toolbar button (Add / Remove / Accept / View stats).
+@mixin xp-tool-button {
+  background: t.color(tint-blue);
+  border: 1px solid t.color(border-dark);
+  border-radius: t.radius(sm);
+  cursor: pointer;
+
+  &:hover {
+    background: t.color(row-hover);
+  }
+
+  &:active {
+    background: t.color(row-active);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
 }
 
 // Zebra list row: white, tinted every $stripe row, light-blue on hover.

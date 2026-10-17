@@ -1,0 +1,10 @@
+@use "mixins" as m;
+
+// Layout lives in XPListPanel.tsx (Tailwind). SCSS: etched frame + title.
+.xp-list-panel {
+  @include m.xp-groupbox;
+}
+
+.xp-list-panel-title {
+  @include m.xp-section-title($highlight: false);
+}
