@@ -13,22 +13,12 @@
   background: linear-gradient($direction, t.color($from), t.color($to));
 }
 
-// Same gradient but with raw colors (for one-off translucent stops).
-@mixin xp-gradient-raw($from, $to, $direction: to bottom) {
-  background: linear-gradient($direction, $from, $to);
-}
-
 // Raised XP bevel: light top/left edge, dark bottom/right edge.
 @mixin xp-bevel-border($light: t.color(border-light), $dark: t.color(border-dark), $width: 1px) {
   border-top: $width solid $light;
   border-left: $width solid $light;
   border-right: $width solid $dark;
   border-bottom: $width solid $dark;
-}
-
-// Sunken bevel (text fields, wells): the raised one flipped.
-@mixin xp-bevel-inset($light: t.color(border-light), $dark: t.color(border-dark), $width: 1px) {
-  @include xp-bevel-border($dark, $light, $width);
 }
 
 // Blue window title bar: gradient, white bold text, dark bottom rule.
