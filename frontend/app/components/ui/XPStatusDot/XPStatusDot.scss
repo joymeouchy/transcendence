@@ -1,0 +1,5 @@
+@use "tokens" as t;
+
+.xp-status-dot {
+  box-shadow: inset 1px 1px t.tint(0.45);
+}

@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { UserService, UserSearchResult } from "@/services/user.services";
 
+import clsx from "clsx";
 import styles from "./AddFriendsPanel.module.scss";
+import XPStatusDot from "../../ui/XPStatusDot/XPStatusDot";
 
 interface Props {
 	onAddFriend?: (receiverId: number) => Promise<void>;
@@ -53,9 +55,13 @@ export default function AddFriendPanel({
 	}
 
 	return (
-		<div className={styles.addFriend}>
-			<div className={styles.searchBox}>
+		<div className="relative w-full">
+			<div className="flex w-full gap-1.25 bg-xp-tint-blue p-1.75 max-[450px]:p-1.5">
 				<input
+					className={clsx(
+						styles.searchInput,
+						"h-6 min-w-0 flex-1 rounded-xp-2xs px-1.5 py-0.75 font-xp text-xp-sm outline-none",
+					)}
 					type="text"
 					placeholder="Search username..."
 					value={friendUsername}
@@ -66,6 +72,10 @@ export default function AddFriendPanel({
 				/>
 
 				<button
+					className={clsx(
+						styles.searchButton,
+						"h-6 shrink-0 grow-0 basis-19.5 px-1.5 py-0.75 font-xp text-xp-sm whitespace-nowrap text-xp-ink max-[450px]:basis-17.5",
+					)}
 					onClick={handleAddFriend}
 					disabled={!selectedUser || loadingMessage !== null}
 				>
@@ -74,24 +84,21 @@ export default function AddFriendPanel({
 			</div>
 
 			{searchResults.length > 0 && (
-				<div className={styles.searchResults}>
+				<div className={clsx(styles.searchResults, "absolute top-full left-0 z-20 max-h-45 w-full overflow-x-hidden overflow-y-auto bg-xp-white")}>
 					{searchResults.map((user) => (
 						<div
 							key={user.id}
-							className={styles.searchItem}
+							className={clsx(
+								styles.searchItem,
+								"flex cursor-pointer items-center gap-2 truncate px-2 py-1.5 font-xp text-xp-sm text-xp-gray-900",
+							)}
 							onClick={() => {
 								setSelectedUser(user);
 								setFriendUsername(user.username);
 								setSearchResults([]);
 							}}
 						>
-							<span
-								className={`${styles.dot} ${
-									user.isOnline
-										? styles.online
-										: styles.offline
-								}`}
-							/>
+							<XPStatusDot online={user.isOnline} />
 
 							{user.username}
 						</div>
