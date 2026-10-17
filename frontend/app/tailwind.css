@@ -42,6 +42,8 @@
   --color-xp-pressed: var(--xp-pressed);
   --color-xp-go: var(--xp-go);
   --color-xp-go-border: var(--xp-go-border);
+  --color-xp-pick-hover: var(--xp-pick-hover);
+  --color-xp-pick: var(--xp-pick);
   --color-xp-start: var(--xp-start);
   --color-xp-start-dark: var(--xp-start-dark);
   --color-xp-window-bg: var(--xp-window-bg);

@@ -3,7 +3,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import "./FloatingIcons.scss";
 
 import DesktopIcon from "../Sidebar/DesktopIcon/DesktopIcon";
 import { floatingIcons } from "@/app/data/navigationItems/FloatingIconsFields";
@@ -18,11 +17,11 @@ export default function FloatingIcons() {
 
     return (
         <>
-            <div className="floating-icons">
+            <div className="pointer-events-none absolute inset-0 z-1">
                 {floatingIcons.map((icon) => (
                     <div
                         key={icon.label}
-                        className={`floating-icon-position ${icon.position}`}
+                        className={`pointer-events-auto absolute ${icon.position}`}
                     >
                         <DesktopIcon
                             image={icon.image}
