@@ -1,11 +1,7 @@
 @use "tokens" as t;
 @use "mixins" as m;
 
-// Layout lives in FriendsPanel.tsx (Tailwind). SCSS: zebra rows + status dot.
+// Layout lives in FriendsPanel.tsx (Tailwind). SCSS: zebra rows.
 .friend {
 	@include m.xp-list-row(even, t.color(divider-soft));
-}
-
-.dot {
-	box-shadow: inset 1px 1px t.tint(0.45);
 }

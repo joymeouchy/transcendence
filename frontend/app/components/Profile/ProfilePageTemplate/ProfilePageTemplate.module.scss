@@ -1,15 +1,6 @@
-@use "tokens" as t;
+@use "mixins" as m;
 
-// Layout lives in ProfilePageTemplate.tsx (Tailwind). SCSS: button states.
+// Layout lives in ProfilePageTemplate.tsx (Tailwind). SCSS: button chrome.
 .statsButton {
-	background: t.color(tint-blue);
-	border: 1px solid t.color(border-dark);
-
-	&:hover {
-		background: t.color(row-hover);
-	}
-
-	&:active {
-		background: t.color(row-active);
-	}
+	@include m.xp-tool-button;
 }

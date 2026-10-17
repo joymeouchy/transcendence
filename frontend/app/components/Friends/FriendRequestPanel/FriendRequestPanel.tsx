@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 
+import clsx from "clsx";
 import styles from "./FriendRequestPanel.module.scss";
+import XPListPanel, { XPListEmpty } from "../../ui/XPListPanel/XPListPanel";
+
+const buttonClass = clsx(
+	styles.friendButton,
+	"min-w-19.5 px-1.75 py-1 font-xp text-xp-xs whitespace-nowrap max-[450px]:min-w-0 max-[450px]:flex-1",
+);
 
 import { FriendRequest } from "@/types/types.dto";
 
@@ -43,16 +50,11 @@ export default function FriendRequestsPanel({
 	}
 
 	return (
-		<div className={styles.panel}>
-			<div className={styles.title}>
-				Friend Requests
-			</div>
-
-			<div className={styles.list}>
+		<XPListPanel title="Friend Requests" className="flex-1">
 				{requests.length === 0 ? (
-					<div className={styles.empty}>
+					<XPListEmpty>
 						No requests
-					</div>
+					</XPListEmpty>
 				) : (
 					requests.map((request) => {
 						const isLoading = loadingId === request.id;
@@ -60,14 +62,17 @@ export default function FriendRequestsPanel({
 						return (
 							<div
 								key={request.id}
-								className={styles.friend}
+								className={clsx(
+									styles.friend,
+									"flex items-center justify-between gap-2 px-2 py-1.5 font-xp text-xp-sm text-xp-gray-900 max-[450px]:flex-col max-[450px]:items-start",
+								)}
 							>
 								<span>
 									{request.sender.username}
 								</span>
 
 								<button
-									className={styles.friendButton}
+									className={buttonClass}
 									onClick={() => handleAccept(request.id)}
 									disabled={loadingId !== null}
 								>
@@ -75,7 +80,7 @@ export default function FriendRequestsPanel({
 								</button>
 
 								<button
-									className={styles.friendButton}
+									className={buttonClass}
 									onClick={() => handleReject(request.id)}
 									disabled={loadingId !== null}
 								>
@@ -85,7 +90,6 @@ export default function FriendRequestsPanel({
 						);
 					})
 				)}
-			</div>
-		</div >
+		</XPListPanel>
 	);
 }

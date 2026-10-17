@@ -9,8 +9,6 @@ import FriendsListPanel from "../FriendListPanel/FriendListPanel";
 
 import { FriendRequest, Friend } from "@/types/types.dto";
 
-import styles from "./FriendsPageTemplate.module.scss";
-
 interface Props {
   friends: Friend[];
   requests: FriendRequest[];
@@ -44,8 +42,8 @@ export default function FriendsPageTemplate({
         isLoading={loading}
         loadingMessage="Loading friends list..."
       >
-        <div className={styles.page}>
-          <div className={styles.leftColumn}>
+        <div className="flex size-full min-h-75 max-w-150 min-w-0 gap-xp-md max-[700px]:max-w-full max-[700px]:flex-col max-[450px]:gap-xp-sm">
+          <div className="flex w-60 min-w-0 shrink-0 flex-col gap-xp-md max-[700px]:w-full max-[450px]:gap-xp-sm">
             <AddFriendPanel onAddFriend={onAddFriend} />
 
             <FriendRequestsPanel
@@ -55,7 +53,7 @@ export default function FriendsPageTemplate({
             />
           </div>
 
-          <div className={styles.friendsPanel}>
+          <div className="flex min-w-0 flex-1 max-[700px]:w-full">
             <FriendsListPanel
               friends={friends}
               onRemoveFriend={onRemoveFriend}

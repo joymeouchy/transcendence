@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import { Friend } from "@/types/types.dto";
+import clsx from "clsx";
 import styles from "./FriendListPanel.module.scss";
+import XPListPanel, { XPListEmpty } from "../../ui/XPListPanel/XPListPanel";
+import XPStatusDot from "../../ui/XPStatusDot/XPStatusDot";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -34,12 +37,9 @@ export default function FriendsListPanel({
   }
 
   return (
-    <div className={styles.panel}>
-      <div className={styles.title}>Friends</div>
-
-      <div className={styles.list}>
+    <XPListPanel title="Friends" className="size-full min-h-0">
         {friends.length === 0 ? (
-          <div className={styles.empty}>No friends yet</div>
+          <XPListEmpty>No friends yet</XPListEmpty>
         ) : (
           friends.map((friend) => {
             const unreadCount = unreadCounts?.[friend.id] ?? 0;
@@ -48,9 +48,10 @@ export default function FriendsListPanel({
             return (
               <div
 	key={friend.friendshipId}
-	className={`${styles.friend} ${
-		selectedFriendId === friend.id ? styles.selected : ""
-	}`}
+	className={clsx(
+		styles.friend,
+		"flex cursor-pointer items-center justify-between gap-2 px-2 py-1.5 font-xp text-xp-sm text-xp-gray-900 max-[450px]:flex-col max-[450px]:items-start",
+	)}
 	role="button"
 	tabIndex={0}
 	onClick={() => onSelectFriend?.(friend)}
@@ -63,22 +64,21 @@ export default function FriendsListPanel({
 		}
 	}}
 >
-                <div className={styles.user}>
-                  <span
-                    className={`${styles.dot} ${
-                      friend.isOnline ? styles.online : styles.offline
-                    }`}
-                  />
+                <div className="flex min-w-0 items-center gap-1.5">
+                  <XPStatusDot online={friend.isOnline} />
                   {friend.username}
                 </div>
 
                 {unreadCount > 0 && (
-                  <span className={styles.unread}>{unreadCount}</span>
+                  <span className="flex h-4.5 min-w-4.5 items-center justify-center rounded-[9px] bg-xp-focus px-1.25 text-xp-sm font-bold text-xp-white">{unreadCount}</span>
                 )}
 
                 {onRemoveFriend && (
                   <button
-                    className={styles.friendButton}
+                    className={clsx(
+                      styles.friendButton,
+                      "min-w-19.5 px-1.75 py-1 font-xp text-xp-xs whitespace-nowrap max-[450px]:w-full",
+                    )}
                     disabled={removingFriendId === friend.friendshipId}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -94,7 +94,6 @@ export default function FriendsListPanel({
             );
           })
         )}
-      </div>
-    </div>
+    </XPListPanel>
   );
 }
