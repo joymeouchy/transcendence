@@ -56,7 +56,7 @@ body {
   }
 
   &__button {
-    background: var(--xp-button-bg, #{t.color(gray-25)});
+    background: t.color(gray-25);
     border: 1px solid t.color(gray-500);
     border-radius: t.radius(2xs);
 
