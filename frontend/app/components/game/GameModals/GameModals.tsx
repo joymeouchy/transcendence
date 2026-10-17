@@ -38,7 +38,7 @@ interface Props {
 	onAcceptRematch: () => void;
 	onDeclineRematch: () => void;
 	onStartOnline: () => void;
-	onPlayFriend: (friend: Friend) => void;
+	onPlayFriend: (friend: Friend, winningScore: number) => void;
 	onCancel: () => void;
 	onExit: () => void;
 	onReset: () => void;
@@ -82,9 +82,9 @@ export default function GameModals({
 		setShowFriendSelect(true);
 	};
 
-	const handleSelectFriend = (friend: Friend) => {
+	const handleSelectFriend = (friend: Friend, winningScore: number) => {
 		setShowFriendSelect(false);
-		onPlayFriend(friend);
+		onPlayFriend(friend, winningScore);
 	};
 
 	return (

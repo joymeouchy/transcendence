@@ -12,6 +12,7 @@ interface Props {
 	isOpen: boolean;
 	username: string;
 	avatarUrl: string | null;
+	winningScore: number;
 	onAccept: () => void;
 	onDecline: () => void;
 	onClose: () => void;
@@ -21,6 +22,7 @@ export default function InviteRequestModal({
 	isOpen,
 	username,
 	avatarUrl,
+	winningScore,
 	onAccept,
 	onDecline,
 	onClose,
@@ -47,6 +49,7 @@ export default function InviteRequestModal({
 				<div className="flex flex-col gap-1.25 font-xp text-xp-md leading-[1.4] text-xp-gray-900">
 					<strong className="text-[15px] text-xp-invite-name">{username}</strong>
 					<span>has invited you to play Pong!</span>
+					<span>First to <strong>{winningScore}</strong> points wins.</span>
 				</div>
 			</div>
 

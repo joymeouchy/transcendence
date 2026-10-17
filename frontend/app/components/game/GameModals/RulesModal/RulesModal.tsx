@@ -1,6 +1,7 @@
 "use client";
 
 import XPModal from "../../../ui/XPModal/XPModal";
+import { pongConfig, WINNING_SCORE_OPTIONS } from "@/types/game_types";
 
 type Props = {
   isOpen: boolean;
@@ -32,7 +33,11 @@ export default function RulesModal({
         </p>
 
         <p>
-          🏆 The first player to reach <strong>5 points</strong> wins the match.
+          🏆 The first player to reach <strong>{pongConfig.winningScore} points</strong> wins the match.
+        </p>
+
+        <p>
+          🎚️ When you invite a friend, you can choose the max score: {WINNING_SCORE_OPTIONS.join(", ")} points.
         </p>
 
         <p>

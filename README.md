@@ -23,7 +23,8 @@ The game is **server-authoritative**: the backend runs the physics (ball movemen
   - reconnection within a 15-second grace period if a player drops,
   - rematch requests,
   - random power-ups (big paddle, small paddle, freeze, small ball, paddle speed boost),
-  - selectable game themes (classic, football, space).
+  - selectable game themes (classic, football, space),
+  - a selectable max score (3, 5, 7 or 11 points) when inviting a friend.
 - Match history with a chart, personal statistics (wins, losses, win rate, rank) and a global leaderboard.
 - Windows XP-inspired UI: desktop, taskbar, start menu, draggable-looking windows, sounds, wallpapers.
 - Responsive layout for desktop and mobile.
@@ -326,10 +327,11 @@ Login sessions are not stored in the database (authentication uses JWTs). Live o
 | Chat | Real-time direct messages between friends, with history. | jmeouchy | rdennaou |
 | Matchmaking | Random queue; a user already in a game cannot queue or be invited. | jmeouchy | rdennaou |
 | Game invitations | Invite a friend; accept / reject / cancel / 30-second timeout; invites received on any page. | jmeouchy | rdennaou |
-| Real-time Pong | Server-authoritative physics broadcast to both players, rendered on a canvas; first to 5 wins. | jmeouchy | rdennaou |
+| Real-time Pong | Server-authoritative physics broadcast to both players, rendered on a canvas; first to 5 wins by default. | jmeouchy | rdennaou |
 | Disconnection / reconnection | Match pauses for 15 s when a player drops; they can rejoin, otherwise the match is abandoned and the opponent wins. | jmeouchy | rdennaou |
 | Rematch | Both players can request a rematch at the end of a match. | jmeouchy | rdennaou |
 | Power-ups | Random power-ups announced 2 s before they apply. | jmeouchy | rdennaou |
+| Max score setting | The inviter picks 3, 5, 7 or 11 points (5 by default); the friend sees it in the invite, it's validated on the server and kept for rematches. Random matchmaking always uses 5. | jmeouchy, rdennaou | rdennaou |
 | Game themes & wallpapers | Choose a game theme and a desktop wallpaper, saved per user. | jmeouchy | rdennaou |
 | Match history & stats | Match list, chart, wins / losses / win rate / rank. | jmeouchy | rdennaou |
 | Leaderboard | Podium and ranking table of all players. | jmeouchy | rdennaou |
@@ -384,7 +386,7 @@ Login sessions are not stored in the database (authentication uses JWTs). Live o
 ### 5. Complete web-based game — Major (2)
 
 - **Why:** Pong is the core of the project.
-- **How:** two players play a live match. The backend runs the game loop (ball movement, collisions, scoring, first to 5 points wins) and emits the state; the frontend draws it on an HTML5 canvas and sends only up/down input. Rules are shown in an in-game rules window, and the match ends with a game-over screen and a recorded result.
+- **How:** two players play a live match. The backend runs the game loop (ball movement, collisions, scoring, first to 5 points wins by default) and emits the state; the frontend draws it on an HTML5 canvas and sends only up/down input. Rules are shown in an in-game rules window, and the match ends with a game-over screen and a recorded result.
 
 ### 6. Remote players — Major (2)
 
@@ -414,7 +416,7 @@ Login sessions are not stored in the database (authentication uses JWTs). Live o
 ### 11. Game customization — Minor (1)
 
 - **Why:** variety and personalization.
-- **How:** **power-ups** — every 10–15 s a random power-up (big paddle, small paddle, freeze, small ball, paddle speed boost) is announced, then applied for a few seconds. **Themes** — classic (default), football and space, each defining background, paddle and ball colors/images, stored in the `Customization` table and saved per user. Desktop wallpapers can also be changed. The classic theme is the default.
+- **How:** **power-ups** — every 10–15 s a random power-up (big paddle, small paddle, freeze, small ball, paddle speed boost) is announced, then applied for a few seconds. **Themes** — classic (default), football and space, each defining background, paddle and ball colors/images, stored in the `Customization` table and saved per user. Desktop wallpapers can also be changed. **Game settings**: when inviting a friend, the inviter chooses the max score of the match (3, 5, 7 or 11 points). The friend sees it in the invite before accepting, the server only accepts values from the allowed list, and a rematch keeps the same score. **Defaults**: the classic theme and a max score of 5, which random matchmaking always uses.
 
 ---
 

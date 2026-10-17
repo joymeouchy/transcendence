@@ -7,6 +7,7 @@ export type IncomingInvite = {
 	fromUserId: number;
 	fromUsername: string;
 	fromAvatarUrl: string | null;
+	winningScore: number;
 };
 
 export default function useGameInvite() {
