@@ -1,0 +1,134 @@
+// ============================================================
+// XP DESIGN TOKENS: the single source of truth for the UI.
+//
+// Every value lives here exactly once and flows out three ways:
+//   1. SCSS        -> `@use "tokens" as t;` then t.color(blue), t.space(md)...
+//   2. CSS vars    -> xp-theme.scss loops over these maps into :root (--xp-*)
+//   3. Tailwind    -> tailwind.css maps the --xp-* vars into @theme,
+//                     so `bg-xp-blue`, `text-xp-md`, `p-xp-sm` exist
+// ============================================================
+
+@use "sass:map";
+@use "sass:color";
+@use "sass:meta";
+
+// ---------- COLOR PALETTE ----------
+// Keys become --xp-<key> and Tailwind `*-xp-<key>` utilities.
+$colors: (
+  // XP Luna blues (title bars, taskbar, selections)
+  "blue": #245edb,
+  "dark-blue": #0c2d83,
+  "light-blue": #3a6ff7,
+  "sidebar": #1d4fa3,
+  "selection": #2b579a,
+  "highlight": #316ac5,
+  "link": #0000ee,
+  "focus": #2563eb,
+  "app-bg": #0f172a,
+  "blue-deep": #1f4fbf,
+
+  // Start button green
+  "start": #2f8f4e,
+  "start-dark": #1f6f39,
+
+  // Window surfaces and bevel edges
+  "window-bg": #e9eefc,
+  "panel-bg": #f5f7ff,
+  "button-face": #dfe8f7,
+  "classic-face": #ece9d8,
+  "border-light": #ffffff,
+  "border-dark": #7f9db9,
+
+  // Text and neutrals
+  "text": #000000,
+  "white": #ffffff,
+  "black": #000000,
+  "gray-dark": #222222,
+  "gray": #666666,
+  "gray-mid": #808080,
+  "gray-light": #cccccc,
+
+  // Close button / errors
+  "close": #ff846e,
+  "close-dark": #d9544f,
+  "error": #e34840,
+);
+
+// ---------- TYPOGRAPHY ----------
+$fonts: (
+  "main": ("Tahoma", "Segoe UI", sans-serif),
+  "mono": ("Consolas", monospace),
+);
+
+// Font-size scale. Keys become --xp-font-size-<key> and `text-xp-<key>`.
+$font-sizes: (
+  "3xs": 8px,
+  "2xs": 9px,
+  "xs": 10px,
+  "sm": 11px,
+  "base": 12px,
+  "md": 13px,
+  "lg": 14px,
+  "xl": 16px,
+  "2xl": 18px,
+  "3xl": 20px,
+  "4xl": 22px,
+  "5xl": 24px,
+  "6xl": 32px,
+);
+
+// ---------- SPACING ----------
+$spacing: (
+  "2xs": 2px,
+  "xs": 4px,
+  "sm": 8px,
+  "md": 12px,
+  "lg": 16px,
+  "xl": 24px,
+  "2xl": 32px,
+  "3xl": 40px,
+);
+
+// ---------- RADII ----------
+$radii: (
+  "2xs": 2px,
+  "xs": 3px,
+  "sm": 4px,
+  "md": 6px,
+  "lg": 8px,
+  "xl": 10px,
+  "2xl": 12px,
+);
+
+// ---------- SHADOWS ----------
+$shadows: (
+  "window": 2px 2px 10px rgba(0, 0, 0, 0.35),
+);
+
+// ---------- ACCESSORS ----------
+// Throw at compile time on a typo instead of silently emitting nothing.
+@function _get($map, $key, $kind) {
+  // `blue`/`white` unquoted are Sass colors, not strings: use their name.
+  @if meta.type-of($key) == "color" {
+    $key: meta.inspect($key);
+  }
+  @if not map.has-key($map, $key) {
+    @error "Unknown #{$kind} token `#{$key}`. Add it to styles/_tokens.scss.";
+  }
+  @return map.get($map, $key);
+}
+
+@function color($key) { @return _get($colors, $key, "color"); }
+@function font($key) { @return _get($fonts, $key, "font"); }
+@function size($key) { @return _get($font-sizes, $key, "font-size"); }
+@function space($key) { @return _get($spacing, $key, "spacing"); }
+@function radius($key) { @return _get($radii, $key, "radius"); }
+@function shadow($key) { @return _get($shadows, $key, "shadow"); }
+
+// Translucent black/white overlays derived from the palette,
+// e.g. shade(0.25) for XP's dark bevel lines, tint(0.9) for highlights.
+@function shade($alpha) { @return color.change(color("black"), $alpha: $alpha); }
+@function tint($alpha) { @return color.change(color("white"), $alpha: $alpha); }
+
+// Any palette color at a given opacity, e.g. alpha(blue, 0.15).
+@function alpha($key, $alpha) { @return color.change(color($key), $alpha: $alpha); }

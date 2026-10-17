@@ -1,5 +1,7 @@
 /* globals.scss */
 
+@use "tokens" as t;
+
 html,
 body {
   width: 100%;
@@ -13,20 +15,9 @@ body {
   box-sizing: border-box;
 }
 
-
-:root {
-  --background: #0f172a;
-  --foreground: #ffffff;
-
-  --primary: #2563eb;
-
-  --game-background: #111827;
-  --game-border: #475569;
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: t.color(app-bg);
+  color: t.color(white);
 
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 

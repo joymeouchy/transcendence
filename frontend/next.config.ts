@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 
 // the public site address (https://localhost:8443 locally, the real domain on
@@ -10,6 +11,11 @@ const nextConfig: NextConfig = {
   // next dev only serves its dev resources (live reload, etc.) to localhost by
   // default; allow the real domain too so the app works when hosted
   allowedDevOrigins: [siteUrl.hostname],
+  // lets every stylesheet write `@use "tokens"` / `@use "mixins"`
+  // instead of long relative paths to app/styles
+  sassOptions: {
+    loadPaths: [path.join(process.cwd(), "app/styles")],
+  },
   images: {
     remotePatterns: [
       {

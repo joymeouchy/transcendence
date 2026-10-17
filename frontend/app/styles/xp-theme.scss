@@ -1,46 +1,32 @@
+// Generates the --xp-* CSS custom properties from the SCSS tokens.
+// Nothing is hand-written here: edit styles/_tokens.scss instead.
+// Tailwind reads these vars in app/tailwind.css (@theme inline).
+
+@use "sass:meta";
+@use "tokens" as t;
+
 :root {
-  /* COLORS */
+  @each $name, $value in t.$colors {
+    --xp-#{$name}: #{$value};
+  }
 
-  --xp-blue: #245edb;
-  --xp-dark-blue: #0c2d83;
-  --xp-light-blue: #3a6ff7;
+  @each $name, $value in t.$fonts {
+    --xp-font-#{$name}: #{meta.inspect($value)};
+  }
 
-  --xp-window-bg: #e9eefc;
+  @each $name, $value in t.$font-sizes {
+    --xp-font-size-#{$name}: #{$value};
+  }
 
-  --xp-border-light: #ffffff;
-  --xp-border-dark: #7f9db9;
+  @each $name, $value in t.$spacing {
+    --xp-space-#{$name}: #{$value};
+  }
 
-  --xp-sidebar: #1d4fa3;
+  @each $name, $value in t.$radii {
+    --xp-radius-#{$name}: #{$value};
+  }
 
-  --xp-text: #000000;
-
-  /* FONTS */
-
-  --xp-font-main:
-    "Tahoma",
-    "Segoe UI",
-    sans-serif;
-
-  --xp-font-mono:
-    "Consolas",
-    monospace;
-
-  /* SPACING */
-
-  --xp-space-xs: 4px;
-  --xp-space-sm: 8px;
-  --xp-space-md: 12px;
-  --xp-space-lg: 16px;
-  --xp-space-xl: 24px;
-
-  /* RADIUS */
-
-  --xp-radius-sm: 4px;
-  --xp-radius-md: 6px;
-  --xp-radius-lg: 10px;
-
-  /* SHADOWS */
-
-  --xp-window-shadow:
-    2px 2px 10px rgba(0, 0, 0, 0.35);
+  @each $name, $value in t.$shadows {
+    --xp-#{$name}-shadow: #{$value};
+  }
 }

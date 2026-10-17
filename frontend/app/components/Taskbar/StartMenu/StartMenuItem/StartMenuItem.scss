@@ -1,3 +1,5 @@
+@use "tokens" as t;
+
 .xp-start-menu-item {
   display: flex;
   align-items: center;
@@ -5,11 +7,11 @@
 
   padding: 6px 8px;
 
-  border-radius: 3px;
+  border-radius: t.radius(xs);
 
   cursor: pointer;
 
-  color: #000;
+  color: t.color(text);
   text-decoration: none;
 
   background: transparent;
@@ -27,20 +29,20 @@
 
 /* normal hover */
 .xp-start-menu-item:hover {
-  background: #2b579a;
-  color: white;
+  background: t.color(selection);
+  color: t.color(white);
 }
 
 /* danger variant */
 .xp-start-menu-item--danger {
   gap: 1px;
   padding: 0px 0px;
-  color: #ffffff;
+  color: t.color(white);
 }
 
 /* override hover completely */
 .xp-start-menu-item--danger:hover {
   background: transparent;
-  outline: 1px dotted rgba(255, 255, 255, 0.8);
+  outline: 1px dotted t.tint(0.8);
   outline-offset: -2px;
 }
