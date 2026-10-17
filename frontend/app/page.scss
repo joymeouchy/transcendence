@@ -1,187 +1,25 @@
-.xp-login-center {
-  display: flex;
+@use "tokens" as t;
+@use "mixins" as m;
 
-  align-items: center;
-  justify-content: center;
+// Welcome screen (app/page.tsx). Layout is Tailwind; this is the glass.
 
-  flex-direction: row;
-
-  gap: 40px;
-}
-
-/* divider — keep subtle XP glass separation */
+// vertical separator between branding and the choices
 .xp-divider {
-  width: 1px;
-  height: 60vh;
-
-  background: rgba(255, 255, 255, 0.25);
-
-  box-shadow: 1px 0 0 rgba(0, 0, 0, 0.25);
-  opacity: 0.9;
+  background: t.tint(0.25);
+  box-shadow: 1px 0 0 t.shade(0.25);
 }
 
-/* RIGHT SIDE */
-.xp-right-container {
-  width: 380px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* MAIN GLASS PANEL (cleaned, XP-tinted glass) */
-.xp-auth-panel {
-  width: 100%;
-
-  padding: var(--xp-space-lg);
-
-  display: flex;
-  flex-direction: row;
-
-  gap: var(--xp-space-lg);
-
-  border-radius: var(--xp-radius-md);
-
-  background: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0.16),
-    rgba(255, 255, 255, 0.06)
-  );
-
-  border: 1px solid rgba(255, 255, 255, 0.25);
-
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-
-  font-family: var(--xp-font-main);
-  color: white;
-}
-
-/* fallback panel (same glass system, more stable) */
-.xp-login-panel-temp {
-  width: 360px;
-
-  padding: var(--xp-space-lg);
-
-  border-radius: var(--xp-radius-md);
-
-  background: rgba(255, 255, 255, 0.12);
-
-  border: 1px solid rgba(255, 255, 255, 0.2);
-
-  backdrop-filter: blur(10px);
-
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-}
-
-/* STACK */
-.xp-auth-stack {
-  width: 360px;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: var(--xp-space-md);
-}
-
-/* USER TILE (glass XP card, NOT flat) */
+// glass "user tile" choice
 .xp-user-tile {
-  display: flex;
-  align-items: center;
-
-  gap: var(--xp-space-sm);
-
-  padding: var(--xp-space-sm) var(--xp-space-md);
-
-  border-radius: var(--xp-radius-sm);
-
-  color: white;
-  text-decoration: none;
-
-  background: rgba(255, 255, 255, 0.08);
-
-  border: 1px solid rgba(255, 255, 255, 0.18);
-
-  backdrop-filter: blur(6px);
-
+  @include m.xp-glass(0.08, 0.18, 6px);
   transition: all 0.15s ease;
 
-  cursor: pointer;
-}
+  &:hover {
+    background: t.tint(0.14);
+    transform: translateY(-1px);
+  }
 
-.xp-user-tile:hover {
-  background: rgba(255, 255, 255, 0.14);
-
-  transform: translateY(-1px);
-}
-
-.xp-user-tile:active {
-  transform: translateY(0px);
-}
-
-/* ICON BOX (glass inset cube) */
-.xp-icon-box {
-  width: 42px;
-  height: 42px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: var(--xp-radius-sm);
-
-  background: rgba(255, 255, 255, 0.12);
-
-  border: 1px solid rgba(255, 255, 255, 0.25);
-
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2);
-}
-
-.xp-avatar {
-  width: 24px;
-  height: 24px;
-
-  border-radius: 4px;
-
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.xp-avatar-new {
-  background: rgba(120, 200, 255, 0.7);
-}
-
-/* TEXT */
-.xp-user-text h3 {
-  margin: 0;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  color: white;
-}
-
-.xp-user-text p {
-  margin: 2px 0 0;
-
-  font-size: 12px;
-
-  opacity: 0.75;
-}
-
-/* ICON */
-.xp-auth-icon {
-  width: 70px;
-  height: 70px;
-}
-
-.xp-system-text {
-  margin-bottom: var(--xp-space-md);
-
-  font-size: 13px;
-
-  color: white;
-
-  opacity: 0.9;
+  &:active {
+    transform: translateY(0px);
+  }
 }

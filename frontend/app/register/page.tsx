@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.services";
@@ -11,6 +9,9 @@ import { useAuth } from "@/context/AuthContext";
 
 import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
+import AuthField from "../components/auth/AuthField";
+import AuthButton from "../components/auth/AuthButton";
+import AuthLink from "../components/auth/AuthLink";
 import XPAlert from "../components/ui/XPAlert/XPAlert";
 
 export default function RegisterPage() {
@@ -68,40 +69,38 @@ export default function RegisterPage() {
   return (
     <AuthLayout>
       <AuthPanel>
-        <form onSubmit={handleSubmit} className="xp-form">
-          <h3 className="xp-title">Register for Pong XP</h3>
+        <form onSubmit={handleSubmit} className="xp-form flex flex-col items-stretch gap-2.5">
+          <h3 className="xp-title text-xp-md font-bold">Register for Pong XP</h3>
 
           {registerFields.map((field) => (
-            <div key={field.key} className="xp-field">
-              <label className="xp-label">{field.label}</label>
-              <input
-                type={field.type}
-                placeholder={field.placeholder}
-                value={formData[field.key as keyof typeof formData]}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    [field.key as keyof typeof formData]: e.target.value,
-                  }))
-                }
-                className="xp-input"
-                required={field.required}
-              />
-            </div>
+            <AuthField
+              key={field.key}
+              label={field.label}
+              type={field.type}
+              placeholder={field.placeholder}
+              value={formData[field.key as keyof typeof formData]}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  [field.key as keyof typeof formData]: e.target.value,
+                }))
+              }
+              required={field.required}
+            />
           ))}
-          <button type="submit" className="xp-submit" disabled={loading}>
+          <AuthButton type="submit" disabled={loading}>
             {loading ? "Registering..." : "Register"}
-          </button>
+          </AuthButton>
         </form>
-        <Link
+        <AuthLink
           href={loading ? "#" : "/login"}
-          className={`xp-link ${loading ? "disabled" : ""}`}
+          className={loading ? "disabled" : ""}
           onClick={(e) => {
             if (loading) e.preventDefault();
           }}
         >
           Already a user? Login
-        </Link>
+        </AuthLink>
       </AuthPanel>
       <XPAlert
         isOpen={showSuccess}

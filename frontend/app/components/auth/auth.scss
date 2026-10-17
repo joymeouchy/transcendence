@@ -1,197 +1,65 @@
+@use "tokens" as t;
+@use "mixins" as m;
+
+// XP welcome-screen chrome. Layout lives in the Auth* components
+// (Tailwind); this file only paints what Tailwind can't express well.
+
 .xp-screen {
-  width: 100vw;
-  height: 100vh;
+  @include m.xp-gradient(login-bg-top, login-bg-bottom);
 
-  background: linear-gradient(to bottom, #3a6ea5, #1e4f8a);
+  // CRT-style scanlines over the whole screen
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      t.tint(0.05),
+      t.tint(0.05) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+    pointer-events: none;
+  }
 
-  position: relative;
-
-  font-family: var(--xp-font-main);
-
-  overflow: hidden;
-}
-
-.xp-screen::before {
-  content: "";
-
-  position: absolute;
-  inset: 0;
-
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.05),
-    rgba(255, 255, 255, 0.05) 1px,
-    transparent 2px,
-    transparent 4px
-  );
-
-  pointer-events: none;
-}
-
-.xp-screen::after {
-  content: "";
-
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  width: 100%;
-  height: 60px;
-
-  background: linear-gradient(to bottom, #224b8f, #16396d);
-
-  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
-
-  z-index: 2;
+  // top bar (the bottom one is .xp-bottom-bar)
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    @include m.xp-gradient(login-bar, login-bar-dark);
+    border-bottom: 1px solid t.tint(0.7);
+    z-index: 2;
+  }
 }
 
 .xp-bottom-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-
-  width: 100%;
-  height: 60px;
-
-  background: linear-gradient(to top, #224b8f, #16396d);
-
-  border-top: 1px solid rgba(255, 255, 255, 0.7);
-
-  z-index: 2;
-}
-
-.xp-login-center {
-  position: absolute;
-
-  top: 45%;
-  left: 50%;
-
-  transform: translate(-50%, -50%);
-
-  display: flex;
-  align-items: center;
-
-  gap: 40px;
-}
-
-.xp-branding {
-  color: white;
-
-  text-align: right;
-
-  font-size: 14px;
-  line-height: 1.2;
-}
-
-.xp-logo-text span {
-  font-size: 22px;
-  font-weight: bold;
+  @include m.xp-gradient(login-bar, login-bar-dark, to top);
+  border-top: 1px solid t.tint(0.7);
 }
 
 .xp-login-panel {
-  width: 360px;
-
-  padding: 20px;
-
-  border-radius: var(--xp-radius-md);
-
-  background: rgba(255, 255, 255, 0.15);
-
-  backdrop-filter: blur(8px);
-
-  border: 1px solid rgba(255, 255, 255, 0.3);
-
-  box-shadow: var(--xp-window-shadow);
-}
-
-.xp-form {
-  display: flex;
-  flex-direction: column;
-
-  gap: 10px;
-
-  align-items: stretch;
-}
-
-.xp-form input {
-  width: 100%;
-
-  padding: 6px;
-
-  border-radius: var(--xp-radius-sm);
-
-  border: 1px solid #7aa3d6;
-
-  outline: none;
+  @include m.xp-glass(0.15, 0.3, 8px);
 }
 
 .xp-submit {
-  width: fit-content;
+  background: t.color(go);
+  border: 1px solid t.color(go-border);
 
-  padding: 6px 14px;
-
-  border-radius: var(--xp-radius-sm);
-
-  border: 1px solid #1f7a1f;
-
-  background: #429c43;
-
-  color: white;
-
-  font-size: 14px;
-  font-weight: bold;
-
-  cursor: pointer;
+  &:active {
+    @include m.xp-gradient(pressed, white);
+  }
 }
 
-.xp-submit:active {
-  background: linear-gradient(to bottom, #cfe3ff, #ffffff);
-}
-
-.xp-link {
-  display: block;
-
-  margin-top: 10px;
-
-  font-size: 14px;
-
-  color: white;
-
-  opacity: 0.8;
-}
-
-.xp-tooltip {
-  position: absolute;
-
-  top: 30%;
-  right: 10%;
-
-  background: white;
-
-  padding: 6px 10px;
-
-  border-radius: var(--xp-radius-sm);
-
-  font-size: 12px;
-
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.xp-divider {
-  width: 1px;
-  height: 60%;
-
-  background: rgba(255, 255, 255, 0.4);
-}
-
+// framed picture tile (welcome screen user pictures)
 .xp-avatar {
-  border: 2px solid #fff;
-
+  background: t.tint(0.7);
+  border: 2px solid t.color(white);
   box-shadow:
-    inset -1px -1px 0 #000,
-    inset 1px 1px 0 #dfdfdf;
-
+    inset -1px -1px 0 t.color(black),
+    inset 1px 1px 0 t.color(gray-75);
   image-rendering: pixelated;
-
-  object-fit: cover;
 }

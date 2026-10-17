@@ -1,4 +1,5 @@
 import Image from "next/image";
+import clsx from "clsx";
 import "./auth.scss";
 
 type AuthIconProps = {
@@ -18,7 +19,7 @@ export default function AuthIcon({
 }: AuthIconProps) {
   return (
     <Image
-      className={`xp-avatar ${className}`}
+      className={clsx("xp-avatar rounded-xp-sm object-cover", className)}
       src={src}
       alt={alt}
       width={width}
