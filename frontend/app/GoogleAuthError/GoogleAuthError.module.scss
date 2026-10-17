@@ -1,0 +1,14 @@
+// components/GoogleAuthError/GoogleAuthError.module.scss
+@use "../../app/styles/tokens" as t;
+@use "../../app/styles/mixins" as m;
+
+.box {
+  @include m.xp-groupbox(t.color(error));
+  background: t.alpha(error, 0.1);
+}
+
+.icon {
+  @include m.xp-bevel-border(t.color(border-light), t.color(error-dark));
+  background: t.color(error);
+  color: t.color(white);
+}
