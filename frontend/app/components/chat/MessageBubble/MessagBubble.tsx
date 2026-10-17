@@ -1,6 +1,6 @@
-import { Message } from "../MessageList/MessageList";
+import clsx from "clsx";
 
-import styles from "./MessageBubble.module.scss";
+import { Message } from "../MessageList/MessageList";
 
 interface Props {
 	message: Message;
@@ -13,18 +13,24 @@ export default function MessageBubble({
 }: Props) {
 	return (
 		<div
-			className={`${styles.row} ${
-				isMine
-					? styles.mine
-					: styles.theirs
-			}`}
+			className={clsx(
+				"mb-1.5 flex w-full min-w-0",
+				isMine ? "justify-end" : "justify-start",
+			)}
 		>
-			<div className={styles.bubble}>
-				<div className={styles.content}>
+			<div
+				className={clsx(
+					"max-w-[70%] min-w-0 rounded-xp-xs border px-2 py-1.25 max-[500px]:max-w-[85%] max-[500px]:px-1.75",
+					isMine
+						? "border-xp-border-dark bg-xp-row-hover"
+						: "border-xp-gray-250 bg-xp-gray-10",
+				)}
+			>
+				<div className="font-xp text-xp-sm leading-[15px] text-xp-gray-900 [overflow-wrap:anywhere] [word-break:break-word]">
 					{message.content}
 				</div>
 
-				<div className={styles.time}>
+				<div className="mt-0.5 text-right font-xp text-xp-3xs leading-[10px] text-xp-gray-500">
 					{new Date(
 						message.createdAt
 					).toLocaleTimeString([], {

@@ -1,81 +1,24 @@
-.input {
-	display: flex;
-	align-items: flex-end;
-	gap: 6px;
+@use "tokens" as t;
+@use "mixins" as m;
 
-	flex-shrink: 0;
+// Layout lives in ChatInput.tsx (Tailwind). SCSS: field + button states.
+.textarea {
+	background: t.color(white);
+	border: 1px solid t.color(border-dark);
 
-	width: 100%;
-	padding: 7px;
+	&:focus {
+		border-color: t.color(blue);
+	}
 
-	background: #eaf4fb;
-	border-top: 1px solid #8a9aaa;
-
-	box-sizing: border-box;
+	&::placeholder {
+		color: t.color(gray-450);
+	}
 }
 
-.input textarea {
-	flex: 1;
-	min-width: 0;
-	min-height: 22px;
-	max-height: 100px;
+.send {
+	@include m.xp-tool-button($idle-when-disabled: true);
 
-	padding: 4px 6px;
-
-	resize: none;
-	overflow-y: auto;
-
-	background: white;
-	border: 1px solid #7f9db9;
-	border-radius: 2px;
-	outline: none;
-
-	font-family: var(--xp-font-main);
-	font-size: 11px;
-	line-height: 15px;
-
-	box-sizing: border-box;
-}
-
-.input textarea:focus {
-	border-color: var(--xp-blue);
-}
-
-.input textarea::placeholder {
-	color: #808080;
-}
-
-.input button {
-	flex-shrink: 0;
-
-	min-width: 55px;
-	height: 24px;
-	padding: 3px 10px;
-
-	background: #eaf4fb;
-	border: 1px solid #7f9db9;
-	border-radius: var(--xp-radius-sm);
-
-	color: #1f3f5c;
-	font-family: var(--xp-font-main);
-	font-size: 11px;
-
-	white-space: nowrap;
-	cursor: pointer;
-
-	box-sizing: border-box;
-}
-
-.input button:hover:not(:disabled) {
-	background: #dceeff;
-}
-
-.input button:active:not(:disabled) {
-	background: #c9e3f7;
-}
-
-.input button:disabled {
-	color: #808080;
-	cursor: default;
-	opacity: 0.7;
+	&:disabled {
+		color: t.color(gray-450);
+	}
 }

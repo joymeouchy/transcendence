@@ -52,6 +52,7 @@
   --color-xp-row-border: var(--xp-row-border);
   --color-xp-divider-soft: var(--xp-divider-soft);
   --color-xp-online: var(--xp-online);
+  --color-xp-online-dark: var(--xp-online-dark);
   --color-xp-offline: var(--xp-offline);
   --color-xp-danger: var(--xp-danger);
   --color-xp-danger-bright: var(--xp-danger-bright);
@@ -63,6 +64,7 @@
   --color-xp-panel-bg: var(--xp-panel-bg);
   --color-xp-button-face: var(--xp-button-face);
   --color-xp-classic-face: var(--xp-classic-face);
+  --color-xp-classic-gray: var(--xp-classic-gray);
   --color-xp-border-light: var(--xp-border-light);
   --color-xp-border-dark: var(--xp-border-dark);
   --color-xp-text: var(--xp-text);

@@ -2,8 +2,6 @@ import { useEffect, useRef } from "react";
 
 import MessageBubble from "../MessageBubble/MessagBubble";
 
-import styles from "./MessageList.module.scss";
-
 import { Message } from "@/types/messages";
 export type { Message };
 
@@ -30,7 +28,7 @@ export default function MessageList({
 	return (
 		<div
 			ref={listRef}
-			className={styles.list}
+			className="flex min-h-0 w-full min-w-0 flex-1 flex-col gap-1.5 overflow-x-hidden overflow-y-auto bg-xp-white px-2.5 py-2"
 		>
 			{messagesLoading ? (
 				<div>Loading messages...</div>
