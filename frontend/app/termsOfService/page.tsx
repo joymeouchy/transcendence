@@ -4,7 +4,7 @@ import DesktopLayout from "../components/DesktopLayout/DesktopLayout";
 import XPWindow from "../components/ui/XPWindow/XPWindow";
 import { useRouter } from "next/navigation";
 
-import styles from "./page.module.scss";
+import LegalDocument from "../components/LegalDocument/LegalDocument";
 
 
 
@@ -18,12 +18,10 @@ export default function TermsOfService() {
         onClose={() => router.push("/home")}
 
       >
-        <div className={styles.content}>
-          <h1>Terms of Service</h1>
-
-          <p className={styles.updated}>
-            Last updated: August 18, 2026
-          </p>
+        <LegalDocument
+					title="Terms of Service"
+					updated="Last updated: August 18, 2026"
+				>
 
           <h2>1. Acceptance of Terms</h2>
 
@@ -180,7 +178,7 @@ export default function TermsOfService() {
             If you have questions about these Terms of
             Service, please contact us on slack @jmeouchy or @rdennaou.
           </p>
-        </div>
+        </LegalDocument>
       </XPWindow>
     </DesktopLayout>
   );

@@ -3,7 +3,7 @@
 import DesktopLayout from "../components/DesktopLayout/DesktopLayout";
 import XPWindow from "../components/ui/XPWindow/XPWindow";
 
-import styles from "./page.module.scss";
+import LegalDocument from "../components/LegalDocument/LegalDocument";
 
 import { useRouter } from "next/navigation";
 
@@ -17,12 +17,10 @@ export default function PrivacyPolicy() {
 				title="Privacy Policy"
 				onClose={() => router.push("/home")}
 			>
-				<div className={styles.content}>
-					<h1>Privacy Policy</h1>
-
-					<p className={styles.updated}>
-						Last updated: August 18, 2026
-					</p>
+				<LegalDocument
+					title="Privacy Policy"
+					updated="Last updated: August 18, 2026"
+				>
 
 					<p>
 						This Privacy Policy explains how we
@@ -279,7 +277,7 @@ export default function PrivacyPolicy() {
 						information, please contact us on slack
 						@jmeouchy or @rdennaou.
 					</p>
-				</div>
+				</LegalDocument>
 			</XPWindow>
 		</DesktopLayout>
 	);
