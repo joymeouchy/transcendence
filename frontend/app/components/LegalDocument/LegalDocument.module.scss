@@ -1,0 +1,36 @@
+@use "tokens" as t;
+
+// Prose styling for long legal text. Nested element rules are the right
+// tool here (no Tailwind typography plugin); the container is Tailwind.
+.document {
+	h1 {
+		margin: 0 0 4px;
+		font-size: t.size(2xl);
+	}
+
+	h2 {
+		margin: 18px 0 6px;
+		font-size: t.size(md);
+		font-weight: bold;
+	}
+
+	p {
+		margin: 0 0 10px;
+	}
+
+	ul {
+		margin: 0 0 12px;
+		padding-left: 24px;
+	}
+
+	li {
+		margin-bottom: 4px;
+	}
+
+	// (0,2,0) beats the `p` margin above without !important
+	.updated {
+		margin-bottom: 16px;
+		font-size: t.size(sm);
+		color: t.color(gray-700);
+	}
+}

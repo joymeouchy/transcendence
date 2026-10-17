@@ -241,3 +241,23 @@
     border-color: transparent;
   }
 }
+
+// Flat Windows-classic gray push button (Marvin / Deep Thought dialogs).
+@mixin xp-classic-button($border: t.color(gray-600), $pressed: t.color(gray-150), $idle-when-disabled: false) {
+  $enabled: "";
+  @if $idle-when-disabled {
+    $enabled: ":not(:disabled)";
+  }
+
+  background: t.color(gray-50);
+  border: 1px solid $border;
+  cursor: pointer;
+
+  &:hover#{$enabled} {
+    background: t.color(gray-75);
+  }
+
+  &:active#{$enabled} {
+    background: $pressed;
+  }
+}

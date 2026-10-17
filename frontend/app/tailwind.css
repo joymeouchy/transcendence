@@ -128,6 +128,8 @@
   --color-xp-close: var(--xp-close);
   --color-xp-close-dark: var(--xp-close-dark);
   --color-xp-error: var(--xp-error);
+  --color-xp-error-dark: var(--xp-error-dark);
+  --color-xp-classic-navy: var(--xp-classic-navy);
   /* tokens:colors:end */
 
   /* typography */
