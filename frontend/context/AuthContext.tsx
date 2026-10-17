@@ -14,7 +14,7 @@ import { authService } from "../services/auth.services";
 import { UserService } from "../services/user.services";
 
 import { UserProfile } from "@/types/types.dto";
-import { playSound, sounds } from "@/lib/sounds";
+import { playSound, playSoundWhenAllowed, sounds } from "@/lib/sounds";
 import { socket } from "@/lib/socket";
 
 type AuthContextType = {
@@ -102,6 +102,18 @@ useEffect(() => {
  * isOnline and live features work app-wide instead of only on
  * pages that happen to open the socket themselves.
  */
+/**
+ * Play the login sound after a Google OAuth redirect, since that
+ * flow doesn't go through login()
+ */
+useEffect(() => {
+  if (!user) return;
+  if (sessionStorage.getItem("pendingLoginSound")) {
+    sessionStorage.removeItem("pendingLoginSound");
+    playSoundWhenAllowed(sounds.startup);
+  }
+}, [user]);
+
 useEffect(() => {
   if (user) {
     socket.connect();
@@ -140,6 +152,8 @@ const login = async (
     password,
   });
   const currentUser = await UserService.getMe();
+  // Drop any stale Google flag so the sound doesn't play twice
+  sessionStorage.removeItem("pendingLoginSound");
   setUser(currentUser);
   playSound(sounds.startup);
 };
