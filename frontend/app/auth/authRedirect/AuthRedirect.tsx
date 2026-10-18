@@ -2,34 +2,51 @@
 
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { isAuthenticated } from "@/lib/auth";
 
-// Replace with your real top-level protected routes
-const protectedRoutes = ["/home", "/profile", "/friends", "/game", "/chat", "/settings"];
+const guestOnlyRoutes = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+];
 
-// Pages only for logged-out users
-const guestOnlyRoutes = ["/forgot-password", "/reset-password"];
+const protectedRoutes = [
+  "/home",
+  "/profile",
+  "/friends",
+  "/game",
+  "/chats",
+  "/gameStats",
+  "/paint",
+  "/privacy-policy",
+  "/terms-of-service",
+];
 
 const matches = (pathname: string, routes: string[]) =>
-  routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+  routes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
 
 export default function AuthRedirect() {
-  const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (loading) return;
+    const hasToken = isAuthenticated();
+    const isGuestRoute =
+      pathname === "/" || matches(pathname, guestOnlyRoutes);
+    const isProtectedRoute = matches(pathname, protectedRoutes);
 
-    if (user && (pathname === "/" || matches(pathname, guestOnlyRoutes))) {
+    if (hasToken && isGuestRoute) {
       router.replace("/home");
       return;
     }
 
-    if (!user && matches(pathname, protectedRoutes)) {
+    if (!hasToken && isProtectedRoute) {
       router.replace("/");
     }
-  }, [user, loading, pathname, router]);
+  }, [pathname, router]);
 
   return null;
 }

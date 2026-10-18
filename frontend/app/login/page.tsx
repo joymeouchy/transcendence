@@ -1,10 +1,10 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useState } from "react";
 
 import { authService } from "@/services/auth.services";
 import { useRouter } from "next/navigation";
-import { isAuthenticated } from "@/lib/auth";
+// import { isAuthenticated } from "@/lib/auth";
 import { useAuth } from "@/context/AuthContext";
 
 import { loginFields } from "../data/auth/loginFields";
@@ -28,11 +28,11 @@ export default function LoginPage() {
 
   const { login } = useAuth();
 
-  useEffect(() => {
-    if (isAuthenticated()) {
-      router.replace("/home");
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (isAuthenticated()) {
+  //     router.replace("/home");
+  //   }
+  // }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

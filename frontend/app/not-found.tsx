@@ -32,7 +32,7 @@ export default function NotFound() {
         <div className="not-found__actions flex justify-end gap-xp-sm bg-xp-window-bg p-xp-md">
           <button
             className="not-found__button min-w-22.5 cursor-pointer px-4 py-1.5 font-xp text-xp-base text-xp-gray-950 max-[480px]:min-w-0 max-[480px]:flex-1"
-            onClick={() => router.replace("/")}
+            onClick={() => router.replace("/home")}
           >
             Go Home
           </button>

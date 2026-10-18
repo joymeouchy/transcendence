@@ -25,7 +25,7 @@ export default function RulesModal({
         </h3>
 
         <p>
-          🏓 Control your paddle and hit the ball back to your opponent.
+          🏓 Use WASD or Arrows to control your paddle and hit the ball back to your opponent.
         </p>
 
         <p>

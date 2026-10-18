@@ -30,6 +30,11 @@ export const images = {
 
 	paint: "/paint.png",
 
+	legalInfo: "/info_icon.png",
+	// gameInfo: "/gnome-help.png",
+	gameInfo: "/gtk-help.png",
+	
+
 	windowsOneCatLeftWallpaper: "/wallpapers/catXP.jpg",
 	windowsSabahoWallpaper: "/wallpapers/sabahooo.jpg",
 	windowsOneCatRightWallpaper: "/wallpapers/catXP2.jpg",

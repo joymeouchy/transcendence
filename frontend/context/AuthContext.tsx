@@ -82,16 +82,34 @@ export function AuthProvider({
  */
 useEffect(() => {
   let mounted = true;
-  async function restoreSession() {
+
+  const restoreSession = async () => {
     try {
-      await refreshUser();
+      const token = authService.getToken();
+
+      if (!token) {
+        if (mounted) setUser(null);
+        return;
+      }
+
+      const currentUser = await UserService.getMe();
+
+      if (mounted) {
+        setUser(currentUser);
+      }
+    } catch {
+      if (mounted) {
+        setUser(null);
+      }
     } finally {
       if (mounted) {
         setLoading(false);
       }
     }
-  }
+  };
+
   restoreSession();
+
   return () => {
     mounted = false;
   };

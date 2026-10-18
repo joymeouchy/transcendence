@@ -39,13 +39,13 @@ export const customizationItem = {
 export const privacyPolicyItem = {
   image: images.privacyPolicy,
   label: "Privacy Policy",
-  href: "/privacyPolicy",
+  href: "/privacy-policy",
 };
 
 export const termsOfServicesItem = {
   image: images.termsOfService,
   label: "Terms Of Service",
-  href: "/termsOfService",
+  href: "/terms-of-service",
 };
 
 export const gameStatsItem = {

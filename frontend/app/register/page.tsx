@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.services";
-import { isAuthenticated } from "@/lib/auth";
+// import { isAuthenticated } from "@/lib/auth";
 import { registerFields } from "../data/auth/registerFields";
 import { useAuth } from "@/context/AuthContext";
 
@@ -31,11 +31,11 @@ export default function RegisterPage() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
-  useEffect(() => {
-    if (isAuthenticated()) {
-      router.replace("/home");
-    }
-  }, [router]);
+  // useEffect(() => {
+  //   if (isAuthenticated()) {
+  //     router.replace("/home");
+  //   }
+  // }, [router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,7 +61,12 @@ export default function RegisterPage() {
       setSuccessMessage("Registration successful");
       setShowSuccess(true);
     } catch (err) {
-    } finally {
+    } finally {const guestOnlyRoutes = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+];
       setLoading(false);
     }
   };
