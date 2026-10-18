@@ -1,15 +1,9 @@
 **what joy needs:**
---change styling of "signing in" after google signin page
---add login sound after google page
-
---listen for the new `game_abandoned` socket (check SOCKET_EVENTS.md)
 
 
 **what rawan needs:**
--- README2: ctrl + F "TODO" find all the notes i added and double check everything and if i missed any modules. there are things i didnt add/adjust yet
-
-**To Test:**
--- if one player disconnected and the other left, will the player still be able to reconnect?
+--check the rematch bug. on accept rematch check if user already in game
+--check rematch: if 2 players finished the game. one player left the game screen, if they recieve a rematch request. cant press any button have to refresh page
 
 
 photo sources:
