@@ -92,6 +92,12 @@ export default function useGameSocket() {
     }) => {
       setRoom(data.room);
 
+      // a rematch can start while a rematch popup is still open
+      // (both players pressed Rematch at the same time), so clear it all
+      setRematchRequested(false);
+      setWaitingRematch(false);
+      setRematchDeclined(false);
+
       const [leftPlayer, rightPlayer] = data.players;
 
       if (user?.username === leftPlayer) {
@@ -128,6 +134,8 @@ export default function useGameSocket() {
 
     const handleRematchDeclined = () => {
       setWaitingRematch(false);
+      // the opponent who asked may have left, so close their request popup too
+      setRematchRequested(false);
       setRematchDeclined(true);
     };
 
@@ -265,6 +273,7 @@ export default function useGameSocket() {
       return;
     }
 
+    leaveFinishedMatch();
     socket.emit("join_queue");
     setMatchmakingStatus("searching");
     setModalState("matchmaking");
@@ -321,7 +330,10 @@ export default function useGameSocket() {
     setInviteWaiting(false);
     setInvitedFriendId(null);
     setMatchmakingStatus("inviteBusy");
-    setModalState("matchmaking");
+    // never cover a running match with the "friend unavailable" screen
+    setModalState((current) =>
+      current === "playing" ? current : "matchmaking"
+    );
   };
 
   const handleOpponentDisconnected = () => {
@@ -354,20 +366,28 @@ export default function useGameSocket() {
     setWaitingRematch(true);
   }
 
+  // leaving the result screen without a rematch: tell the server so we leave
+  // the old room, otherwise a later rematch request still reaches us
+  function leaveFinishedMatch() {
+    if (room && modalState === "result") {
+      socket.emit("decline_rematch", { room });
+    }
+  }
+
   function acceptRematch() {
+    // always close the popup, even if the room is already gone
+    setRematchRequested(false);
     if (!room) return;
 
     socket.emit("request_rematch", { room });
-
-    setRematchRequested(false);
   }
 
   function declineRematch() {
+    setRematchRequested(false);
     if (!room) return;
 
     socket.emit("decline_rematch", { room });
 
-    setRematchRequested(false);
     setRematchDeclined(false);
 
     setWinner("");
@@ -391,6 +411,7 @@ export default function useGameSocket() {
   function resetGame() {
     // drop the paused match on the server before clearing local state
     if (opponentDisconnected) socket.emit("leave_game");
+    leaveFinishedMatch();
     setWinner("");
     setOpponentName("");
     setScoreLeft(0);

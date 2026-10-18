@@ -36,8 +36,8 @@ the server tell two tabs of the same account apart from two different accounts.
 
 | Event | Payload | Description |
 |-------|---------|-------------|
-| `request_rematch` | `{ room: string }` | Request a rematch. |
-| `decline_rematch` | `{ room: string }` | Decline a rematch. |
+| `request_rematch` | `{ room: string }` | Request a rematch, or accept one (both players sending it starts the new match). If you're not in that room (for example after reconnecting with a new socket) or you're already in another match, you get `rematch_declined` back. Same if the opponent left the result screen, disconnected or is in another match, and then they get no request. |
+| `decline_rematch` | `{ room: string }` | Decline a rematch. Also send it when leaving the result screen without a rematch ("Return to Main Menu", "Find New Opponent"): it takes you out of the old room so later rematch requests for that match don't reach you. The opponent only gets `rematch_declined` if a rematch was asked for, by them or by you (so their request popup closes). |
 
 ### Invites
 
@@ -118,7 +118,7 @@ Messages are sent over REST, not a socket event: see `POST /messages` and `GET /
 |-------|---------|-------------|
 | `rematch_requested` | none | Opponent wants a rematch. |
 | `rematch_accepted` | none | Opponent accepted your rematch request; `match_found` follows right after. |
-| `rematch_declined` | none | Opponent declined the rematch. |
+| `rematch_declined` | none | The rematch can't happen: the opponent declined it, left the result screen, disconnected, or is already in another match (or you are, or your socket isn't in that match anymore). Also sent to you if the opponent asked for a rematch and then left, so close any open rematch request popup. |
 | `rematch_failed` | none | Both players requested a rematch, but the other one disconnected before the new match could start. |
 
 ### Invites
@@ -126,10 +126,10 @@ Messages are sent over REST, not a socket event: see `POST /messages` and `GET /
 | Event | Payload | Description |
 |-------|---------|-------------|
 | `invite_received` | `{ fromUserId: number, fromUsername: string, fromAvatarUrl: string \| null, winningScore: number }` | A friend invited you to play, to `winningScore` points. `fromAvatarUrl` is the inviter's avatar from when their socket connected, so it can be outdated if they changed it since. |
-| `invite_cancelled` | `{ fromUserId: number }` | The invite from `fromUserId` was cancelled (they cancelled it, it timed out, or they disconnected). |
+| `invite_cancelled` | `{ fromUserId: number }` | The invite from `fromUserId` was cancelled (they cancelled it, it timed out, they disconnected, or a match started for you or for them, for example from matchmaking). Close the invite popup. |
 | `invite_declined` | `{ friendId: number }` | `friendId` declined your invite (or disconnected before responding). |
 | `invite_timeout` | `{ friendId: number }` | `friendId` didn't respond within 30 s. |
-| `invite_error` | `{ message: string }` | Your `invite_friend` request couldn't be sent, or an invite you accepted with `invite_response` can't start because the inviter left or one of you is already in a game (see `message`). |
+| `invite_error` | `{ message: string }` | Your `invite_friend` request couldn't be sent, or an invite you accepted with `invite_response` can't start because the inviter left, one of you is already in a game, or the invite was cancelled just before you accepted it (see `message`). Also sent to the inviter when the invited friend starts another match before answering ("Your friend started another game."). Never sent to a player who is in a running match. |
 
 ### Messages
 

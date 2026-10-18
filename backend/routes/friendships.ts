@@ -12,6 +12,11 @@ import prisma from "../src/prisma";
 
 const router = Router();
 
+// "lowerId:higherId" pairs whose friend request is being created right now.
+// the duplicate check and the create in /send are separate queries, so two
+// requests at the same moment (a double-click) could both pass the check
+const pairsInProgress = new Set<string>();
+
 /**
  * @swagger
  * /friendships/send:
@@ -60,39 +65,51 @@ router.post("/send", authHelper, async (req: AuthRequest, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const existing = await prisma.friendship.findFirst({
-      where: {
-        OR: [
-          { senderId, receiverId },
-          { senderId: receiverId, receiverId: senderId },
-        ],
-      },
-    });
-
-    if (existing) {
-      if (existing.status === FriendshipStatus.accepted) {
-        return res.status(400).json({ error: "You are already friends with this user" });
-      }
-
-      if (existing.senderId === senderId) {
-        return res.status(400).json({ error: "Friend request already sent" });
-      }
-
-      // the other user already sent us a request
-      return res.status(400).json({
-        error: "This user already sent you a friend request, accept it instead",
-      });
+    // same key whichever of the two sends it, so A->B and B->A at the
+    // same moment are caught too
+    const pairKey = [senderId, receiverId].sort((a, b) => a - b).join(":");
+    if (pairsInProgress.has(pairKey)) {
+      return res.status(400).json({ error: "Friend request already sent" });
     }
+    pairsInProgress.add(pairKey);
 
-    const friendship = await prisma.friendship.create({
-      data: {
-        senderId,
-        receiverId,
-        status: FriendshipStatus.pending,
-      },
-    });
+    try {
+      const existing = await prisma.friendship.findFirst({
+        where: {
+          OR: [
+            { senderId, receiverId },
+            { senderId: receiverId, receiverId: senderId },
+          ],
+        },
+      });
 
-    res.status(201).json(friendship);
+      if (existing) {
+        if (existing.status === FriendshipStatus.accepted) {
+          return res.status(400).json({ error: "You are already friends with this user" });
+        }
+
+        if (existing.senderId === senderId) {
+          return res.status(400).json({ error: "Friend request already sent" });
+        }
+
+        // the other user already sent us a request
+        return res.status(400).json({
+          error: "This user already sent you a friend request, accept it instead",
+        });
+      }
+
+      const friendship = await prisma.friendship.create({
+        data: {
+          senderId,
+          receiverId,
+          status: FriendshipStatus.pending,
+        },
+      });
+
+      res.status(201).json(friendship);
+    } finally {
+      pairsInProgress.delete(pairKey);
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -207,25 +224,35 @@ router.delete("/reject/:id", authHelper, async (req: AuthRequest<{ id: string }>
  * @swagger
  * /friendships/pending/{userId}:
  *   get:
- *     summary: Get pending friend requests for a user
+ *     summary: Get pending friend requests for the authenticated user
  *     parameters:
  *       - in: path
  *         name: userId
  *         required: true
  *         schema:
  *           type: integer
+ *         description: Must be your own user ID
  *     responses:
  *       200:
  *         description: List of pending requests
  *       400:
  *         description: Invalid user ID
+ *       401:
+ *         description: No token provided
+ *       403:
+ *         description: Not your user ID
  */
-router.get("/pending/:userId", async (req, res) => {
+router.get("/pending/:userId", authHelper, async (req: AuthRequest<{ userId: string }>, res) => {
   try {
     const userId = parseInt(req.params.userId);
 
     if (isNaN(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
+    }
+
+    // pending requests are private: only the receiver can list them
+    if (userId !== req.userId) {
+      return res.status(403).json({ error: "Not authorized" });
     }
 
     const pending = await prisma.friendship.findMany({
@@ -266,8 +293,10 @@ router.get("/pending/:userId", async (req, res) => {
  *         description: List of friends
  *       400:
  *         description: Invalid user ID
+ *       401:
+ *         description: No token provided
  */
-router.get("/:userId", async (req, res) => {
+router.get("/:userId", authHelper, async (req: AuthRequest<{ userId: string }>, res) => {
   try {
     const userId = parseInt(req.params.userId);
 

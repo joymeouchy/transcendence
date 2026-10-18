@@ -73,14 +73,65 @@ const INVITE_TIMEOUT_MS = 30000;
 // a rematch is played to the same score. Only non-default scores are stored.
 const roomWinningScores = new Map<string, number>();
 
+// users whose match was decided but isn't created yet (avatars still loading).
+// without this, two invites accepted at the same moment could both pass the
+// busy check during that await and put the same player in two matches
+const startingMatch = new Set<number>();
+
 // true if any of the user's sockets/tabs is currently playing a match
 function isUserBusy(userId: number): boolean {
+  if (startingMatch.has(userId)) return true;
   const sockets = onlineUsers.get(userId);
   if (!sockets) return false;
   for (const socketId of sockets) {
     if (findRoomBySocket(socketId)) return true;
   }
   return false;
+}
+
+// a player just started a match: drop every invite they sent or received, so
+// an invite popup can't stay open (and be accepted) while they're playing
+function cancelInvitesFor(userId: number | undefined) {
+  if (!userId) return;
+
+  for (const [key, pending] of pendingInvites) {
+    const [inviterId, inviteeId] = key.split(":").map(Number);
+    if (inviterId !== userId && inviteeId !== userId) continue;
+
+    clearTimeout(pending.timeout);
+    pendingInvites.delete(key);
+
+    // close the invite popup on every tab of the invitee
+    onlineUsers
+      .get(inviteeId!)
+      ?.forEach((sId) =>
+        io.to(sId).emit("invite_cancelled", { fromUserId: inviterId }),
+      );
+
+    // the friend got busy: tell the inviter, who is still waiting on them
+    if (inviteeId === userId) {
+      io.to(pending.inviterSocketId).emit("invite_error", {
+        message: "Your friend started another game.",
+      });
+    }
+  }
+}
+
+// call as soon as a match is decided, before any await: marks both players
+// busy and drops their other invites right away
+function reserveMatch(...userIds: (number | undefined)[]) {
+  for (const id of userIds) {
+    if (!id) continue;
+    startingMatch.add(id);
+    cancelInvitesFor(id);
+  }
+}
+
+// call once startGame has run (the game itself keeps them busy from then on)
+function releaseMatch(...userIds: (number | undefined)[]) {
+  for (const id of userIds) {
+    if (id) startingMatch.delete(id);
+  }
 }
 
 const app = express();
@@ -278,6 +329,7 @@ io.on("connection", (socket) => {
       // reset the queue before the avatar lookup below awaits, otherwise a
       // join_queue firing in the meantime could match against this player again
       waitingPlayer = null;
+      reserveMatch(waitingUserId, joiningUserId);
 
       // join both players
       matchedSocket.join(room);
@@ -316,6 +368,7 @@ io.on("connection", (socket) => {
         matchedSocket.id,
         socketToUser,
       );
+      releaseMatch(waitingUserId, joiningUserId);
       console.log("Game started in room:", room);
     }
   });
@@ -333,6 +386,35 @@ io.on("connection", (socket) => {
       return;
     }
     const { room } = data;
+
+    // only the players of that match can ask for its rematch. this also
+    // happens after a reconnect with a new socket, which isn't in the old
+    // room anymore, so answer instead of leaving the client on "Waiting..."
+    if (!socket.rooms.has(room)) {
+      socket.emit("rematch_declined");
+      return;
+    }
+
+    // already playing another match (in this tab or another one)
+    const requesterId = socketToUser.get(socket.id);
+    if (requesterId && isUserBusy(requesterId)) {
+      socket.emit("rematch_declined");
+      return;
+    }
+
+    // the opponent left the result screen (they leave the room then),
+    // disconnected, or started another match: treat it as a decline
+    const opponentSocketId = [...(io.sockets.adapter.rooms.get(room) ?? [])].find(
+      (id) => id !== socket.id,
+    );
+    const opponentId = opponentSocketId
+      ? socketToUser.get(opponentSocketId)
+      : undefined;
+    if (!opponentSocketId || (opponentId && isUserBusy(opponentId))) {
+      rematches.delete(room);
+      socket.emit("rematch_declined");
+      return;
+    }
 
     if (!rematches.has(room)) {
       rematches.set(room, []);
@@ -367,6 +449,7 @@ io.on("connection", (socket) => {
 
         const p1UserId = socketToUser.get(p1Socket.id);
         const p2UserId = socketToUser.get(p2Socket.id);
+        reserveMatch(p1UserId, p2UserId);
 
         const [leftAvatar, rightAvatar] = await Promise.all([
           p1UserId ? getCurrentAvatarUrl(p1UserId) : p1Socket.data.avatarUrl,
@@ -390,6 +473,7 @@ io.on("connection", (socket) => {
           ...pongConfig,
           winningScore,
         });
+        releaseMatch(p1UserId, p2UserId);
         console.log("Rematch started in room:", newRoom);
       } else {
         // one of them disconnected between requesting and matching
@@ -408,10 +492,21 @@ io.on("connection", (socket) => {
       return;
     }
     const { room } = data;
+    if (!socket.rooms.has(room)) return;
 
+    // also sent when a player leaves the result screen without answering.
+    // only tell the opponent if a rematch was asked for: either they're
+    // waiting on us, or we asked and their request popup is still open
+    const asked = (rematches.get(room) ?? []).length > 0;
     rematches.delete(room);
     roomWinningScores.delete(room);
-    socket.to(room).emit("rematch_declined");
+    if (asked) {
+      socket.to(room).emit("rematch_declined");
+    }
+
+    // leave the finished match's room so later rematch requests for it
+    // don't pop up while we're on another screen or in another match
+    socket.leave(room);
   });
 
   // if opponent disconnects, the player can leave the paused game and go back to the queue
@@ -552,7 +647,17 @@ io.on("connection", (socket) => {
 
       const key = `${fromUserId}:${responderId}`;
       const pending = pendingInvites.get(key);
-      if (!pending) return;
+      if (!pending) {
+        // the invite was cancelled just before this answer arrived (for
+        // example the inviter's match started). the popup already sent the
+        // accepter to the game page, so tell them, unless they're playing
+        if (accepted && !isUserBusy(responderId)) {
+          socket.emit("invite_error", {
+            message: "This invite is no longer available.",
+          });
+        }
+        return;
+      }
 
       clearTimeout(pending.timeout);
       pendingInvites.delete(key);
@@ -576,13 +681,18 @@ io.on("connection", (socket) => {
 
       if (isUserBusy(fromUserId) || isUserBusy(responderId)) {
         // one of them started a game (possibly from another tab) since the
-        // invite was sent: let both sides know, not just the inviter
-        inviterSocket.emit("invite_error", {
-          message: "Your friend is no longer available.",
-        });
-        socket.emit("invite_error", {
-          message: "This invite is no longer available.",
-        });
+        // invite was sent. tell whoever is still waiting, but never the one
+        // who's playing: the error screen would cover their running match
+        if (!isUserBusy(fromUserId)) {
+          inviterSocket.emit("invite_error", {
+            message: "Your friend is no longer available.",
+          });
+        }
+        if (!isUserBusy(responderId)) {
+          socket.emit("invite_error", {
+            message: "This invite is no longer available.",
+          });
+        }
         return;
       }
 
@@ -594,6 +704,8 @@ io.on("connection", (socket) => {
       if (waitingUserId === fromUserId || waitingUserId === responderId) {
         waitingPlayer = null;
       }
+
+      reserveMatch(fromUserId, responderId);
 
       const room = `match-${matchId++}`;
       inviterSocket.join(room);
@@ -618,6 +730,7 @@ io.on("connection", (socket) => {
         ...pongConfig,
         winningScore: pending.winningScore,
       });
+      releaseMatch(fromUserId, responderId);
       console.log("Friend match started in room:", room);
     },
   );

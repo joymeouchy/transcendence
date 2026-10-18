@@ -1,9 +1,8 @@
 **what joy needs:**
-
+-- add popup if friend request was sent
+-- in game page remove al shi yali btf2si mn bara and bital3ek
 
 **what rawan needs:**
---check the rematch bug. on accept rematch check if user already in game
---check rematch: if 2 players finished the game. one player left the game screen, if they recieve a rematch request. cant press any button have to refresh page
 
 
 photo sources:

@@ -352,6 +352,12 @@ router.post("/reset-password", async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
+    // without this, a missing token reaches the query as `undefined`, which
+    // Prisma drops from the filter, matching ANY user with a pending reset
+    if (typeof token !== "string" || token.length === 0) {
+      return res.status(400).json({ error: "Invalid or expired reset token" });
+    }
+
     const passwordError = validatePassword(newPassword);
     if (passwordError) {
       return res.status(400).json({ error: passwordError });
