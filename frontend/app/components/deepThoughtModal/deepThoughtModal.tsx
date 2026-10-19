@@ -281,9 +281,9 @@ export default function DeepThoughtModal({
 			title="Deep Thought"
 			isOpen={isOpen}
 			onClose={handleClose}
-			className="w-105"
 		>
-			<div className="p-xp-lg font-xp text-xp-black">
+			{/* width lives on the content so XPWindow's own max-width keeps the frame snug on phones */}
+			<div className="w-98 max-w-full p-xp-lg font-xp text-xp-black max-[450px]:p-xp-sm">
 				{renderContent()}
 			</div>
 		</XPModal>

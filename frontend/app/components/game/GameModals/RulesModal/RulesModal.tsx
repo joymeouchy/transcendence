@@ -30,6 +30,10 @@ export default function RulesModal({
         </p>
 
         <p>
+          👆 On a touchscreen, hold your finger on the game where you want your paddle to go.
+        </p>
+
+        <p>
           🎯 Score points by getting the ball past your opponent's paddle.
         </p>
 

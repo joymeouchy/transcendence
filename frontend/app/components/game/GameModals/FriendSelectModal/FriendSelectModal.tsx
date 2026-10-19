@@ -57,7 +57,7 @@ export default function FriendSelectModal({
 			isOpen={isOpen}
 			onClose={onClose}
 		>
-			<div className="flex min-w-105 flex-col gap-4 p-5">
+			<div className="flex w-105 max-w-full flex-col gap-4 p-5 max-[450px]:p-xp-xs">
 				<div className="flex flex-col gap-1">
 					<p className="m-0 text-xp-xl font-bold">Choose a friend</p>
 					<span className="text-xp-md text-xp-gray-700">
@@ -108,8 +108,8 @@ export default function FriendSelectModal({
 								>
 									<div className="flex min-w-0 items-center">
 
-										<div className="flex flex-col gap-0.5">
-											<span className="text-xp-lg font-bold">
+										<div className="flex min-w-0 flex-col gap-0.5">
+											<span className="truncate text-xp-lg font-bold" title={friend.username}>
 												{friend.username}
 											</span>
 
@@ -129,7 +129,7 @@ export default function FriendSelectModal({
 									</div>
 
 									<button
-										className="ml-5 min-w-15 cursor-pointer px-3 py-1 disabled:cursor-not-allowed disabled:opacity-50"
+										className="ml-5 min-w-15 shrink-0 cursor-pointer px-3 py-1 max-[450px]:ml-xp-sm disabled:cursor-not-allowed disabled:opacity-50"
 										disabled={!friend.isOnline}
 										onClick={() =>
 											onSelectFriend(friend, winningScore)

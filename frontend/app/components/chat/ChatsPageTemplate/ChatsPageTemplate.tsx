@@ -32,6 +32,8 @@ export default function ChatsPageTemplate({
   onClose,
 }: Props) {
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
+  // phones show one pane at a time: the friends list, then the open chat
+  const [mobileChatOpen, setMobileChatOpen] = useState(false);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
@@ -104,6 +106,7 @@ export default function ChatsPageTemplate({
 
   function handleSelectFriend(friend: Friend) {
     setSelectedFriend(friend);
+    setMobileChatOpen(true);
 
     setUnreadCounts((prev) => {
       const updated = { ...prev };
@@ -143,8 +146,8 @@ export default function ChatsPageTemplate({
         isLoading={loading}
         loadingMessage="Loading chats..."
       >
-        <div className="flex h-100 w-150 max-w-full gap-2.5 overflow-hidden p-1.25 font-xp max-[600px]:h-[70dvh] max-[600px]:min-h-87.5 max-[600px]:w-full max-[600px]:flex-col">
-          <div className="h-full w-50 shrink-0 max-[600px]:h-32.5 max-[600px]:w-full max-[600px]:border-b max-[600px]:border-xp-groupbox-border">
+        <div className="flex h-100 w-150 max-w-full gap-2.5 overflow-hidden p-1.25 font-xp max-[600px]:h-[70dvh] max-[600px]:min-h-87.5 max-[600px]:w-full">
+          <div className={clsx("h-full w-50 shrink-0 max-[600px]:w-full", mobileChatOpen && "max-[600px]:hidden")}>
             <FriendsListPanel
               friends={friends}
               selectedFriendId={selectedFriend?.id}
@@ -156,7 +159,8 @@ export default function ChatsPageTemplate({
           <div
             className={clsx(
               styles.chatPanel,
-              "h-full min-h-0 min-w-0 flex-1 overflow-hidden rounded-xp-sm bg-xp-window-bg max-[600px]:h-auto max-[600px]:w-full",
+              "h-full min-h-0 min-w-0 flex-1 overflow-hidden rounded-xp-sm bg-xp-window-bg",
+              !mobileChatOpen && "max-[600px]:hidden",
             )}
           >
             {selectedFriend ? (
@@ -166,6 +170,7 @@ export default function ChatsPageTemplate({
                 messages={messages}
                 messagesLoading={messagesLoading}
                 onSendMessage={handleSendMessage}
+                onBack={() => setMobileChatOpen(false)}
               />
             ) : (
               <div>

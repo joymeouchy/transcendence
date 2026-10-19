@@ -68,14 +68,15 @@ export default function MatchSelectModal({
           </div>
         }
       >
-        <div className="flex w-[min(90vw,420px)] flex-col items-center gap-3.75 text-center max-[450px]:w-[90vw]">
+        <div className="flex w-[min(90vw,420px)] flex-col items-center gap-3.75 text-center max-[450px]:w-full">
           <div className="match-select__header">
             <p>Welcome to Pong!</p>
 
             <span>Choose a game mode to start playing.</span>
           </div>
 
-          <div className="flex w-full flex-row items-center justify-center gap-2 max-[450px]:flex-col">
+          {/* stacked full-width buttons on phones: easier to tap */}
+          <div className="flex w-full flex-row items-center justify-center gap-2 max-[450px]:flex-col max-[450px]:items-stretch max-[450px]:*:min-h-9">
             <button onClick={onStartOnline}>🎮 Play Online</button>
 
             <button onClick={onPlayFriend}>👥 Play Friend</button>
@@ -83,7 +84,7 @@ export default function MatchSelectModal({
             <button onClick={onCustomize}>🎨 Customize Game</button>
           </div>
 
-          <div className="return-button">
+          <div className="return-button max-[450px]:w-full max-[450px]:*:min-h-9 max-[450px]:*:w-full">
             <button onClick={onReturnHome}>🏠 Return to Homepage</button>
           </div>
         </div>

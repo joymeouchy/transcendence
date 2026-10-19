@@ -21,7 +21,7 @@ export default function LegalModal({ isOpen, onClose }: Props) {
 
   return (
     <XPModal closeOnOverlayClick={false} title="Legal & Privacy" isOpen={isOpen} onClose={onClose}>
-      <div className="flex w-[min(90vw,360px)] flex-col items-center gap-4 p-4 text-center">
+      <div className="flex w-[min(90vw,360px)] flex-col items-center gap-4 p-4 text-center max-[450px]:w-full max-[450px]:p-xp-xs">
         <p>
           Review our policies to learn how your information is handled and the
           rules for using Pong.

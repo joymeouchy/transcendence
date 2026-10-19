@@ -11,8 +11,13 @@ import { gameThemes } from "@/app/data/game/gameCustomization";
 
 import { CustomizationTheme } from "@/services/Customization.services";
 
+// Touch: while a finger is down, nudge the paddle toward it at roughly the
+// rate a held key auto-repeats, so touch and keyboard players move alike.
+const TOUCH_MOVE_INTERVAL_MS = 33;
+
 type Props = {
   theme: CustomizationTheme | null;
+  playerSide: "left" | "right";
   pendingPowerUp: {
     type: string;
     side: "left" | "right";
@@ -20,8 +25,12 @@ type Props = {
   } | null;
 };
 
-export default function GameCanvas({ theme, pendingPowerUp }: Props) {
+export default function GameCanvas({ theme, playerSide, pendingPowerUp }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // finger position in canvas units, null when not touching
+  const touchTargetY = useRef<number | null>(null);
+  const touchTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const gameState = useRef<GameStateSend | null>(null);
   const roomRef = useRef<string | null>(null);
@@ -216,8 +225,76 @@ export default function GameCanvas({ theme, pendingPowerUp }: Props) {
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (touchTimer.current) clearInterval(touchTimer.current);
+    };
+  }, []);
+
+  const moveTowardTouch = () => {
+    const state = gameState.current;
+    const target = touchTargetY.current;
+
+    if (!roomRef.current || !state || target === null) return;
+
+    const paddleCenter =
+      state.paddles[playerSide] +
+      state.dynamicConfig.paddleHeights[playerSide] / 2;
+
+    // dead zone of about one step so the paddle doesn't jitter in place
+    const deadZone = pongConfig.paddleSpeed / 2;
+
+    if (Math.abs(target - paddleCenter) <= deadZone) return;
+
+    socket.emit("paddle_move", {
+      room: roomRef.current,
+      direction: target < paddleCenter ? "up" : "down",
+    });
+  };
+
+  const updateTouchTarget = (e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+
+    touchTargetY.current =
+      ((e.clientY - rect.top) / rect.height) * pongConfig.canvasHeight;
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // mouse players use the keyboard; only touch/pen steer by pointer
+    if (e.pointerType === "mouse") return;
+
+    e.currentTarget.setPointerCapture(e.pointerId);
+    updateTouchTarget(e);
+    moveTowardTouch();
+
+    if (!touchTimer.current) {
+      touchTimer.current = setInterval(moveTowardTouch, TOUCH_MOVE_INTERVAL_MS);
+    }
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (touchTargetY.current === null) return;
+
+    updateTouchTarget(e);
+  };
+
+  const handlePointerEnd = () => {
+    touchTargetY.current = null;
+
+    if (touchTimer.current) {
+      clearInterval(touchTimer.current);
+      touchTimer.current = null;
+    }
+  };
+
   return (
-    <div className="relative aspect-4/3 w-full overflow-hidden border-4 border-xp-game-border bg-xp-game-bg">
+    <div
+      className="relative aspect-4/3 w-full touch-none overflow-hidden border-4 border-xp-game-border bg-xp-game-bg select-none"
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerEnd}
+      onPointerCancel={handlePointerEnd}
+    >
       <canvas
         className="block size-full"
         ref={canvasRef}
