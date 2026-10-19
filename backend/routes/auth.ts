@@ -7,6 +7,8 @@ import crypto from "crypto";
 import {
   authHelper,
   AuthRequest,
+  normalizeEmail,
+  validateEmail,
   validatePassword,
   validateUsername,
 } from "../src/helpers/auth_helpers";
@@ -45,6 +47,7 @@ const transporter = nodemailer.createTransport({
  *                 description: 3-20 characters, leading and trailing spaces are trimmed
  *               email:
  *                 type: string
+ *                 description: must look like name@domain.tld (max 254 characters), stored lowercase
  *               password:
  *                 type: string
  *                 description: 8-72 characters, at least one letter and one number
@@ -59,12 +62,18 @@ const transporter = nodemailer.createTransport({
 
 router.post("/register", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { password } = req.body;
+    const email = normalizeEmail(req.body.email);
     const username =
       typeof req.body.username === "string" ? req.body.username.trim() : "";
 
     if (!username || !email || !password) {
       return res.status(400).json({ error: "Missing fields" });
+    }
+
+    const emailError = validateEmail(email);
+    if (emailError) {
+      return res.status(400).json({ error: emailError });
     }
 
     const usernameError = validateUsername(username);
@@ -145,7 +154,12 @@ router.post("/register", async (req, res) => {
  */
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { password } = req.body;
+    const email = normalizeEmail(req.body.email);
+
+    if (!email || typeof password !== "string" || !password) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
 
     const user = await prisma.user.findUnique({
       where: { email },
@@ -271,7 +285,7 @@ router.get("/google/callback", (req, res, next) => {
  */
 router.post("/forgot-password", async (req, res) => {
   try {
-    const { email } = req.body;
+    const email = normalizeEmail(req.body.email);
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {

@@ -1,6 +1,6 @@
 {
   "exclude": ["node_modules"],
-  "include": ["src/**/*", "routes/**/*", "/shared/**/*"],
+  "include": ["src/**/*", "routes/**/*", "../frontend/types/game_types.ts"],
   "compilerOptions": {
     "rootDir": "..",
     "outDir": "./dist",

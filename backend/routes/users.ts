@@ -1,5 +1,4 @@
 import { Router } from "express";
-import jwt from "jsonwebtoken";
 import { FriendshipStatus } from "../generated/prisma/client";
 import { authHelper, AuthRequest, validateUsername } from "../src/helpers/auth_helpers";
 import { avatarUpload, uploadAvatar, deleteAvatar } from "../src/helpers/upload_helpers";
@@ -55,7 +54,6 @@ const router = Router();
  *         description: Server error
  */
 router.get("/me", authHelper, async (req: AuthRequest, res) => {
-  console.log("userId from token:", req.userId); // add this
   try {
     const userId = req.userId!;
 
@@ -220,10 +218,10 @@ router.get("/me/matches", authHelper, async (req: AuthRequest, res) => {
  */
 router.get("/search", authHelper, async (req: AuthRequest, res) => {
   try {
-    const query = req.query.q as string;
+    const query = req.query.q;
     const currentUserId = req.userId!;
 
-    if (!query) {
+    if (typeof query !== "string" || !query) {
       return res.status(400).json({ error: "Missing search query" });
     }
 

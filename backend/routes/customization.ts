@@ -4,6 +4,8 @@ import prisma from "../src/prisma";
 
 const router = Router();
 
+const MAX_WALLPAPER_LENGTH = 50;
+
 /**
  * @swagger
  * /customization:
@@ -232,7 +234,7 @@ router.patch("/me", authHelper, async (req: AuthRequest, res) => {
     const userId = req.userId!;
     const { themeName } = req.body;
 
-    if (!themeName) {
+    if (typeof themeName !== "string" || !themeName) {
       return res.status(400).json({ error: "Theme name is required" });
     }
 
@@ -284,7 +286,7 @@ router.patch("/me", authHelper, async (req: AuthRequest, res) => {
  *       200:
  *         description: Wallpaper updated
  *       400:
- *         description: Wallpaper is required
+ *         description: Wallpaper is missing, not a string, or longer than 50 characters
  *       401:
  *         description: No token provided
  *       500:
@@ -295,8 +297,14 @@ router.patch("/me/wallpaper", authHelper, async (req: AuthRequest, res) => {
     const userId = req.userId!;
     const { wallpaper } = req.body;
 
-    if (!wallpaper) {
+    if (typeof wallpaper !== "string" || !wallpaper) {
       return res.status(400).json({ error: "Wallpaper is required" });
+    }
+
+    // the ids are defined by the frontend (desktopCustomization.ts), so only
+    // the shape is checked here; an unknown id falls back to the default
+    if (wallpaper.length > MAX_WALLPAPER_LENGTH) {
+      return res.status(400).json({ error: "Invalid wallpaper" });
     }
 
     const updated = await prisma.user.update({

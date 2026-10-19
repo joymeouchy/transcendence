@@ -7,6 +7,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { AuthProvider } from "../generated/prisma/client";
 import prisma from "../src/prisma";
 import { BACKEND_URL } from "./urls";
+import { normalizeEmail } from "./helpers/auth_helpers";
 
 passport.use(
   new GoogleStrategy(
@@ -18,7 +19,7 @@ passport.use(
     },
     async (_accessToken, _refreshToken, profile, done) => {
       try {
-        const email = profile.emails?.[0]?.value;
+        const email = normalizeEmail(profile.emails?.[0]?.value);
         const avatarUrl = profile.photos?.[0]?.value;
 
         if (!email) return done(new Error("No email from Google"));

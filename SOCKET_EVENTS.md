@@ -150,7 +150,7 @@ type PendingPowerUp = {
   applyAt: number;        // timestamp (ms) when it activates
 };
 
-// max scores allowed in invite_friend (shared/game_types.ts)
+// max scores allowed in invite_friend (frontend/types/game_types.ts)
 const WINNING_SCORE_OPTIONS = [3, 5, 7, 11];
 ```
 

@@ -1,3 +1,5 @@
+// The backend imports this file so dont use imports here or backend build will break
+
 // dynamic values that change during gameplay (sent to frontend)
 export interface GameStateSend {
   ball: { x: number; y: number; vx: number; vy: number };

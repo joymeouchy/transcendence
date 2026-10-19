@@ -5,7 +5,7 @@ import {
   FullGameState,
   pongConfig,
   PowerUpType,
-} from "../../shared/game_types";
+} from "../../frontend/types/game_types";
 import prisma from "../src/prisma";
 
 export const games: Record<string, FullGameState> = {};
@@ -465,8 +465,6 @@ async function updateGame(io: Server, room: string) {
           },
         })
         .catch((err) => console.error("Failed to save match:", err));
-    } else {
-      console.log("Missing user IDs - p1:", p1UserId, "p2:", p2UserId);
     }
 
     io.to(room).emit("game_over", {
