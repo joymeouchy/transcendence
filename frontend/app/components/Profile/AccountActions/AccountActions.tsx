@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import ChangePasswordModal from "../ChangePasswordModal/ChangePasswordModal";
 import ChangeProfilePictureModal from "../ChangeProfilePictureModal/ChangeProfilePictureModal";
@@ -13,8 +13,8 @@ interface AccountActionsProps {
   isOwnProfile?: boolean;
   isFriend?: boolean;
 
-  onAddFriend?: () => void;
-  onRemoveFriend?: () => void;
+  onAddFriend?: () => void | Promise<void>;
+  onRemoveFriend?: () => void | Promise<void>;
 }
 
 export default function AccountActions({
@@ -29,7 +29,26 @@ export default function AccountActions({
   const [showPicture, setShowPicture] = useState(false);
   const [showUsername, setShowUsername] = useState(false);
 
+  // add/remove friend: disabled until the request finishes; the ref also
+  // stops a fast double click (state updates aren't immediate)
+  const [friendActionPending, setFriendActionPending] = useState(false);
+  const friendActionRef = useRef(false);
+
   const isGoogleAccount = provider === "google";
+
+  async function runFriendAction(action?: () => void | Promise<void>) {
+    if (!action || friendActionRef.current) return;
+
+    friendActionRef.current = true;
+    setFriendActionPending(true);
+
+    try {
+      await action();
+    } finally {
+      friendActionRef.current = false;
+      setFriendActionPending(false);
+    }
+  }
 
   return (
     <>
@@ -58,13 +77,14 @@ export default function AccountActions({
           </>
         ) : (
           <button
-            onClick={
-              isFriend
-                ? onRemoveFriend
-                : onAddFriend
+            onClick={() =>
+              runFriendAction(isFriend ? onRemoveFriend : onAddFriend)
             }
+            disabled={friendActionPending}
           >
-            {isFriend ? "Remove Friend" : "Add Friend"}
+            {friendActionPending
+              ? isFriend ? "Removing..." : "Sending..."
+              : isFriend ? "Remove Friend" : "Add Friend"}
           </button>
         )}
       </div>

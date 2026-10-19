@@ -30,8 +30,8 @@ interface ProfilePageTemplateProps {
   onClose?: () => void;
   isOwnProfile?: boolean;
   isFriend?: boolean;
-  onAddFriend?: () => void;
-  onRemoveFriend?: () => void;
+  onAddFriend?: () => void | Promise<void>;
+  onRemoveFriend?: () => void | Promise<void>;
 }
 
 export default function ProfilePageTemplate({

@@ -109,15 +109,14 @@ export default function FriendsPage() {
 	) {
 		if (!user) return;
 
-		try {
-			await FriendshipService.sendRequest(
-				user.id,
-				receiverId
-			);
+		// errors propagate: AddFriendPanel only reports success when this resolves
+		// (the failure itself is already shown by the api error popup)
+		await FriendshipService.sendRequest(
+			user.id,
+			receiverId
+		);
 
-			await refreshFriends();
-		} catch (error) {
-		}
+		await refreshFriends();
 	}
 
 	const liveFriends = friends.map((friend) => ({
@@ -134,6 +133,9 @@ export default function FriendsPage() {
 			onAccept={handleAccept}
 			onReject={handleReject}
 			onRemoveFriend={handleRemoveFriend}
+			onSelectFriend={(friend) =>
+				router.push(`/profile/${friend.id}`)
+			}
 			onAddFriend={handleAddFriend}
 			onClose={() =>
 				router.push("/home")

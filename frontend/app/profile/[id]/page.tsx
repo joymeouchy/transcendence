@@ -7,6 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { UserService } from "@/services/user.services";
 import { Friend, FriendshipService } from "@/services/friendships.service";
 import { useAuth } from "@/context/AuthContext";
+import { useAlert } from "@/context/AlertContext";
 import { UserProfile } from "@/types/types.dto";
 
 export default function UserProfilePage() {
@@ -15,6 +16,7 @@ export default function UserProfilePage() {
   const router = useRouter();
 
   const { user: currentUser } = useAuth();
+  const { showAlert } = useAlert();
 
   const [user, setUser] = useState<UserProfile | null>(null);
 
@@ -63,7 +65,9 @@ export default function UserProfilePage() {
 
     try {
       await FriendshipService.sendRequest(currentUser.id, user.id);
+      showAlert(`Friend request sent to ${user.username}.`);
     } catch (error) {
+      // the api layer already shows the error popup
     }
   }
 

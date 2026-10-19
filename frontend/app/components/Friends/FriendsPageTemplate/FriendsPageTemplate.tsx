@@ -18,6 +18,7 @@ interface Props {
   onAccept?: (id: number) => Promise<void>;
   onReject?: (id: number) => Promise<void>;
   onRemoveFriend?: (id: number) => Promise<void>;
+  onSelectFriend?: (friend: Friend) => void;
 
   onAddFriend?: (receiverId: number) => Promise<void>;
 
@@ -31,6 +32,7 @@ export default function FriendsPageTemplate({
   onAccept,
   onReject,
   onRemoveFriend,
+  onSelectFriend,
   onAddFriend,
   onClose,
 }: Props) {
@@ -57,6 +59,7 @@ export default function FriendsPageTemplate({
             <FriendsListPanel
               friends={friends}
               onRemoveFriend={onRemoveFriend}
+              onSelectFriend={onSelectFriend}
             />
           </div>
         </div>

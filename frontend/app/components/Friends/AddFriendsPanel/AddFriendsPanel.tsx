@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { UserService, UserSearchResult } from "@/services/user.services";
+import { useAlert } from "@/context/AlertContext";
 
 import clsx from "clsx";
 import styles from "./AddFriendsPanel.module.scss";
@@ -18,6 +19,9 @@ export default function AddFriendPanel({
 	const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
 	const [selectedUser, setSelectedUser] = useState<UserSearchResult | null>(null);
 	const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
+	// state updates aren't immediate: this blocks a fast double click from sending twice
+	const sendingRef = useRef(false);
+	const { showAlert } = useAlert();
 
 	useEffect(() => {
 		async function searchUsers() {
@@ -38,18 +42,24 @@ export default function AddFriendPanel({
 	}, [friendUsername, selectedUser]);
 
 	async function handleAddFriend() {
-		if (!selectedUser) return;
+		if (!selectedUser || sendingRef.current) return;
+
+		const receiver = selectedUser;
 
 		try {
+			sendingRef.current = true;
 			setLoadingMessage("Sending friend request...");
 
-			await onAddFriend?.(selectedUser.id);
+			await onAddFriend?.(receiver.id);
 
 			setFriendUsername("");
 			setSelectedUser(null);
 			setSearchResults([]);
+			showAlert(`Friend request sent to ${receiver.username}.`);
 		} catch (err) {
+			// keep the selection so the user can retry; the error popup comes from the api layer
 		} finally {
+			sendingRef.current = false;
 			setLoadingMessage(null);
 		}
 	}
@@ -65,6 +75,7 @@ export default function AddFriendPanel({
 					type="text"
 					placeholder="Search username..."
 					value={friendUsername}
+					disabled={loadingMessage !== null}
 					onChange={(e) => {
 						setFriendUsername(e.target.value);
 						setSelectedUser(null);
