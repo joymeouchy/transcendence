@@ -64,9 +64,11 @@ export default function FriendsListPanel({
 		}
 	}}
 >
-                <div className="flex min-w-0 items-center gap-1.5">
+                <div className="flex min-w-0 items-center gap-1.5 max-[450px]:max-w-full">
                   <XPStatusDot online={friend.isOnline} />
-                  {friend.username}
+                  <span className="min-w-0 truncate" title={friend.username}>
+                    {friend.username}
+                  </span>
                 </div>
 
                 {unreadCount > 0 && (

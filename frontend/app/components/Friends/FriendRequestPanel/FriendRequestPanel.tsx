@@ -64,28 +64,30 @@ export default function FriendRequestsPanel({
 								key={request.id}
 								className={clsx(
 									styles.friend,
-									"flex items-center justify-between gap-2 px-2 py-1.5 font-xp text-xp-sm text-xp-gray-900 max-[450px]:flex-col max-[450px]:items-start",
+									"flex items-center justify-between gap-2 px-2 py-1.5 font-xp text-xp-sm text-xp-gray-900 max-[450px]:flex-col max-[450px]:items-stretch",
 								)}
 							>
-								<span>
+								<span className="min-w-0 truncate" title={request.sender.username}>
 									{request.sender.username}
 								</span>
 
-								<button
-									className={buttonClass}
-									onClick={() => handleAccept(request.id)}
-									disabled={loadingId !== null}
-								>
-									{isLoading ? "Loading..." : "Accept"}
-								</button>
+								<div className="flex shrink-0 gap-2">
+									<button
+										className={buttonClass}
+										onClick={() => handleAccept(request.id)}
+										disabled={loadingId !== null}
+									>
+										{isLoading ? "Loading..." : "Accept"}
+									</button>
 
-								<button
-									className={buttonClass}
-									onClick={() => handleReject(request.id)}
-									disabled={loadingId !== null}
-								>
-									{isLoading ? "Loading..." : "Reject"}
-								</button>
+									<button
+										className={buttonClass}
+										onClick={() => handleReject(request.id)}
+										disabled={loadingId !== null}
+									>
+										{isLoading ? "Loading..." : "Reject"}
+									</button>
+								</div>
 							</div>
 						);
 					})

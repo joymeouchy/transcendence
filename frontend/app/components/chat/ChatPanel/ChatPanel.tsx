@@ -14,6 +14,7 @@ interface Props {
 	messages: Message[];
 	messagesLoading?: boolean;
 	onSendMessage?: (message: string) => void;
+	onBack?: () => void;
 }
 
 export default function ChatPanel({
@@ -22,10 +23,11 @@ export default function ChatPanel({
 	messages,
 	messagesLoading,
 	onSendMessage,
+	onBack,
 }: Props) {
 	return (
 		<div className="flex size-full min-h-0 flex-col">
-			<ChatHeader user={user} />
+			<ChatHeader user={user} onBack={onBack} />
 
 			<MessageList
 				messages={messages}

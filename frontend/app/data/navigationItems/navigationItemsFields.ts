@@ -33,7 +33,7 @@ export const friendshipsItem = {
 export const customizationItem = {
   image: images.customization,
   label: "Customize",
-  position: "top-[30%] left-[40%]",
+  position: "roomy:top-[30%] roomy:left-[40%]",
 };
 
 export const privacyPolicyItem = {
@@ -58,13 +58,13 @@ export const marvinItem = {
   image: images.marvin,
   label: "Marvin",
   // Tailwind classes placing the icon on the desktop
-  position: "top-[75%] left-[82%]",
+  position: "roomy:top-[75%] roomy:left-[82%]",
 };
 
 export const deepThoughtItem = {
   image: images.deepthought,
   label: "Deep Thought",
-  position: "top-[15%] left-[60%]",
+  position: "roomy:top-[15%] roomy:left-[60%]",
 };
 
 export const paintItem = {

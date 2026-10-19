@@ -17,8 +17,6 @@ export default function LandingPage() {
   return (
     <AuthLayout>
       <div className="flex w-full min-w-0 flex-col items-center gap-6 md:flex-row md:items-center md:gap-8">
-        <div className="xp-divider hidden h-[60vh] w-px shrink-0 opacity-90 md:block" />
-
         <div className="flex w-full min-w-0 flex-col gap-xp-md md:w-90">
           <div>
             <div className="mb-xp-md text-xp-md text-xp-white opacity-90">

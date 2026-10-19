@@ -18,11 +18,12 @@ export default function FloatingIcons() {
 
   return (
     <>
-      <div className="pointer-events-none absolute inset-0 z-1">
+      {/* placed freely on larger screens (`roomy`); on phones (`compact`) they join the desktop icon grid */}
+      <div className="pointer-events-none absolute inset-0 z-1 compact:contents">
         {floatingIcons.map((icon) => (
           <div
             key={icon.label}
-            className={`pointer-events-auto absolute ${icon.position}`}
+            className={`pointer-events-auto roomy:absolute ${icon.position}`}
           >
             <DesktopIcon
               image={icon.image}

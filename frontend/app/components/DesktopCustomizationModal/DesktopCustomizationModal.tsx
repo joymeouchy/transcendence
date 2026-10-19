@@ -53,18 +53,19 @@ export default function DesktopCustomizationModal({
 			onClose={onClose}
 		>
 			<div className="flex h-150 max-h-[70vh] min-h-0 flex-col">
-				<div className="grid min-h-0 flex-1 grid-cols-2 gap-4 overflow-x-hidden overflow-y-auto pt-1 pr-2 pb-2 pl-1">
+				<div className="grid min-h-0 flex-1 grid-cols-2 gap-4 overflow-x-hidden overflow-y-auto pt-1 pr-2 pb-2 pl-1 max-[450px]:gap-xp-sm max-[450px]:pr-1">
 					{desktopThemes.map((theme) => (
 						<button
 							key={theme.id}
 							className={clsx(
-								"desktop-theme-card flex cursor-pointer flex-col items-center gap-2 rounded-xp-lg bg-transparent p-2 text-xp-black",
+								"desktop-theme-card flex min-w-0 cursor-pointer flex-col items-center gap-2 rounded-xp-lg bg-transparent p-2 text-xp-black max-[450px]:p-1",
 								selectedTheme.id === theme.id && "selected",
 							)}
 							onClick={() => setSelectedTheme(theme)}
 							disabled={isSaving}
 						>
-							<div className="relative h-32.5 w-55 overflow-hidden rounded-xp-md bg-xp-black">
+							{/* 220x130 preview that scales down with its column on phones */}
+							<div className="relative aspect-22/13 w-55 max-w-full overflow-hidden rounded-xp-md bg-xp-black">
 								<img
 									src={theme.background}
 									alt={theme.name}
@@ -72,7 +73,7 @@ export default function DesktopCustomizationModal({
 								/>
 							</div>
 
-							<span className="font-bold text-xp-black">{theme.name}</span>
+							<span className="max-w-full truncate font-bold text-xp-black">{theme.name}</span>
 						</button>
 					))}
 				</div>

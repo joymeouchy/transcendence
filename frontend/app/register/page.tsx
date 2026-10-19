@@ -31,12 +31,6 @@ export default function RegisterPage() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
-  // useEffect(() => {
-  //   if (isAuthenticated()) {
-  //     router.replace("/home");
-  //   }
-  // }, [router]);
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 

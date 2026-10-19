@@ -36,6 +36,12 @@
   }
 }
 
+// vertical separator between the branding and the form (AuthLayout)
+.xp-divider {
+  background: t.tint(0.25);
+  box-shadow: 1px 0 0 t.shade(0.25);
+}
+
 .xp-bottom-bar {
   @include m.xp-gradient(login-bar, login-bar-dark, to top);
   border-top: 1px solid t.tint(0.7);

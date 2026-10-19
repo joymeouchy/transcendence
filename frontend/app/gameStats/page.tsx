@@ -98,13 +98,16 @@ export default function GameStatsPage() {
     <DesktopLayout>
       <XPWindow
         title="Game Stats"
+        // may shrink to the desktop's free space (it's a flex item there)
+        className="min-w-0"
         onClose={() => router.push("/home")}
         isLoading={
           activeTab === "history" ? matchesLoading : false
         }
         loadingMessage="Loading match history..."
       >
-        <div className="flex w-full min-h-0 min-w-0 flex-col font-xp">
+        {/* one fixed width for both tabs, so switching tabs doesn't resize the window */}
+        <div className="flex w-225 max-w-full min-h-0 min-w-0 flex-col font-xp">
           <div className={clsx(styles.tabs, "mb-3 flex shrink-0 items-end gap-0.75")}>
             <button
               className={tabClass(activeTab === "history")}

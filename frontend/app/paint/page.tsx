@@ -25,7 +25,7 @@ export default function PaintPage() {
         isLoading={isLoading}
         loadingMessage="Loading Paint..."
       >
-        <div className="h-[65vh] max-h-162.5 min-h-100 w-full min-w-150 overflow-hidden bg-xp-gray-200">
+        <div className="h-[65vh] max-h-162.5 min-h-100 w-150 max-w-full overflow-hidden bg-xp-gray-200">
           <iframe
             src="https://jspaint.app"
             title="JS Paint"

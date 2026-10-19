@@ -1,0 +1,6 @@
+@use "mixins" as m;
+
+// Layout lives in ChatHeader.tsx (Tailwind). SCSS: back button chrome.
+.back {
+	@include m.xp-tool-button;
+}

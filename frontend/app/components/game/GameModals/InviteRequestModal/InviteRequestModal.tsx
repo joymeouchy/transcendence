@@ -33,7 +33,7 @@ export default function InviteRequestModal({
 			isOpen={isOpen}
 			onClose={onClose}
 		>
-			<div className="invite-content flex items-center gap-3.5 p-5">
+			<div className="invite-content flex items-center gap-3.5 p-5 max-[450px]:gap-xp-md max-[450px]:p-xp-md">
 				{avatarUrl ? (
 					<img
 						src={avatarUrl}
@@ -46,14 +46,14 @@ export default function InviteRequestModal({
 					</div>
 				)}
 
-				<div className="flex flex-col gap-1.25 font-xp text-xp-md leading-[1.4] text-xp-gray-900">
-					<strong className="text-[15px] text-xp-invite-name">{username}</strong>
+				<div className="flex min-w-0 flex-col gap-1.25 font-xp text-xp-md leading-[1.4] text-xp-gray-900">
+					<strong className="text-[15px] text-xp-invite-name [overflow-wrap:anywhere]">{username}</strong>
 					<span>has invited you to play Pong!</span>
 					<span>First to <strong>{winningScore}</strong> points wins.</span>
 				</div>
 			</div>
 
-			<div className="flex justify-between bg-xp-invite-bg px-10 pt-0 pb-1.5">
+			<div className="flex justify-between bg-xp-invite-bg px-10 pt-0 pb-1.5 max-[450px]:px-xp-md">
 				<button
 					className="invite-button accept"
 					onClick={onAccept}

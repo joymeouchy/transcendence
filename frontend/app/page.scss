@@ -3,12 +3,6 @@
 
 // Welcome screen (app/page.tsx). Layout is Tailwind; this is the glass.
 
-// vertical separator between branding and the choices
-.xp-divider {
-  background: t.tint(0.25);
-  box-shadow: 1px 0 0 t.shade(0.25);
-}
-
 // glass "user tile" choice
 .xp-user-tile {
   @include m.xp-glass(0.08, 0.18, 6px);
