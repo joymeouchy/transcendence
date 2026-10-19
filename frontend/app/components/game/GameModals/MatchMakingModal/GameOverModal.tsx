@@ -32,6 +32,7 @@ export default function GameOverModal({
 
   return (
     <XPModal
+      closeOnOverlayClick={false}
       title={rematchDeclined ? "Rematch Declined" : "Match Complete"}
       isOpen={isOpen}
 	    onClose={onExit}

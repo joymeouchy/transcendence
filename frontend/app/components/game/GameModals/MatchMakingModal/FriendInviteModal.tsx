@@ -26,6 +26,7 @@ export default function FriendInviteModal({
 
   return (
     <XPModal
+      closeOnOverlayClick={false}
       title="Play with Friend"
       isOpen={isOpen}
       onClose={onClose}

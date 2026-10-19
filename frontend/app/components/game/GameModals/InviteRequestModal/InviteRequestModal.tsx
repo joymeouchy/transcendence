@@ -16,6 +16,7 @@ interface Props {
 	onAccept: () => void;
 	onDecline: () => void;
 	onClose: () => void;
+	closeOnOverlayClick?: boolean;
 }
 
 export default function InviteRequestModal({
@@ -26,12 +27,14 @@ export default function InviteRequestModal({
 	onAccept,
 	onDecline,
 	onClose,
+	closeOnOverlayClick = true,
 }: Props) {
 	return (
 		<XPModal
 			title="Game Invite"
 			isOpen={isOpen}
 			onClose={onClose}
+			closeOnOverlayClick={closeOnOverlayClick}
 		>
 			<div className="invite-content flex items-center gap-3.5 p-5">
 				{avatarUrl ? (

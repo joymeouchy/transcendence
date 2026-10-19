@@ -63,6 +63,7 @@ export default function CustomizationModal({ isOpen, onBack, onSave }: Props) {
 
   return (
     <XPModal
+      closeOnOverlayClick={false}
       title="Customize Pong"
       isOpen={isOpen}
       onClose={onBack}

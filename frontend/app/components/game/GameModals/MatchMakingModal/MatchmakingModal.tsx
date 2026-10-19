@@ -114,6 +114,7 @@ export default function MatchmakingModal({
 
   return (
     <XPModal
+      closeOnOverlayClick={false}
       title={content.title}
       isOpen={isOpen}
       onClose={

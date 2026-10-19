@@ -15,6 +15,7 @@ export default function OpponentDisconnectedModal({
 }: Props) {
   return (
     <XPModal
+      closeOnOverlayClick={false}
       title="Connection Lost"
       isOpen={isOpen}
     >

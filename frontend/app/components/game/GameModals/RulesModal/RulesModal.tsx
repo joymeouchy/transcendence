@@ -14,6 +14,7 @@ export default function RulesModal({
 }: Props) {
   return (
     <XPModal
+      closeOnOverlayClick={false}
       title="Pong Rules"
       isOpen={isOpen}
       onClose={onClose}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import InviteRequestModal from "../game/GameModals/InviteRequestModal/InviteRequestModal";
 import { useGameInvite } from "@/context/GameInviteContext";
@@ -8,6 +8,7 @@ import { pongConfig } from "@/types/game_types";
 
 export default function GameInvitePopup() {
 	const router = useRouter();
+	const pathname = usePathname();
 
 	const {
 		incomingInvite,
@@ -43,6 +44,8 @@ export default function GameInvitePopup() {
 			onAccept={handleAccept}
 			onDecline={handleDecline}
 			onClose={handleDecline}
+			// on the game page a stray click outside must not decline the invite
+			closeOnOverlayClick={pathname !== "/game"}
 		/>
 	); 
 }

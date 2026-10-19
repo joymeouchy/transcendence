@@ -12,6 +12,8 @@ type XPModalProps = {
   headerButton?: React.ReactNode;
   isLoading?: boolean;
   loadingMessage?: string;
+  // false: clicking the dimmed backdrop does nothing (close with ✕ or a button)
+  closeOnOverlayClick?: boolean;
 };
 
 export default function XPModal({
@@ -23,13 +25,16 @@ export default function XPModal({
   headerButton,
   isLoading = false,
   loadingMessage = "Loading...",
+  closeOnOverlayClick = true,
 }: XPModalProps) {
   if (!isOpen) return null;
 
   return (
     <div
       className="xp-modal-overlay fixed inset-0 z-9999 flex items-center justify-center p-xp-lg"
-      onClick={() => onClose?.()}
+      onClick={() => {
+        if (closeOnOverlayClick) onClose?.();
+      }}
     >
       <div
         className="xp-modal-container"

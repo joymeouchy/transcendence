@@ -18,6 +18,7 @@ export default function RematchRequestModal({
 
 	return (
 		<XPModal
+			closeOnOverlayClick={false}
 			title="Rematch Request"
 			isOpen={isOpen}
 			onClose={onDecline}

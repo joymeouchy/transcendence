@@ -52,6 +52,7 @@ export default function FriendSelectModal({
 
 	return (
 		<XPModal
+			closeOnOverlayClick={false}
 			title="Play with a Friend"
 			isOpen={isOpen}
 			onClose={onClose}

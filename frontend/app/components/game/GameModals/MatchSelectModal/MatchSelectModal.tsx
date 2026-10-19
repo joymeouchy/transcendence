@@ -32,6 +32,7 @@ export default function MatchSelectModal({
   return (
     <>
       <XPModal
+        closeOnOverlayClick={false}
         title="Play Pong"
         isOpen={isOpen}
         onClose={onBack}

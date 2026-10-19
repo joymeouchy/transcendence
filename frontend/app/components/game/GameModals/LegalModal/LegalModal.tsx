@@ -20,7 +20,7 @@ export default function LegalModal({ isOpen, onClose }: Props) {
   const router = useRouter();
 
   return (
-    <XPModal title="Legal & Privacy" isOpen={isOpen} onClose={onClose}>
+    <XPModal closeOnOverlayClick={false} title="Legal & Privacy" isOpen={isOpen} onClose={onClose}>
       <div className="flex w-[min(90vw,360px)] flex-col items-center gap-4 p-4 text-center">
         <p>
           Review our policies to learn how your information is handled and the
