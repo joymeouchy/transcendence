@@ -80,7 +80,7 @@ export default function UserProfilePage() {
     if (!friendshipId) return;
 
     try {
-      await FriendshipService.rejectRequest(friendshipId);
+      await FriendshipService.removeFriend(friendshipId);
       setIsFriend(false);
       setFriendshipId(null);
     } catch (error) {

@@ -48,7 +48,17 @@ export const FriendshipService = {
     return data;
   },
 
+  // Same endpoint as removeFriend: the backend deletes the row whatever its
+  // status, so callers must check the request is still pending first.
   async rejectRequest(friendshipId: number) {
+    const { data } = await api.delete(
+      `/friendships/reject/${friendshipId}`
+    );
+
+    return data;
+  },
+
+  async removeFriend(friendshipId: number) {
     const { data } = await api.delete(
       `/friendships/reject/${friendshipId}`
     );

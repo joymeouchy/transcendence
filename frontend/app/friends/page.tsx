@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useAlert } from "@/context/AlertContext";
 
 import {
 	FriendshipService,
@@ -15,6 +16,7 @@ import FriendsPageTemplate from "../components/Friends/FriendsPageTemplate/Frien
 export default function FriendsPage() {
 	const router = useRouter();
 	const { user, onlineUsers } = useAuth();
+	const { showAlert } = useAlert();
 
 	const [friends, setFriends] = useState<Friend[]>([]);
 	const [requests, setRequests] = useState<PendingRequest[]>([]);
@@ -46,7 +48,7 @@ export default function FriendsPage() {
 		loadPage();
 	}, [user]);
 
-	async function refreshFriends() {
+	const refreshFriends = useCallback(async () => {
 		if (!user) return;
 
 		try {
@@ -60,21 +62,54 @@ export default function FriendsPage() {
 
 			setFriends(friendsData);
 			setRequests(requestsData);
-		} catch (error) {
+		} catch {
 		}
-	}
+	}, [user]);
 
+	// another tab (or the other user) may have changed things meanwhile:
+	// reload when this tab comes back into view
+	useEffect(() => {
+		const handleVisible = () => {
+			if (document.visibilityState === "visible") {
+				refreshFriends();
+			}
+		};
+
+		document.addEventListener("visibilitychange", handleVisible);
+		window.addEventListener("focus", handleVisible);
+
+		return () => {
+			document.removeEventListener("visibilitychange", handleVisible);
+			window.removeEventListener("focus", handleVisible);
+		};
+	}, [refreshFriends]);
+
+	// On failure (e.g. the request was already accepted/rejected in another
+	// tab) the api popup explains why; reloading shows the real state.
 	async function handleAccept(id: number) {
 		try {
 			await FriendshipService.acceptRequest(id);
-
-			await refreshFriends();
-		} catch (error) {
+		} catch {
 		}
+
+		await refreshFriends();
 	}
 
 	async function handleReject(id: number) {
+		if (!user) return;
+
 		try {
+			// Reject and remove share one endpoint that deletes the friendship
+			// whatever its status. If this tab is stale and the request was
+			// accepted elsewhere, rejecting would silently unfriend: check first.
+			const pending = await FriendshipService.getPendingRequests(user.id);
+
+			if (!pending.some((request) => request.id === id)) {
+				showAlert("This friend request was already answered.");
+				await refreshFriends();
+				return;
+			}
+
 			await FriendshipService.rejectRequest(id);
 
 			setRequests((prev) =>
@@ -82,7 +117,8 @@ export default function FriendsPage() {
 					(request) => request.id !== id
 				)
 			);
-		} catch (error) {
+		} catch {
+			await refreshFriends();
 		}
 	}
 
@@ -90,7 +126,7 @@ export default function FriendsPage() {
 		friendshipId: number
 	) {
 		try {
-			await FriendshipService.rejectRequest(
+			await FriendshipService.removeFriend(
 				friendshipId
 			);
 
@@ -100,7 +136,8 @@ export default function FriendsPage() {
 						friend.friendshipId !== friendshipId
 				)
 			);
-		} catch (error) {
+		} catch {
+			await refreshFriends();
 		}
 	}
 
