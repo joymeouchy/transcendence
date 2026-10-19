@@ -32,6 +32,11 @@ export default function UserProfilePage() {
 
   useEffect(() => {
     async function loadProfile() {
+      // forget the previous profile's friendship, or a stranger's profile
+      // opened after a friend's would offer "Remove Friend" on the old id
+      setIsFriend(false);
+      setFriendshipId(null);
+
       try {
         const id = Number(params.id);
         const [profile, profileFriends] = await Promise.all([

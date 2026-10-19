@@ -34,11 +34,8 @@ export default function ForgotPasswordPage() {
 
       setAlertMessage(res.message);
 
-    } catch (err: any) {
-      setAlertMessage(
-        err.response?.data?.error ||
-        "Something went wrong"
-      );
+    } catch {
+      // the api error popup already shows what went wrong
 
     } finally {
       setIsLoading(false);

@@ -6,7 +6,6 @@ import clsx from "clsx";
 import styles from "./FriendListPanel.module.scss";
 import XPListPanel, { XPListEmpty } from "../../ui/XPListPanel/XPListPanel";
 import XPStatusDot from "../../ui/XPStatusDot/XPStatusDot";
-import { useRouter } from "next/navigation";
 
 interface Props {
   friends: Friend[];
@@ -24,7 +23,6 @@ export default function FriendsListPanel({
   unreadCounts,
 }: Props) {
   const [removingFriendId, setRemovingFriendId] = useState<number | null>(null);
-  const router = useRouter();
 
   async function handleRemoveFriend(friendshipId: number) {
     try {
@@ -50,10 +48,12 @@ export default function FriendsListPanel({
 	key={friend.friendshipId}
 	className={clsx(
 		styles.friend,
+		isSelected && styles.selected,
 		"flex cursor-pointer items-center justify-between gap-2 px-2 py-1.5 font-xp text-xp-sm text-xp-gray-900 max-[450px]:flex-col max-[450px]:items-start",
 	)}
 	role="button"
 	tabIndex={0}
+	aria-current={isSelected || undefined}
 	onClick={() => onSelectFriend?.(friend)}
 	onKeyDown={(e) => {
 		if (e.target !== e.currentTarget) return;

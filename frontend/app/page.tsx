@@ -3,7 +3,6 @@
 import Link from "next/link";
 import AuthLayout from "./components/auth/AuthLayout";
 import AuthIcon from "./components/auth/AuthIcon";
-import { useRouter } from "next/navigation";
 import { images } from "@/lib/images";
 
 import "./page.scss";
@@ -12,7 +11,6 @@ const tileClass =
   "xp-user-tile flex cursor-pointer items-center gap-xp-sm rounded-xp-sm px-xp-md py-xp-sm text-xp-white no-underline";
 
 export default function LandingPage() {
-  const router = useRouter();
 
   return (
     <AuthLayout>

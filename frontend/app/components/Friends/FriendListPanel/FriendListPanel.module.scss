@@ -11,6 +11,13 @@
 	}
 }
 
+// open conversation in the chat list; same look as the leaderboard's
+// current-user row. Declared after the zebra/hover rules so it wins.
+.friend.selected {
+	background: t.color(row-selected);
+	box-shadow: inset 3px 0 t.color(blue);
+}
+
 .friendButton {
 	@include m.xp-tool-button;
 }

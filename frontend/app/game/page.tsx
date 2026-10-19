@@ -24,20 +24,6 @@ export default function GamePage() {
 		useState<CustomizationTheme | null>(null);
 	const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-
-	const [activeEffects, setActiveEffects] = useState<{
-		left: {
-			type: string;
-			expiresAt: number;
-		} | null;
-		right: {
-			type: string;
-			expiresAt: number;
-		} | null;
-	}>({
-		left: null,
-		right: null,
-	});
 	useEffect(() => {
 		const loadTheme = async () => {
 			try {

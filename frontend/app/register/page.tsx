@@ -55,12 +55,7 @@ export default function RegisterPage() {
       setSuccessMessage("Registration successful");
       setShowSuccess(true);
     } catch (err) {
-    } finally {const guestOnlyRoutes = [
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/reset-password",
-];
+    } finally {
       setLoading(false);
     }
   };

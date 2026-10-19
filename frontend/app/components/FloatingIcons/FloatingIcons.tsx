@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 import DesktopIcon from "../Sidebar/DesktopIcon/DesktopIcon";
 import { floatingIcons } from "@/app/data/navigationItems/FloatingIconsFields";
@@ -10,7 +9,6 @@ import MarvinModal from "../marvinModal/marvinModal";
 import DesktopCustomizationModal from "../DesktopCustomizationModal/DesktopCustomizationModal";
 
 export default function FloatingIcons() {
-  const router = useRouter();
 
   const [deepThoughtOpen, setDeepThoughtOpen] = useState(false);
   const [marvinOpen, setMarvinOpen] = useState(false);
