@@ -19,7 +19,7 @@ import {
   cancelGameCleanup,
   abandonPausedGame,
 } from "./game";
-import { pongConfig, isValidWinningScore } from "../../shared/game_types";
+import { pongConfig, isValidWinningScore } from "../../frontend/types/game_types";
 import passport from "./OAuth";
 import userRoutes from "../routes/users";
 import friendshipRoutes from "../routes/friendships";

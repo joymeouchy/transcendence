@@ -29,7 +29,7 @@ It doesn't repeat the other docs:
 | Setup, `.env`, stack choices, database schema | [`../README.md`](../README.md) |
 | Every socket event and its payload | [`../SOCKET_EVENTS.md`](../SOCKET_EVENTS.md) |
 | Every REST endpoint, with "Try it out" | Swagger at `https://localhost:8443/api/api-docs` (generated from the `@swagger` comments in `routes/`) |
-| Game constants and shared types | [`../shared/game_types.ts`](../shared/game_types.ts) |
+| Game constants and shared types | [`../frontend/types/game_types.ts`](../frontend/types/game_types.ts) (one file, imported by both the frontend and the backend) |
 
 ---
 

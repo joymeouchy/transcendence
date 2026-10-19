@@ -147,7 +147,7 @@ Both members are developers: each wrote code, tested their own features and the 
 
 - The project was split into a **frontend track** (jmeouchy) and a **backend track** (rdennaou), with integration work done together.
 - Features were broken into small tasks and tracked in a shared task list kept in the repository (`TODO.md`), with a section per member and a "To test" section.
-- The interface between the two tracks was written down before implementation: the socket events and their payloads are documented in `SOCKET_EVENTS.md`, the REST endpoints in Swagger (`/api/api-docs`), and the shared game types in `shared/game_types.ts`, which both the frontend and the backend import.
+- The interface between the two tracks was written down before implementation: the socket events and their payloads are documented in `SOCKET_EVENTS.md`, the REST endpoints in Swagger (`/api/api-docs`), and the game rules and types in `frontend/types/game_types.ts`, a single file that both the frontend and the backend import.
 - Work was committed directly to `main` and pulled frequently. Each change was tested locally, then the integrated app was tested with two browser sessions to reproduce real two-player interactions.
 
 ### Tools

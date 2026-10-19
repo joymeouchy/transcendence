@@ -1,5 +1,4 @@
 import { Router } from "express";
-import jwt from "jsonwebtoken";
 import { FriendshipStatus } from "../generated/prisma/client";
 import { authHelper, AuthRequest, validateUsername } from "../src/helpers/auth_helpers";
 import { avatarUpload, uploadAvatar, deleteAvatar } from "../src/helpers/upload_helpers";

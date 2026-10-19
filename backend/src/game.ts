@@ -5,7 +5,7 @@ import {
   FullGameState,
   pongConfig,
   PowerUpType,
-} from "../../shared/game_types";
+} from "../../frontend/types/game_types";
 import prisma from "../src/prisma";
 
 export const games: Record<string, FullGameState> = {};

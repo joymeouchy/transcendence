@@ -8,7 +8,8 @@ RUN npm ci
 
 COPY backend/ .
 
-COPY shared/ /shared/
+# game rules and types, shared with the frontend (imported as ../../frontend/types/game_types)
+COPY frontend/types/game_types.ts /frontend/types/game_types.ts
 
 RUN npx prisma generate --config prisma.config.ts
 
