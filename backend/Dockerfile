@@ -30,6 +30,9 @@ COPY --from=builder /app/dist ./dist
 
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+# the client is generated to generated/prisma (schema.prisma "output"), and its
+# query engine binary lives there too, not in node_modules/.prisma
+COPY --from=builder /app/generated ./generated
 
 EXPOSE 3001
 

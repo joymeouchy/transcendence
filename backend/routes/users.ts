@@ -55,7 +55,6 @@ const router = Router();
  *         description: Server error
  */
 router.get("/me", authHelper, async (req: AuthRequest, res) => {
-  console.log("userId from token:", req.userId); // add this
   try {
     const userId = req.userId!;
 

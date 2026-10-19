@@ -56,6 +56,28 @@ export const validatePassword = (password: unknown): string | null => {
   return null;
 };
 
+// emails are stored and looked up lowercase, so "Rawan@x.com" and
+// "rawan@x.com" are the same account. returns "" for anything that isn't a string.
+export const normalizeEmail = (email: unknown): string =>
+  typeof email === "string" ? email.trim().toLowerCase() : "";
+
+// expects the already normalized email. returns an error message, or null if valid.
+export const validateEmail = (email: string): string | null => {
+  if (email.length === 0) {
+    return "Email is required";
+  }
+  // 254 is the longest address email servers accept
+  if (email.length > 254) {
+    return "Email is too long";
+  }
+  // something@something.something with no spaces. whether the address really
+  // exists can't be checked here, only by sending it a mail
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return "Invalid email address";
+  }
+  return null;
+};
+
 // username rules shared by register and the change-username route.
 // expects the already trimmed username. returns an error message, or null if valid.
 export const validateUsername = (username: unknown): string | null => {

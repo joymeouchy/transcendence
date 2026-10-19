@@ -70,6 +70,8 @@ const socketToUser = new Map<string, number>(); // socketId → userId
 const rematches = new Map<string, string[]>(); // room → [socketIds who want rematch]
 // socketId → the match room it was playing in when it dropped, checked on recovery.
 const droppedFromRoom = new Map<string, string>();
+// how long Socket.IO keeps a dropped session recoverable (its default, 2 min)
+const RECOVERY_WINDOW_MS = 2 * 60 * 1000;
 const INVITE_TIMEOUT_MS = 30000;
 // room → max score chosen in the friend invite, kept after the match ends so
 // a rematch is played to the same score. Only non-default scores are stored.
@@ -96,7 +98,7 @@ const io = new Server(server, {
   cors: {
     origin: FRONTEND_URL,
   },
-  connectionStateRecovery: {},
+  connectionStateRecovery: { maxDisconnectionDuration: RECOVERY_WINDOW_MS },
 });
 
 setIo(io);
@@ -713,6 +715,13 @@ io.on("connection", (socket) => {
     // ending the match, instead of killing it on the first dropped packet
     const room = findRoomBySocket(socket.id);
     if (room) {
+      // remembered so that, if this socket is recovered after the match is
+      // gone, the connection handler can send it game_abandoned
+      droppedFromRoom.set(socket.id, room);
+      setTimeout(
+        () => droppedFromRoom.delete(socket.id),
+        RECOVERY_WINDOW_MS,
+      );
       pauseGame(room);
       io.to(room).emit("player_disconnected");
       scheduleGameCleanup(io, room, socket.id);
