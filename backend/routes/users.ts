@@ -219,10 +219,10 @@ router.get("/me/matches", authHelper, async (req: AuthRequest, res) => {
  */
 router.get("/search", authHelper, async (req: AuthRequest, res) => {
   try {
-    const query = req.query.q as string;
+    const query = req.query.q;
     const currentUserId = req.userId!;
 
-    if (!query) {
+    if (typeof query !== "string" || !query) {
       return res.status(400).json({ error: "Missing search query" });
     }
 
