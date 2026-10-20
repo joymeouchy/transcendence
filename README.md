@@ -70,7 +70,6 @@ cp .env.example .env
 | `SUPABASE_URL` | URL of the Supabase project (avatar storage). |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service role key, used by the backend to upload avatars to the public `avatars` bucket. |
 | `JWT_SECRET` | Secret used to sign login tokens. |
-| `SESSION_SECRET` | Secret for the session used during the Google OAuth handshake. |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth 2.0 credentials. Authorized redirect URI: `https://localhost:8443/api/auth/google/callback`. |
 | `EMAIL_USER` / `EMAIL_PASS` | Gmail address and app password used to send password-reset emails. |
 | `BACKEND_URL` | Public URL of the API, e.g. `https://localhost:8443/api`. |

@@ -1,4 +1,3 @@
-//to run -> npx ts-node-dev src/server.ts
 import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
 dotenv.config();
@@ -40,6 +39,7 @@ import prisma from "../src/prisma";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 
+// Swagger: builds the /api-docs page from the @swagger comments in the route files
 const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
@@ -65,7 +65,10 @@ const swaggerOptions = {
 };
 
 const PORT = 3001;
+// the random matchmaking queue: the one socket waiting for an opponent, or
+// null. one spot is enough, the next player who joins is matched with them
 let waitingPlayer: any = null;
+// counter for unique room names: match-0, match-1, ...
 let matchId = 0;
 const socketToUser = new Map<string, number>(); // socketId → userId
 const rematches = new Map<string, string[]>(); // room → [socketIds who want rematch]
@@ -78,13 +81,19 @@ const INVITE_TIMEOUT_MS = 30000;
 // a rematch is played to the same score. Only non-default scores are stored.
 const roomWinningScores = new Map<string, number>();
 
+// Express app: middleware first (runs on every request), then the route files,
+// each mounted under its own prefix (/auth, /users, ...). Caddy strips /api
+// before requests get here
 const app = express();
+// only the frontend's origin may call the API from a browser
 app.use(
   cors({
     origin: FRONTEND_URL,
   }),
 );
+// parses JSON request bodies into req.body
 app.use(express.json());
+// serves files from backend/uploads (old avatars from before Supabase Storage)
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
@@ -93,12 +102,17 @@ app.use("/friendships", friendshipRoutes);
 app.use("/customization", customizationRoutes);
 app.use("/messages", messageRoutes);
 
+// Express and Socket.IO share one HTTP server on port 3001: normal requests go
+// to Express, /socket.io requests go to Socket.IO
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
     origin: FRONTEND_URL,
   },
+  // if a connection drops briefly (wifi blip, laptop sleep), Socket.IO restores
+  // the same socket with the same id and rooms when it reconnects within this
+  // time, and replays the events it missed. that's what lets a match resume
   connectionStateRecovery: { maxDisconnectionDuration: RECOVERY_WINDOW_MS },
 });
 
@@ -131,10 +145,13 @@ async function cleanupOldMessages() {
 cleanupOldMessages();
 setInterval(cleanupOldMessages, MESSAGE_CLEANUP_INTERVAL_MS);
 
-// Authenticate the socket connection using the same JWT issued by /auth/login
-// or /auth/register, so we know the real userId behind a socket instead of
+// Authenticate the socket connection using the same JWT issued by /auth/login,
+// /auth/register or the Google callback, so we know the real userId behind a socket instead of
 // trusting whatever the client claims (this is what lets us tell two tabs of
 // the same account apart from two different accounts).
+// io.use is socket middleware: it runs once per new connection, before the
+// "connection" handler. next() accepts the connection, next(error) refuses it.
+// the client sends the token with io(url, { auth: { token } })
 io.use(async (socket, next) => {
   const token = socket.handshake.auth?.token;
 
@@ -153,6 +170,8 @@ io.use(async (socket, next) => {
     return next(new Error("Invalid or expired token"));
   }
 
+  // socket.data is a per-socket object for our own values, readable in every
+  // handler below for as long as the socket is connected
   socket.data.userId = decoded.userId;
   socket.data.username = decoded.username;
 
@@ -174,6 +193,15 @@ io.use(async (socket, next) => {
   next();
 });
 
+// runs once for every socket that passed the auth middleware. the socket.on(...)
+// handlers inside are the events this client can send. socket is this one
+// client, io is everyone.
+//
+// sending events:
+//   socket.emit(...)          → only this client
+//   socket.to(room).emit(...) → everyone in the room except this client
+//   io.to(room).emit(...)     → everyone in the room, this client included
+//   io.emit(...)              → every connected client
 io.on("connection", (socket) => {
   const userId = socket.data.userId as number;
 
@@ -189,10 +217,13 @@ io.on("connection", (socket) => {
   const wasOffline = userSockets.size === 0;
   userSockets.add(socket.id);
 
+  // only on the first tab, so friends' lists aren't told "online" again for every tab
   if (wasOffline) {
     io.emit("online_changed", { userId, isOnline: true });
   }
 
+  // true when connectionStateRecovery restored a dropped socket (same id and
+  // rooms). findRoomBySocket still finds its match, which was paused on disconnect
   if (socket.recovered) {
     const droppedRoom = droppedFromRoom.get(socket.id);
     droppedFromRoom.delete(socket.id);
@@ -212,6 +243,8 @@ io.on("connection", (socket) => {
     }
   }
 
+  // random matchmaking: the first player waits, the second one is matched with
+  // them, both join a new room and the game starts
   socket.on("join_queue", async () => {
     // console.log(socket.id, "wants to play");
 
@@ -266,6 +299,7 @@ io.on("connection", (socket) => {
 
       // console.log("Match created:", room);
 
+      // both avatar lookups run at the same time, Promise.all waits for both
       const [leftAvatar, rightAvatar] = await Promise.all([
         waitingUserId
           ? getCurrentAvatarUrl(waitingUserId)
@@ -301,7 +335,9 @@ io.on("connection", (socket) => {
       // console.log("Game started in room:", room);
     }
   });
-  // handle paddle movement
+  // handle paddle movement. the client sends one "up"/"down" per keydown (the
+  // browser repeats keydown while a key is held) or while the screen is touched.
+  // the server moves the paddle (game.ts checks the sender really plays in that room)
   socket.on(
     "paddle_move",
     ({ room, direction }: { room: string; direction: "up" | "down" }) => {
@@ -309,6 +345,8 @@ io.on("connection", (socket) => {
     },
   );
 
+  // rematch: both players stay in the finished match's room on the result
+  // screen. rematches[room] collects who asked, and once both have, a new match starts
   socket.on("request_rematch", async (data: { room: string } | undefined) => {
     if (!data?.room) {
       console.warn("request_rematch received without room:", data);
@@ -332,7 +370,8 @@ io.on("connection", (socket) => {
     }
 
     // the opponent left the result screen (they leave the room then),
-    // disconnected, or started another match: treat it as a decline
+    // disconnected, or started another match: treat it as a decline.
+    // io.sockets.adapter.rooms.get(room) is the Set of socket ids in that room
     const opponentSocketId = [...(io.sockets.adapter.rooms.get(room) ?? [])].find(
       (id) => id !== socket.id,
     );
@@ -406,7 +445,7 @@ io.on("connection", (socket) => {
         // console.log("Rematch started in room:", newRoom);
       } else {
         // one of them disconnected between requesting and matching
-        // whoever's still around know so they're not stuck waiting forever
+        // let whoever's still around know so they're not stuck waiting forever
         (p1Socket ?? p2Socket)?.emit("rematch_failed");
       }
     } else {
@@ -454,6 +493,9 @@ io.on("connection", (socket) => {
     }
   });
 
+  // friend invites: invite_friend → the friend gets invite_received → they answer
+  // with invite_response. if accepted, a match starts with the max score the
+  // inviter chose. the invite is cancelled after INVITE_TIMEOUT_MS without an answer
   socket.on(
     "invite_friend",
     ({ friendId, winningScore }: { friendId: number; winningScore?: number }) => {
@@ -534,6 +576,8 @@ io.on("connection", (socket) => {
         winningScore: matchWinningScore,
       });
 
+      // sent to every tab of the friend. io.to(socketId) works because every
+      // socket is automatically in a room named after its own id
       for (const friendSocketId of friendSockets) {
         io.to(friendSocketId).emit("invite_received", {
           fromUserId: inviterId,
@@ -545,6 +589,7 @@ io.on("connection", (socket) => {
     },
   );
 
+  // the inviter cancelled their invite before the friend answered
   socket.on("cancel_invite", ({ friendId }: { friendId: number }) => {
     const inviterId = socketToUser.get(socket.id);
     if (!inviterId) return;
@@ -562,6 +607,8 @@ io.on("connection", (socket) => {
     );
   });
 
+  // the invited friend accepted or declined. this socket is the friend,
+  // fromUserId is the inviter
   socket.on(
     "invite_response",
     async ({
@@ -664,6 +711,8 @@ io.on("connection", (socket) => {
     },
   );
 
+  // a socket closed (tab closed, network lost, logout). clean up everything it
+  // was part of: online status, invites, the queue and a running match
   socket.on("disconnect", () => {
     const userId = socketToUser.get(socket.id);
     if (userId) {
@@ -684,6 +733,7 @@ io.on("connection", (socket) => {
 
       const stillOnline = onlineUsers.get(userId);
       for (const [key, pending] of pendingInvites) {
+        // "4:9" → skip the first part (inviter), keep the invitee id "9"
         const [, inviteeIdStr] = key.split(":");
 
         if (pending.inviterSocketId === socket.id) {

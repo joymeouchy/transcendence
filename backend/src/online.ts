@@ -1,10 +1,21 @@
-// This is a map of userId to a set of connected socketIds. If the set is non-empty, the user is online.
-// The map is updated in server.ts's connection/disconnect handlers, and is used by the
-// REST API to determine if a user is online without having to query the database.
-// Note: This is a simple in-memory implementation. In a multi-instance deployment, 
-// you would need to use a shared store (e.g., Redis) instead of a plain in-process map.
-export const onlineUsers = new Map<number, Set<string>>(); // userId → connected socketIds
+// who is online right now: userId → the ids of that user's connected sockets.
+// a user is online while they have at least one connected socket.
+//
+// a Set of sockets, not just true/false, because one account can be open in
+// several tabs or devices, and each one has its own socket. closing one tab
+// removes only that socket, so the user stays online until the last one closes.
+//
+// updated in server.ts: a socket is added on "connection" and removed on
+// "disconnect". the REST API reads it to answer "is X online?" without a
+// database query (the isOnline column in the database isn't used).
+//
+// note: this lives in the server's memory, so it's empty after a restart (the
+// clients reconnect and fill it again) and wouldn't work with several backend
+// servers. that would need a shared store like Redis instead
+export const onlineUsers = new Map<number, Set<string>>();
 
+// true if the user has at least one connected socket.
+// `?.size ?? 0` gives 0 when the user isn't in the map at all
 export function isUserOnline(userId: number): boolean {
   return (onlineUsers.get(userId)?.size ?? 0) > 0;
 }

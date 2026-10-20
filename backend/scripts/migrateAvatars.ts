@@ -1,11 +1,13 @@
 // one-time move of old avatars (backend/uploads/avatars on this machine) to Supabase Storage
-// Run both with and without --apply to see what would be moved, then actually move them
+// Run it first without --apply to see what would be moved, then with --apply to move them
 // Run this once then delete it if you want
-//
+// Run it from backend/ on your machine, not in Docker
+
 // dry run (changes nothing):
-//   docker compose exec backend npx ts-node scripts/migrateAvatars.ts
+//   npx ts-node scripts/migrateAvatars.ts
 // actually move them:
-//   docker compose exec backend npx ts-node scripts/migrateAvatars.ts --apply
+//   npx ts-node scripts/migrateAvatars.ts --apply
+
 import fs from "fs";
 import path from "path";
 import prisma from "../src/prisma";

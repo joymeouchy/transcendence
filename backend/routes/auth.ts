@@ -19,7 +19,7 @@ const router = Router();
 const SALT_ROUNDS = 12;
 const TOKEN_EXPIRES_IN = "7d";
 const transporter = nodemailer.createTransport({
-  service: "gmail", // send to user's email
+  service: "gmail", // emails are sent from the EMAIL_USER Gmail account
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -55,7 +55,7 @@ const transporter = nodemailer.createTransport({
  *       201:
  *         description: User registered successfully
  *       400:
- *         description: User already exists, missing fields, or username or password doesn't meet the rules
+ *         description: Missing fields, invalid email, email already in use, username already taken, or username or password doesn't meet the rules
  *       500:
  *         description: Server error
  */
@@ -148,7 +148,7 @@ router.post("/register", async (req, res) => {
  *       200:
  *         description: Login successful, returns JWT token
  *       400:
- *         description: Wrong email or password
+ *         description: Missing fields, wrong email or password, or the account uses Google login
  *       500:
  *         description: Server error
  */

@@ -1,11 +1,22 @@
 import { Router } from "express";
 import { FriendshipStatus } from "../generated/prisma/client";
-import { authHelper, AuthRequest, validateUsername } from "../src/helpers/auth_helpers";
-import { avatarUpload, uploadAvatar, deleteAvatar } from "../src/helpers/upload_helpers";
+import {
+  authHelper,
+  AuthRequest,
+  validateUsername,
+} from "../src/helpers/auth_helpers";
+import {
+  avatarUpload,
+  uploadAvatar,
+  deleteAvatar,
+} from "../src/helpers/upload_helpers";
 import { getIo } from "../src/io";
 import { isUserOnline, onlineUsers } from "../src/online";
 import prisma from "../src/prisma";
 
+// REST routes for user profiles, stats, search, leaderboard and avatars.
+// mounted at /users in server.ts. every route runs authHelper first, which
+// checks the JWT and puts the logged-in user's id in req.userId
 const router = Router();
 
 /**
@@ -80,8 +91,10 @@ router.get("/me", authHelper, async (req: AuthRequest, res) => {
       where: { winnerId: user.id },
     });
 
+    // a user can be player1 or player2 in a match, so both lists are counted.
     const totalMatches =
       user.matchesAsPlayer1.length + user.matchesAsPlayer2.length;
+    // every match that isn't a win is a loss
     const losses = totalMatches - wins;
 
     res.json({
@@ -89,6 +102,7 @@ router.get("/me", authHelper, async (req: AuthRequest, res) => {
       username: user.username,
       email: user.email,
       avatarUrl: user.avatarUrl,
+      // live status from the in-memory socket map, not from the database
       isOnline: isUserOnline(user.id),
       provider: user.provider,
       preferredTheme: user.preferredTheme,
@@ -167,11 +181,14 @@ router.get("/me/matches", authHelper, async (req: AuthRequest, res) => {
       },
     });
 
+    // the frontend expects "me vs opponent" but DB stores player1/player2,
+    // so the fields are swapped depending on which side this user played
     const history = matches.map((match) => {
       const isPlayer1 = match.player1Id === userId;
       const opponent = isPlayer1 ? match.player2 : match.player1;
       const myScore = isPlayer1 ? match.player1Score : match.player2Score;
       const opponentScore = isPlayer1 ? match.player2Score : match.player1Score;
+      // winnerId is only null if no winner could be saved for the match
       const result =
         match.winnerId === null
           ? "draw"
@@ -231,7 +248,7 @@ router.get("/search", authHelper, async (req: AuthRequest, res) => {
           contains: query,
           mode: "insensitive", // doesn't care if it's upper or lower case
         },
-        NOT: { id: currentUserId }, // exclude the user itself from searching his name
+        NOT: { id: currentUserId }, // don't show the current user in their own search
       },
       select: {
         id: true,
@@ -241,23 +258,27 @@ router.get("/search", authHelper, async (req: AuthRequest, res) => {
       take: 10, // limit to 10 results
     });
 
-    res.json(
-      users.map((u) => ({ ...u, isOnline: isUserOnline(u.id) })),
-    );
+    res.json(users.map((u) => ({ ...u, isOnline: isUserOnline(u.id) })));
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// lower bound of the 95% Wilson score interval for a win rate: the win rate we can be
-// confident a player has at least, which stops few-match players topping the board
+// ranking score for the leaderboard (Wilson score lower bound).
+// a plain win rate would put a player with 1 win out of 1 match (100%) above
+// someone with 50 wins out of 55 (91%). this score answers "what win rate are we
+// 95% sure this player has at least?". few matches means less certainty, so the
+// score is pulled down: 1/1 scores about 0.21, 50/55 about 0.80.
+// it's 0 for a player with no wins
 function wilsonLowerBound(wins: number, total: number): number {
   if (total === 0) return 0;
-  const z = 1.96;
+  const z = 1.96; // the z-value for 95% confidence
   const p = wins / total;
   const z2 = z * z;
   return (
-    (p + z2 / (2 * total) - z * Math.sqrt((p * (1 - p) + z2 / (4 * total)) / total)) /
+    (p +
+      z2 / (2 * total) -
+      z * Math.sqrt((p * (1 - p) + z2 / (4 * total)) / total)) /
     (1 + z2 / total)
   );
 }
@@ -271,7 +292,8 @@ function wilsonLowerBound(wins: number, total: number): number {
  *       Players are ranked by the lower bound of the Wilson score interval (95%) on
  *       their win rate, so a long winning record outranks a lucky short one
  *       (e.g. 50W/5L ranks above 1W/0L). Ties are broken by wins, then fewest losses,
- *       then username. Players with no matches are included at the bottom.
+ *       then username. Players with no matches are included, ranked below
+ *       everyone who has a win.
  *       The "friends" scope always includes the current user.
  *     parameters:
  *       - in: header
@@ -330,7 +352,9 @@ router.get("/leaderboard", authHelper, async (req: AuthRequest, res) => {
     const scope = (req.query.scope as string) || "all";
 
     if (scope !== "all" && scope !== "friends") {
-      return res.status(400).json({ error: "Invalid scope, use 'all' or 'friends'" });
+      return res
+        .status(400)
+        .json({ error: "Invalid scope, use 'all' or 'friends'" });
     }
 
     // restrict to the current user + accepted friends when scope is "friends"
@@ -352,6 +376,7 @@ router.get("/leaderboard", authHelper, async (req: AuthRequest, res) => {
       ];
     }
 
+    // {} adds no condition on id, so with scope "all" every user is included
     const idFilter = userIds ? { in: userIds } : {};
 
     // count wins and matches played per user in the DB instead of loading every match
@@ -377,6 +402,8 @@ router.get("/leaderboard", authHelper, async (req: AuthRequest, res) => {
       }),
     ]);
 
+    // turn the grouped counts into userId → count maps. a user's matches are
+    // split between the player1 and player2 counts, so the two are added up
     const wins = new Map(winCounts.map((c) => [c.winnerId!, c._count._all]));
     const played = new Map<number, number>();
     for (const c of p1Counts) played.set(c.player1Id, c._count._all);
@@ -393,13 +420,15 @@ router.get("/leaderboard", authHelper, async (req: AuthRequest, res) => {
           username: u.username,
           avatarUrl: u.avatarUrl,
           wins: userWins,
-          losses: totalMatches - userWins, // same as /users/:id
+          losses: totalMatches - userWins,
           totalMatches,
           winRate:
             totalMatches > 0 ? Math.round((userWins / totalMatches) * 100) : 0,
           score: wilsonLowerBound(userWins, totalMatches),
         };
       })
+      // highest Wilson score first, then the tie-breakers: more wins, fewer
+      // losses, then alphabetical. `||` moves to the next rule only on a tie (0)
       .sort(
         (a, b) =>
           b.score - a.score ||
@@ -407,6 +436,8 @@ router.get("/leaderboard", authHelper, async (req: AuthRequest, res) => {
           a.losses - b.losses ||
           a.username.localeCompare(b.username),
       )
+      // add the rank (1-based index) to each player object, also
+      // remove the score from the final output since it's only used for sorting
       .map(({ score, ...p }, index) => ({ rank: index + 1, ...p }));
 
     res.json(players);
@@ -466,7 +497,7 @@ router.patch("/username", authHelper, async (req: AuthRequest, res) => {
       data: { username },
     });
 
-    // the sockets keep the username they connected with, so update them too.
+    // the sockets keep the username they connected with, so we update them too,
     // otherwise match_found and invites keep showing the old name
     onlineUsers.get(userId)?.forEach((socketId) => {
       const socket = getIo().sockets.sockets.get(socketId);
@@ -535,94 +566,98 @@ router.patch("/username", authHelper, async (req: AuthRequest, res) => {
  *       500:
  *         description: Server error
  */
-router.get("/:id", authHelper, async (req: AuthRequest<{ id: string }>, res) => {
-  try {
-    const userId = parseInt(req.params.id);
-    const requesterId = req.userId!;
+router.get(
+  "/:id",
+  authHelper,
+  async (req: AuthRequest<{ id: string }>, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const requesterId = req.userId!;
 
-    if (isNaN(userId)) {
-      return res.status(400).json({ error: "Invalid user ID" });
-    }
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        avatarUrl: true,
-        provider: true,
-        matchesAsPlayer1: { select: { id: true } },
-        matchesAsPlayer2: { select: { id: true } },
-      },
-    });
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          avatarUrl: true,
+          provider: true,
+          matchesAsPlayer1: { select: { id: true } },
+          matchesAsPlayer2: { select: { id: true } },
+        },
+      });
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
 
-    const wins = await prisma.match.count({
-      where: { winnerId: userId },
-    });
+      const wins = await prisma.match.count({
+        where: { winnerId: userId },
+      });
 
-    const totalMatches =
-      user.matchesAsPlayer1.length + user.matchesAsPlayer2.length;
-    const losses = totalMatches - wins;
+      const totalMatches =
+        user.matchesAsPlayer1.length + user.matchesAsPlayer2.length;
+      const losses = totalMatches - wins;
 
-    const stats = {
-      wins,
-      losses,
-      totalMatches,
-      winRate: totalMatches > 0 ? Math.round((wins / totalMatches) * 100) : 0,
-    };
+      const stats = {
+        wins,
+        losses,
+        totalMatches,
+        winRate: totalMatches > 0 ? Math.round((wins / totalMatches) * 100) : 0,
+      };
 
-    // full profile for the account owner - no need to check friendship
-    if (requesterId === userId) {
-      return res.json({
+      // full profile for the account owner so no need to check friendship
+      if (requesterId === userId) {
+        return res.json({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          avatarUrl: user.avatarUrl,
+          isOnline: isUserOnline(user.id),
+          provider: user.provider,
+          ...stats,
+        });
+      }
+
+      const friendship = await prisma.friendship.findFirst({
+        where: {
+          status: FriendshipStatus.accepted,
+          OR: [
+            { senderId: requesterId, receiverId: userId },
+            { senderId: userId, receiverId: requesterId },
+          ],
+        },
+      });
+
+      // if friends, return full profile, otherwise return limited profile
+      if (friendship) {
+        return res.json({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          avatarUrl: user.avatarUrl,
+          isOnline: isUserOnline(user.id),
+          provider: user.provider,
+          ...stats,
+        });
+      }
+
+      // if not friends, return only username, avatar, and game stats
+      res.json({
         id: user.id,
         username: user.username,
-        email: user.email,
         avatarUrl: user.avatarUrl,
-        isOnline: isUserOnline(user.id),
-        provider: user.provider,
         ...stats,
       });
+    } catch (err) {
+      res.status(500).json({ error: "Server error" });
     }
-
-    const friendship = await prisma.friendship.findFirst({
-      where: {
-        status: FriendshipStatus.accepted,
-        OR: [
-          { senderId: requesterId, receiverId: userId },
-          { senderId: userId, receiverId: requesterId },
-        ],
-      },
-    });
-
-    // if friends, return full profile, otherwise return limited profile
-    if (friendship) {
-      return res.json({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        avatarUrl: user.avatarUrl,
-        isOnline: isUserOnline(user.id),
-        provider: user.provider,
-        ...stats,
-      });
-    }
-
-    // if not friends, return only username, avatar, and game stats
-    res.json({
-      id: user.id,
-      username: user.username,
-      avatarUrl: user.avatarUrl,
-      ...stats,
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-});
+  },
+);
 
 /**
  * @swagger
@@ -668,6 +703,7 @@ router.post(
   "/me/avatar",
   authHelper,
   (req: AuthRequest, res, next) => {
+    // multer is called here to handle the multipart/form-data upload
     avatarUpload.single("avatar")(req, res, (err) => {
       if (err) {
         return res.status(400).json({ error: err.message || "Upload failed" });
@@ -688,7 +724,6 @@ router.post(
         select: { avatarUrl: true },
       });
 
-      // full public Supabase Storage URL, stored as-is
       const avatarUrl = await uploadAvatar(userId, req.file);
 
       const user = await prisma.user.update({
@@ -697,7 +732,7 @@ router.post(
         select: { avatarUrl: true },
       });
 
-      // clean up the previously uploaded file, if it was one of ours
+      // clean up the previously uploaded file
       await deleteAvatar(previousUser?.avatarUrl);
 
       res.json({ avatarUrl: user.avatarUrl });
@@ -752,7 +787,7 @@ router.delete("/me/avatar", authHelper, async (req: AuthRequest, res) => {
       select: { avatarUrl: true },
     });
 
-    // clean up the previously uploaded file, if it was one of ours
+    // clean up the previously uploaded file
     await deleteAvatar(previousUser?.avatarUrl);
 
     res.json({ avatarUrl: user.avatarUrl });

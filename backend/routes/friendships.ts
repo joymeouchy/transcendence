@@ -131,7 +131,11 @@ router.post("/send", authHelper, async (req: AuthRequest, res) => {
  *       200:
  *         description: Friend request accepted
  *       400:
- *         description: Invalid friendship ID
+ *         description: Invalid friendship ID, or already friends
+ *       401:
+ *         description: No token provided
+ *       403:
+ *         description: Only the receiver can accept the request
  *       404:
  *         description: Friend request not found
  */
@@ -188,6 +192,10 @@ router.patch("/accept/:id", authHelper, async (req: AuthRequest<{ id: string }>,
  *         description: Friendship removed
  *       400:
  *         description: Invalid friendship ID
+ *       401:
+ *         description: No token provided
+ *       403:
+ *         description: You are neither the sender nor the receiver of this friendship
  *       404:
  *         description: Friendship not found
  */

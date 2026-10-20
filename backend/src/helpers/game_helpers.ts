@@ -3,7 +3,10 @@ import { getIo } from "../io";
 import { onlineUsers } from "../online";
 import prisma from "../prisma";
 
-// "inviterId:inviteeId" → the pending friend invite between them
+// "inviterId:inviteeId" → the pending friend invite between them.
+// the timeout cancels the invite if the friend doesn't answer in time
+// (INVITE_TIMEOUT_MS in server.ts), and winningScore is the max score the
+// inviter picked for the match
 export const pendingInvites = new Map<
   string,
   { inviterSocketId: string; timeout: NodeJS.Timeout; winningScore: number }
@@ -14,7 +17,9 @@ export const pendingInvites = new Map<
 // busy check during that await and put the same player in two matches
 const startingMatch = new Set<number>();
 
-// true if any of the user's sockets/tabs is currently playing a match
+// true if the user's match is being created, or if any of their sockets/tabs
+// is in a running game. every tab is checked because one account can be open
+// in several tabs, and being in a game in one of them makes the user busy
 export function isUserBusy(userId: number): boolean {
   if (startingMatch.has(userId)) return true;
   const sockets = onlineUsers.get(userId);
@@ -31,6 +36,7 @@ export function cancelInvitesFor(userId: number | undefined) {
   if (!userId) return;
 
   for (const [key, pending] of pendingInvites) {
+    // "4:9" → [4, 9]. skip invites this user isn't part of
     const [inviterId, inviteeId] = key.split(":").map(Number);
     if (inviterId !== userId && inviteeId !== userId) continue;
 
@@ -53,8 +59,15 @@ export function cancelInvitesFor(userId: number | undefined) {
   }
 }
 
+// reserveMatch and releaseMatch wrap every match creation in server.ts
+// (queue, rematch, friend invite):
+//   reserveMatch(a, b) → await the avatar lookups → startGame → releaseMatch(a, b)
+// while the server waits on the avatars, other socket events can run. the
+// reservation keeps both players busy during that gap
+
 // call as soon as a match is decided, before any await: marks both players
-// busy and drops their other invites right away
+// busy and drops their other invites right away. the ids can be undefined
+// (a socket with no known user), those are skipped
 export function reserveMatch(...userIds: (number | undefined)[]) {
   for (const id of userIds) {
     if (!id) continue;

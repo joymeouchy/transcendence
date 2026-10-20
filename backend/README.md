@@ -1,12 +1,5 @@
-Worth fixing before the defense
-
-Some inputs aren't validated. PATCH /customization/me/wallpaper saves any value, and themeName or ?q= given as a non-string give a 500 instead of a 400. This contradicts "server-side validation on every endpoint" in your README.
-Small fixes
 
 The resetBall comments are wrong. They say the ball is sent "toward the loser", but the code sends it toward the player who scored. Decide which you want and make the code and comments agree.
-Unused code: the jwt import in users.ts, the express-session package, SESSION_SECRET in the README's .env table, and the database's isOnline column. An evaluator might ask what they do.
-When both players drop, the second disconnect overwrites the first grace timer. The player who dropped second then "wins" after 15 s, and one timer is never cancelled.
-Power-ups keep counting down while the game is paused, so an effect can run out during a disconnect.
 
 
 

@@ -8,9 +8,13 @@ import {
 } from "../../frontend/types/game_types";
 import prisma from "../src/prisma";
 
+// room → full game state (ball, paddles, scores, players, power-ups)
 export const games: Record<string, FullGameState> = {};
+// room → the 60 fps loop timer. no entry means the game is paused
 export const gameIntervals: Record<string, NodeJS.Timeout> = {};
+// room → the timer that ends the match if a disconnected player doesn't come back
 export const disconnectTimers: Record<string, NodeJS.Timeout> = {};
+// room → the timer for the next power-up
 export const powerUpTimers: Record<string, NodeJS.Timeout> = {};
 
 const DISCONNECT_GRACE_MS = 15000; // time left to reconnect before the match ends
@@ -21,10 +25,13 @@ const POWER_UP_DURATION_MS = 5000; // how long a power-up stays active
 const FREEZE_DURATION_MS = 3000; // freeze is the exception
 
 // scales the ball's velocity by `factor` while keeping direction, capped so
-// consecutive paddle hits / speed boosts can't push it past a playable speed
+// consecutive paddle hits can't push it past a playable speed
 function scaleBallSpeed(game: FullGameState, factor: number) {
   const { ball, config } = game;
   const maxSpeed = config.ballSpeed * BALL_MAX_SPEED_MULTIPLIER;
+  // vx/vy are the horizontal/vertical speeds, the real speed is the length of
+  // that vector: sqrt(vx² + vy²). multiplying both by the same number changes
+  // the speed but not the direction
   const currentSpeed = Math.hypot(ball.vx, ball.vy);
   const targetSpeed = Math.min(currentSpeed * factor, maxSpeed);
   const scale = targetSpeed / currentSpeed;
@@ -46,9 +53,8 @@ function applyPowerUp(
   const expiresAt = Date.now() + duration;
   const { config } = game;
 
-  // "freeze"/"smallPaddle" are debuffs aimed at the opponent, everything else
-  // is a self-buff for the collector. This also decides which activeEffects
-  // slot (and cooldown label) the effect shows up under
+  // "freeze"/"smallPaddle" are debuffs aimed at the opponent,
+  // everything else is a self-buff for the chosen side.
   const affected =
     type === "freeze" || type === "smallPaddle" ? opponent : side;
 
@@ -75,9 +81,9 @@ function applyPowerUp(
 
   game.activeEffects[affected] = { type, expiresAt };
 
-  // reset effect after duration
+  // reset effect after duration, back to the normal values from config
   setTimeout(() => {
-    if (!games[room]) return;
+    if (!games[room]) return; // the match already ended
 
     switch (type) {
       case "bigPaddle":
@@ -99,6 +105,8 @@ function applyPowerUp(
   }, duration);
 }
 
+// the game loop: runs 60 times per second. Each tick moves the game one
+// step forward, then sends the new state to both players in the room
 function runGameLoop(io: Server, room: string) {
   gameIntervals[room] = setInterval(() => {
     if (!games[room]) {
@@ -109,6 +117,7 @@ function runGameLoop(io: Server, room: string) {
     updateGame(io, room);
     if (!games[room]) return; // check again after updateGame deletes it
 
+    // send the new state to both players. the frontend uses this to draw the game
     const game = games[room]!;
     const stateToSend: GameStateSend = {
       ball: game.ball,
@@ -127,6 +136,9 @@ function runGameLoop(io: Server, room: string) {
   }, 1000 / 60);
 }
 
+// loads both players' usernames from the DB when the match starts, so the
+// game_over message doesn't have to wait for a DB query at the end.
+// falls back to "Unknown" if a user can't be found or the query fails
 async function fetchUsernames(
   socketToUser: Map<string, number>,
   player1Id: string,
@@ -134,6 +146,7 @@ async function fetchUsernames(
 ): Promise<{ left: string; right: string }> {
   const p1UserId = socketToUser.get(player1Id);
   const p2UserId = socketToUser.get(player2Id);
+  // drop missing ids
   const ids = [p1UserId, p2UserId].filter(
     (id): id is number => id !== undefined,
   );
@@ -164,12 +177,14 @@ export function startGame(
   config: GameConfig = pongConfig,
 ) {
   games[room] = {
+    // ball starts in the center, going diagonally in a random direction
     ball: {
       x: config.canvasWidth / 2,
       y: config.canvasHeight / 2,
       vx: config.ballSpeed * (Math.random() > 0.5 ? 1 : -1),
       vy: config.ballSpeed * (Math.random() > 0.5 ? 1 : -1),
     },
+    // paddle positions are their top edge, so this centers them vertically
     paddles: {
       left: config.canvasHeight / 2 - config.paddleHeight / 2,
       right: config.canvasHeight / 2 - config.paddleHeight / 2,
@@ -191,6 +206,7 @@ export function startGame(
     },
   };
 
+  // power-ups only start once the countdown is over
   setTimeout(() => scheduleNextPowerUp(io, room), MATCH_COUNTDOWN_MS);
   runGameLoop(io, room);
 }
@@ -206,6 +222,9 @@ const POWER_UP_MIN_DELAY_MS = 10000;
 const POWER_UP_MAX_DELAY_MS = 15000;
 const POWER_UP_WARNING_MS = 2000; // time between the announcement and it taking effect
 
+// power-up cycle: wait a random 10 to 15s, pick a random power-up and side,
+// announce it (power_up_incoming), and apply it 2s later (power_up_activated).
+// every cycle schedules the next one, so power-ups keep coming until the match ends
 function scheduleNextPowerUp(io: Server, room: string) {
   const delay =
     POWER_UP_MIN_DELAY_MS +
@@ -249,6 +268,7 @@ function scheduleNextPowerUp(io: Server, room: string) {
 
 // finds the room that a given socket is currently in, or null if not in any
 export function findRoomBySocket(socketId: string): string | null {
+  // Object.entries returns an array of [key, value] pairs
   for (const [room, game] of Object.entries(games)) {
     if (game.players.left === socketId || game.players.right === socketId) {
       return room;
@@ -264,13 +284,17 @@ export function pauseGame(room: string) {
   delete gameIntervals[room];
 }
 
+// restarts the loop after a reconnect. the state was kept,
+// so the match continues exactly where it stopped
 export function resumeGame(io: Server, room: string) {
   if (games[room] && !gameIntervals[room]) {
     runGameLoop(io, room);
   }
 }
 
-// handles a player disconnecting, giving them some time to reconnect before ending the match
+// handles a player disconnecting, giving them some time to reconnect before ending the match.
+// if they're not back after DISCONNECT_GRACE_MS, the other player wins.
+// a match ended this way is not saved to the match history
 export function scheduleGameCleanup(
   io: Server,
   room: string,
@@ -310,6 +334,7 @@ export function scheduleGameCleanup(
   }, DISCONNECT_GRACE_MS);
 }
 
+// the player reconnected in time: stop the timer that would end the match
 export function cancelGameCleanup(room: string) {
   if (disconnectTimers[room]) {
     clearTimeout(disconnectTimers[room]);
@@ -339,8 +364,7 @@ export function handlePaddleMove(
   const game = games[room];
   if (!game) return;
 
-  // the room name comes from the client, so make sure the sender is actually
-  // one of this match's players before moving a paddle
+  // making sure the sender is actually one of this match's players before moving a paddle
   if (game.players.left !== socketId && game.players.right !== socketId) return;
 
   const { config } = game;
@@ -350,6 +374,8 @@ export function handlePaddleMove(
   if (effect?.type === "freeze" && Date.now() < effect.expiresAt) {
     return; // ignore paddle movement
   }
+  // move by the paddle's speed, limited so it can't leave the canvas:
+  // the top can't go above 0, the bottom edge can't go below canvasHeight
   const speed = game.paddleSpeeds[side];
   if (direction === "up") {
     game.paddles[side] = Math.max(0, game.paddles[side] - speed);
@@ -361,6 +387,9 @@ export function handlePaddleMove(
   }
 }
 
+// one tick of the game: move the ball, bounce it off walls and paddles,
+// count points and check for a winner.
+// async only because the end of the match awaits the usernames
 async function updateGame(io: Server, room: string) {
   const game = games[room];
   if (!game) return;
@@ -371,15 +400,18 @@ async function updateGame(io: Server, room: string) {
   const { config, socketToUser } = game;
   const ball = game.ball;
 
+  // move the ball by its velocity (pixels per tick)
   ball.x += ball.vx;
   ball.y += ball.vy;
 
-  // Top/bottom wall collision
+  // Top/bottom wall collision: flip the vertical direction
   if (ball.y <= 0 || ball.y >= config.canvasHeight - game.ballSize) {
     ball.vy *= -1;
   }
 
-  // Left paddle collision
+  // Left paddle collision: the ball reached the paddle's right edge while
+  // being between its top and bottom. it bounces back, is moved out to the
+  // paddle's edge (so it can't get stuck inside it) and speeds up
   if (
     ball.x <= config.leftPaddleOffset + config.paddleWidth &&
     ball.y >= game.paddles.left &&
@@ -391,7 +423,7 @@ async function updateGame(io: Server, room: string) {
     io.to(room).emit("paddle_hit", { side: "left" });
   }
 
-  // Right paddle collision
+  // Right paddle collision: same as the left one, mirrored
   if (
     ball.x >=
       config.canvasWidth -
@@ -414,13 +446,13 @@ async function updateGame(io: Server, room: string) {
   // Left player misses → right scores
   if (ball.x <= 0) {
     game.scores.right++;
-    resetBall(game, "right"); // right scored, send ball toward left
+    resetBall(game, "right"); // right scored, send ball toward right
   }
 
   // Right player misses → left scores
   if (ball.x >= config.canvasWidth) {
     game.scores.left++;
-    resetBall(game, "left"); // left scored, send ball toward right
+    resetBall(game, "left"); // left scored, send ball toward left
   }
 
   // Win condition
@@ -431,7 +463,7 @@ async function updateGame(io: Server, room: string) {
     if (game.isEnding) return; // already handling win, skip
     game.isEnding = true; // mark as ending immediately
 
-    // stop the loop
+    // stop the loop and the power-ups, and remove the match from memory
     clearInterval(gameIntervals[room]);
     clearTimeout(powerUpTimers[room]);
     delete gameIntervals[room];
@@ -453,7 +485,7 @@ async function updateGame(io: Server, room: string) {
       winnerSocketId === game.players.left ? usernames.left : usernames.right;
 
     if (p1UserId && p2UserId) {
-      // fire-and-forget: persist the match without blocking the game_over emit
+      // fire-and-forget: persist the match without blocking the game_over emit (no await)
       prisma.match
         .create({
           data: {
@@ -476,9 +508,10 @@ async function updateGame(io: Server, room: string) {
   }
 }
 
+// after a point: ball back to the center at the starting speed, with a random vertical direction
 function resetBall(game: FullGameState, lastScorer: "left" | "right") {
   const { config } = game;
-  const direction = lastScorer === "left" ? -1 : 1; // send toward loser
+  const direction = lastScorer === "left" ? -1 : 1; // send toward the scorer
   game.ball = {
     x: config.canvasWidth / 2,
     y: config.canvasHeight / 2,

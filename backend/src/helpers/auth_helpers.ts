@@ -5,10 +5,15 @@ import { JWT_SECRET } from "../urls";
 export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 20;
 
+// Express's Request type with the userId that authHelper adds after checking the token.
+// P is the type of req.params, e.g. AuthRequest<{ id: string }> for a /:id route
 export interface AuthRequest<P = Record<string, string>> extends Request<P> {
   userId?: number;
 }
 
+// middleware that protects a route: it runs before the route handler and only
+// calls next() (lets the request through) if the request has a valid JWT.
+// the frontend sends the token as the header "Authorization: Bearer <token>"
 export const authHelper = (
   req: AuthRequest,
   res: Response,
@@ -21,14 +26,19 @@ export const authHelper = (
       return res.status(401).json({ error: "No token provided" });
     }
 
-    const token = authHeader.split(" ")[1]; // Bearer <token>
+    // "Bearer <token>" split on the space gives ["Bearer", "<token>"]
+    const token = authHeader.split(" ")[1];
 
     if (!token) {
       return res.status(401).json({ error: "No token provided" });
     }
 
+    // checks the signature with JWT_SECRET (so a forged or edited token fails)
+    // and the expiry date, then returns the payload { userId, username }.
     const decoded = jwt.verify(token, JWT_SECRET) as any;
 
+    // the route handlers read the logged-in user from here, never from the
+    // request body, so a client can't pretend to be someone else
     req.userId = decoded.userId;
     next();
   } catch (err) {
@@ -56,12 +66,10 @@ export const validatePassword = (password: unknown): string | null => {
   return null;
 };
 
-// emails are stored and looked up lowercase, so "Rawan@x.com" and
-// "rawan@x.com" are the same account. returns "" for anything that isn't a string.
+// emails are stored and looked up lowercase, returns "" for anything that isn't a string.
 export const normalizeEmail = (email: unknown): string =>
   typeof email === "string" ? email.trim().toLowerCase() : "";
 
-// expects the already normalized email. returns an error message, or null if valid.
 export const validateEmail = (email: string): string | null => {
   if (email.length === 0) {
     return "Email is required";
@@ -70,16 +78,14 @@ export const validateEmail = (email: string): string | null => {
   if (email.length > 254) {
     return "Email is too long";
   }
-  // something@something.something with no spaces. whether the address really
-  // exists can't be checked here, only by sending it a mail
+  // email format: something@something.something with no spaces
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return "Invalid email address";
   }
   return null;
 };
 
-// username rules shared by register and the change-username route.
-// expects the already trimmed username. returns an error message, or null if valid.
+// username rules shared by register and the change-username route
 export const validateUsername = (username: unknown): string | null => {
   if (typeof username !== "string" || username.length === 0) {
     return "Username is required";
