@@ -21,7 +21,7 @@ export default function LandingPage() {
               To begin, select an option
             </div>
 
-            <Link href="/login" className={tileClass}>
+            <Link href="/login" prefetch={false} className={tileClass}>
               <AuthIcon className="size-17.5" src={images.loginIcon} />
               <div>
                 <h3>Log In</h3>
@@ -31,7 +31,7 @@ export default function LandingPage() {
           </div>
 
           <div>
-            <Link href="/register" className={tileClass}>
+            <Link href="/register" prefetch={false} className={tileClass}>
               <AuthIcon className="size-17.5" src={images.registerIcon} />
               <div>
                 <h3>Register</h3>

@@ -89,6 +89,8 @@ export default function ChangeUsernameModal({
 						Username
 						<input
 							type="text"
+							name="username"
+							autoComplete="username"
 							value={username}
 							onChange={(e) =>
 								setUsername(e.target.value)

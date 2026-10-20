@@ -69,6 +69,9 @@ export default function RegisterPage() {
           {registerFields.map((field) => (
             <AuthField
               key={field.key}
+              id={field.key}
+              name={field.key}
+              autoComplete={field.type === "password" ? "new-password" : field.key}
               label={field.label}
               type={field.type}
               placeholder={field.placeholder}

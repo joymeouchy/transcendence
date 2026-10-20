@@ -73,6 +73,8 @@ export default function AddFriendPanel({
 						"h-6 min-w-0 flex-1 rounded-xp-2xs px-1.5 py-0.75 font-xp text-xp-sm outline-none",
 					)}
 					type="text"
+					name="friendSearch"
+					autoComplete="off"
 					placeholder="Search username..."
 					value={friendUsername}
 					disabled={loadingMessage !== null}

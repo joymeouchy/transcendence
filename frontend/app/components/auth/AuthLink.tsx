@@ -8,6 +8,7 @@ type AuthLinkProps = React.ComponentProps<typeof Link>;
 export default function AuthLink({ className, ...props }: AuthLinkProps) {
   return (
     <Link
+      prefetch={false}
       {...props}
       className={clsx("xp-link mt-2.5 block text-xp-lg text-xp-white opacity-80", className)}
     />

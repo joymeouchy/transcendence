@@ -26,7 +26,7 @@ export default function DesktopIcon({
 
 	if (href) {
 		return (
-			<Link href={href} className={iconClass}>
+			<Link href={href} prefetch={false} className={iconClass}>
 				{content}
 			</Link>
 		);

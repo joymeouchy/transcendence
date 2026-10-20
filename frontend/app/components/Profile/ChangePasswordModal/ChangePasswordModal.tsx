@@ -98,6 +98,8 @@ export default function ChangePasswordModal({
 						<input
 							className="p-2 text-xp-lg"
 							type="password"
+							name="currentPassword"
+							autoComplete="current-password"
 							value={currentPassword}
 							onChange={(e) =>
 								setCurrentPassword(e.target.value)
@@ -110,6 +112,8 @@ export default function ChangePasswordModal({
 						<input
 							className="p-2 text-xp-lg"
 							type="password"
+							name="newPassword"
+							autoComplete="new-password"
 							value={newPassword}
 							onChange={(e) =>
 								setNewPassword(e.target.value)
@@ -122,6 +126,8 @@ export default function ChangePasswordModal({
 						<input
 							className="p-2 text-xp-lg"
 							type="password"
+							name="confirmPassword"
+							autoComplete="new-password"
 							value={confirmPassword}
 							onChange={(e) =>
 								setConfirmPassword(e.target.value)

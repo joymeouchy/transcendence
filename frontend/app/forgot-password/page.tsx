@@ -53,6 +53,9 @@ export default function ForgotPasswordPage() {
             Forgot Password
           </h3>
           <AuthField
+            id="email"
+            name="email"
+            autoComplete="email"
             label="Email"
             type="email"
             placeholder="Enter your email"

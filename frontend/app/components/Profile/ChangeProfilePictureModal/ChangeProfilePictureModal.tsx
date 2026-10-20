@@ -136,6 +136,7 @@ export default function ChangeProfilePictureModal({
             <input
               className="w-auto"
               type="file"
+              name="avatar"
               accept="image/*"
               onChange={handleFileChange}
             />

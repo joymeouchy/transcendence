@@ -80,6 +80,7 @@ export default function MarvinModal({
 
 				<textarea
 					className={clsx(styles.input, "w-full resize-none border border-xp-gray-500 bg-xp-white p-1.5 font-xp text-xp-base outline-none")}
+					name="question"
 					value={question}
 					onChange={(e) =>
 						setQuestion(e.target.value)

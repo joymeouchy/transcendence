@@ -67,6 +67,8 @@ export default function ResetPasswordContent() {
 
 					<AuthField
 						id="password"
+						name="password"
+						autoComplete="new-password"
 						label="New Password"
 						type="password"
 						placeholder="New password"
@@ -80,6 +82,8 @@ export default function ResetPasswordContent() {
 
 					<AuthField
 						id="confirmPassword"
+						name="confirmPassword"
+						autoComplete="new-password"
 						label="Confirm Password"
 						type="password"
 						placeholder="Confirm password"

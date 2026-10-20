@@ -32,6 +32,7 @@ export default function FriendsPanel({
 					friends.map((friend) => (
 						<Link
 							key={friend.id}
+							prefetch={false}
 							href={`/profile/${friend.id}`}
 							className={clsx(
 								styles.friend,

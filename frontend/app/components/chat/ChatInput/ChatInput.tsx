@@ -31,6 +31,7 @@ export default function ChatInput({
 					styles.textarea,
 					"max-h-25 min-h-5.5 min-w-0 flex-1 resize-none overflow-y-auto rounded-xp-2xs px-1.5 py-1 font-xp text-xp-sm leading-[15px] outline-none",
 				)}
+				name="message"
 				value={value}
 				onChange={(e) =>
 					setValue(e.target.value)

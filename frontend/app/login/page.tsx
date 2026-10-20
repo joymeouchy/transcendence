@@ -62,6 +62,9 @@ export default function LoginPage() {
           {loginFields.map((field) => (
             <AuthField
               key={field.key}
+              id={field.key}
+              name={field.key}
+              autoComplete={field.type === "password" ? "current-password" : field.key}
               label={field.label}
               type={field.type}
               placeholder={field.placeholder}
