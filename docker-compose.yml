@@ -1,10 +1,5 @@
-# to run first time:
+# to run (also after every code change):
 # docker compose up --build
-#
-# later:
-# docker compose up
-# if it says permission denied, run:
-# sudo chown -R $USER:$USER backend/generated/
 #
 # the app is served only through Caddy at https://localhost:8443
 # (frontend at /, backend at /api, sockets at /socket.io)
@@ -19,48 +14,39 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data # keeps the local CA/certificates between restarts
       - caddy_config:/config
+    restart: unless-stopped
     depends_on:
       - frontend
       - backend
+  # production builds: code is compiled into the images, so after changing
+  # code run docker compose up --build again
   backend:
     build:
       context: .
       dockerfile: backend/Dockerfile
-      target: builder
+      target: runner
     expose:
       - "3001" # reachable by caddy only, not from the host
-    volumes:
-      - ./backend:/app
-      # game rules and types, shared with the frontend (the folder, not the
-      # single file: a file mount goes stale when git replaces the file)
-      - ./frontend/types:/frontend/types:ro
-      - backend_node_modules:/app/node_modules
     env_file:
       - .env
-    command: sh -c "rm -rf /app/generated && npx prisma generate && npx tsx watch src/server.ts"
+    restart: unless-stopped
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: development
+      target: runner
       args:
+        # baked into the browser code at build time
         NEXT_PUBLIC_API_URL: ${BACKEND_URL}
         NEXT_PUBLIC_SOCKET_URL: ${FRONTEND_URL}
     expose:
       - "3000"
-    volumes:
-      - ./frontend:/app
-      - frontend_node_modules:/app/node_modules
     environment:
-      NODE_ENV: development
-      NEXT_PUBLIC_API_URL: ${BACKEND_URL}
+      # read by next.config.ts at runtime for the allowed image hosts
       NEXT_PUBLIC_SOCKET_URL: ${FRONTEND_URL}
-      WATCHPACK_POLLING: "true"
-    command: npm run dev
+    restart: unless-stopped
     depends_on:
       - backend
 volumes:
-  backend_node_modules:
-  frontend_node_modules:
   caddy_data:
   caddy_config:

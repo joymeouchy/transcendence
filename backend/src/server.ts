@@ -60,7 +60,8 @@ const swaggerOptions = {
     },
     security: [{ bearerAuth: [] }],
   },
-  apis: [path.join(__dirname, "../routes/*.ts")],
+  // .ts when run with tsx, .js when run from the compiled dist folder
+  apis: [path.join(__dirname, "../routes/*.{ts,js}")],
 };
 
 const PORT = 3001;
@@ -175,7 +176,6 @@ io.use(async (socket, next) => {
 
 io.on("connection", (socket) => {
   const userId = socket.data.userId as number;
-  console.log("Client connected:", socket.id, "userId:", userId);
 
   socketToUser.set(socket.id, userId);
 
@@ -202,18 +202,18 @@ io.on("connection", (socket) => {
       cancelGameCleanup(room);
       resumeGame(io, room);
       io.to(room).emit("player_reconnected");
-      console.log("Recovered session, resumed game in room:", room);
+      // console.log("Recovered session, resumed game in room:", room);
     } else if (droppedRoom) {
       // we dropped mid-match and the game is gone: the opponent left (or the
       // grace period ran out) while we were away, so tell the client to reset
       socket.leave(droppedRoom);
       socket.emit("game_abandoned");
-      console.log("Recovered session, game already gone in room:", droppedRoom);
+      // console.log("Recovered session, game already gone in room:", droppedRoom);
     }
   }
 
   socket.on("join_queue", async () => {
-    console.log(socket.id, "wants to play");
+    // console.log(socket.id, "wants to play");
 
     // queueing from a match that's paused on a disconnected opponent counts
     // as leaving it
@@ -228,7 +228,7 @@ io.on("connection", (socket) => {
       findRoomBySocket(socket.id) ||
       (queueingUserId && isUserBusy(queueingUserId))
     ) {
-      console.log(socket.id, "tried to queue while already in a game");
+      // console.log(socket.id, "tried to queue while already in a game");
       return;
     }
 
@@ -244,10 +244,10 @@ io.on("connection", (socket) => {
 
       if (waitingUserId && joiningUserId && waitingUserId === joiningUserId) {
         socket.emit("already_waiting");
-        console.log(
-          "Same user tried to play against themselves:",
-          joiningUserId,
-        );
+        // console.log(
+        //   "Same user tried to play against themselves:",
+        //   joiningUserId,
+        // );
         return;
       }
 
@@ -264,7 +264,7 @@ io.on("connection", (socket) => {
       matchedSocket.join(room);
       matchedWaitingPlayer.join(room);
 
-      console.log("Match created:", room);
+      // console.log("Match created:", room);
 
       const [leftAvatar, rightAvatar] = await Promise.all([
         waitingUserId
@@ -298,7 +298,7 @@ io.on("connection", (socket) => {
         socketToUser,
       );
       releaseMatch(waitingUserId, joiningUserId);
-      console.log("Game started in room:", room);
+      // console.log("Game started in room:", room);
     }
   });
   // handle paddle movement
@@ -403,7 +403,7 @@ io.on("connection", (socket) => {
           winningScore,
         });
         releaseMatch(p1UserId, p2UserId);
-        console.log("Rematch started in room:", newRoom);
+        // console.log("Rematch started in room:", newRoom);
       } else {
         // one of them disconnected between requesting and matching
         // whoever's still around know so they're not stuck waiting forever
@@ -443,14 +443,14 @@ io.on("connection", (socket) => {
     const room = findRoomBySocket(socket.id);
     if (room && abandonPausedGame(room)) {
       socket.leave(room);
-      console.log(socket.id, "left paused game in room:", room);
+      // console.log(socket.id, "left paused game in room:", room);
     }
   });
 
   socket.on("leave_queue", () => {
     if (waitingPlayer?.id === socket.id) {
       waitingPlayer = null;
-      console.log(socket.id, "left the queue");
+      // console.log(socket.id, "left the queue");
     }
   });
 
@@ -660,7 +660,7 @@ io.on("connection", (socket) => {
         winningScore: pending.winningScore,
       });
       releaseMatch(fromUserId, responderId);
-      console.log("Friend match started in room:", room);
+      // console.log("Friend match started in room:", room);
     },
   );
 
@@ -679,7 +679,7 @@ io.on("connection", (socket) => {
       if (!userSockets || userSockets.size === 0) {
         onlineUsers.delete(userId);
         io.emit("online_changed", { userId, isOnline: false });
-        console.log(`User ${userId} is offline`);
+        // console.log(`User ${userId} is offline`);
       }
 
       const stillOnline = onlineUsers.get(userId);
@@ -705,7 +705,6 @@ io.on("connection", (socket) => {
         }
       }
     }
-    console.log("Disconnected:", socket.id);
 
     if (waitingPlayer?.id === socket.id) {
       waitingPlayer = null;

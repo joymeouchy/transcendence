@@ -49,6 +49,8 @@ RUN npm ci --omit=dev
 
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+# next start reads it at runtime (allowed avatar image hosts)
+COPY --from=builder /app/next.config.ts ./next.config.ts
 
 EXPOSE 3000
 
