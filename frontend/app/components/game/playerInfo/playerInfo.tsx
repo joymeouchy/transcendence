@@ -38,8 +38,10 @@ export default function PlayerInfo({
 	return (
 		<div
 			className={clsx(
-				"absolute top-1/2 z-2 flex min-w-30 -translate-y-1/2 flex-col items-center gap-2.5 font-[monospace] text-xp-2xl text-xp-white",
-				"game-stacked:w-auto game-stacked:min-w-0 game-stacked:items-center game-stacked:gap-2 max-[900px]:min-w-auto",
+				// max-w-30 keeps the HUD inside the 32.5 gutter so long power-up
+				// names wrap instead of spilling over the canvas
+				"absolute top-1/2 z-2 flex min-w-30 max-w-30 -translate-y-1/2 flex-col items-center gap-2.5 font-[monospace] text-xp-2xl text-xp-white",
+				"game-stacked:w-auto game-stacked:min-w-0 game-stacked:max-w-none game-stacked:items-center game-stacked:gap-2 max-[900px]:min-w-auto",
 				sideClass[side],
 			)}
 		>

@@ -220,10 +220,10 @@ const POWER_UP_TYPES: PowerUpType[] = [
 ];
 const POWER_UP_MIN_DELAY_MS = 10000;
 const POWER_UP_MAX_DELAY_MS = 15000;
-const POWER_UP_WARNING_MS = 2000; // time between the announcement and it taking effect
+const POWER_UP_WARNING_MS = 3000; // time between the announcement and it taking effect
 
 // power-up cycle: wait a random 10 to 15s, pick a random power-up and side,
-// announce it (power_up_incoming), and apply it 2s later (power_up_activated).
+// announce it (power_up_incoming), and apply it 3s later (power_up_activated).
 // every cycle schedules the next one, so power-ups keep coming until the match ends
 function scheduleNextPowerUp(io: Server, room: string) {
   const delay =

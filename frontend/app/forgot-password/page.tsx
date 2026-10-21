@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 
 import { authService } from "@/services/auth.services";
+import { validateEmail } from "@/lib/validation";
 
 import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
@@ -25,6 +26,12 @@ export default function ForgotPasswordPage() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+
+    const emailError = validateEmail(email.trim());
+    if (emailError) {
+      setAlertMessage(emailError);
+      return;
+    }
 
     setIsLoading(true);
 

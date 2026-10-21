@@ -552,7 +552,7 @@ Contract notes:
 
 - `sendRequest(senderId, receiverId)` sends both ids, but the backend ignores `senderId` and uses the user from the JWT.
 - There is no dedicated "remove friend" endpoint on the backend. `rejectRequest` and `removeFriend` both call `DELETE /friendships/reject/:id`, which deletes the row **whatever its status**. They are separate functions so the intent is readable at the call site. Because of this, the friends page checks that a request is still pending before rejecting it (see [§11](#friends-friends)).
-- The backend validates usernames, passwords and avatar files. The frontend only checks that fields are filled in and that passwords match.
+- Forms are validated on both sides. `lib/validation.ts` copies the backend rules (email format, username 3-20 characters, password 8-72 characters with a letter and a number, message max 2000 characters) so errors show before the request is sent. The backend still re-checks everything, plus avatar files and uniqueness. Keep both copies in sync.
 - The REST contract is documented in Swagger (`/api/api-docs`). If you change an endpoint on the backend, update the service type here.
 
 ### Frontend vs backend responsibilities (REST)
@@ -560,7 +560,7 @@ Contract notes:
 | Frontend | Backend |
 | --- | --- |
 | Holds the token, sends it on requests, decides which UI to show | Verifies the JWT on every protected route (`authHelper`) |
-| Basic form checks (required fields, password confirmation) | Authoritative validation (username length, password rules, unique email/username, file type and size) |
+| Form checks with the same rules as the backend (`lib/validation.ts`: email, username, password, chat length) and password confirmation | Authoritative validation (username length, password rules, unique email/username, file type and size) |
 | Displays stats, history and leaderboard as received; computes the cumulative chart and filters client-side | Computes wins, losses, win rate, rank and leaderboard order from the `Match` table |
 | Shows avatar URLs | Stores avatars in Supabase Storage and rewrites legacy relative avatar paths into absolute URLs |
 
@@ -914,7 +914,7 @@ Guidelines that follow from the current code:
 | --- | --- | --- |
 | Global API alert | `lib/api.ts` interceptor → `lib/alert.ts` `alertManager` → `AlertProvider` → `XPAlert` | Every failed Axios request opens one global XP alert with the server's `error`/`message`. `alertManager` holds a single listener and `AlertProvider` a single message, so a later error replaces the current one. |
 | `useAlert().showAlert(message)` | `context/AlertContext.tsx` | Imperative access to the same global alert. Used for success and state messages: "Friend request sent to …" (`AddFriendsPanel`, `/profile/[id]`) and "This friend request was already answered." (`/friends`). |
-| Local `XPAlert` | register (password mismatch, success), forgot password (success), reset password (invalid link, password mismatch, success), profile modals (success), Start menu (sign-out confirmation) | Page-owned dialogs for validation and success only. Forgot/reset password leave request errors to the interceptor (empty `catch`), so a failure shows a single alert. |
+| Local `XPAlert` | register (invalid field, password mismatch, success), forgot password (invalid email, success), reset password (invalid link, invalid password, password mismatch, success), profile modals (success), Start menu (sign-out confirmation) | Page-owned dialogs for validation and success only. Forgot/reset password leave request errors to the interceptor (empty `catch`), so a failure shows a single alert. |
 | Inline error text | `ChangeUsernameModal`, `ChangePasswordModal`, `ChangeProfilePictureModal` | Reads `err.response.data.error` with a fallback string. |
 | Empty `catch {}` | Most pages and services | Intentional: the interceptor has already informed the user. |
 | `GoogleAuthError` | `/login?error=` | Inline XP error box. |

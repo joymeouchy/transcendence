@@ -6,6 +6,8 @@ import { authService } from "@/services/auth.services";
 import { useRouter } from "next/navigation";
 // import { isAuthenticated } from "@/lib/auth";
 import { useAuth } from "@/context/AuthContext";
+import { alertManager } from "@/lib/alert";
+import { validateEmail } from "@/lib/validation";
 
 import { loginFields } from "../data/auth/loginFields";
 
@@ -36,6 +38,16 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // only the format here: the password rules are checked at signup, and
+    // the server answers "wrong password" for anything else
+    const validationError =
+      validateEmail(formData.email.trim()) ||
+      (formData.password ? null : "Password is required");
+    if (validationError) {
+      alertManager.show(validationError);
+      return;
+    }
 
     setIsLoading(true);
 

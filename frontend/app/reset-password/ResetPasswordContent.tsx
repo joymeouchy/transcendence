@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { authService } from "@/services/auth.services";
+import { validatePassword } from "@/lib/validation";
 
 import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
@@ -31,6 +32,12 @@ export default function ResetPasswordContent() {
 
 		if (!token) {
 			setAlertMessage("Invalid reset link");
+			return;
+		}
+
+		const passwordError = validatePassword(password);
+		if (passwordError) {
+			setAlertMessage(passwordError);
 			return;
 		}
 

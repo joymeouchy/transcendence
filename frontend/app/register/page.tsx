@@ -6,6 +6,11 @@ import { authService } from "@/services/auth.services";
 // import { isAuthenticated } from "@/lib/auth";
 import { registerFields } from "../data/auth/registerFields";
 import { useAuth } from "@/context/AuthContext";
+import {
+  validateEmail,
+  validatePassword,
+  validateUsername,
+} from "@/lib/validation";
 
 import AuthLayout from "../components/auth/AuthLayout";
 import AuthPanel from "../components/auth/AuthPanel";
@@ -33,6 +38,16 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const validationError =
+      validateUsername(formData.username.trim()) ||
+      validateEmail(formData.email.trim()) ||
+      validatePassword(formData.password);
+    if (validationError) {
+      setAlertMessage(validationError);
+      setShowAlert(true);
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setAlertMessage("Passwords do not match");
