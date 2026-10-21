@@ -28,7 +28,7 @@ The game is **server-authoritative**: the backend runs the physics (ball movemen
 - Match history with a chart, personal statistics (wins, losses, win rate, rank) and a global leaderboard.
 - Windows XP-inspired UI: desktop, taskbar, start menu, draggable-looking windows, sounds, wallpapers.
 - Responsive layout for desktop and mobile.
-- Privacy Policy and Terms of Service pages, reachable from the desktop and the start menu.
+- Privacy Policy and Terms of Service pages, reachable by everyone: from the footer of the login/register screens, and from the desktop and the start menu once signed in.
 - Everything served over HTTPS through a Caddy reverse proxy, started with a single Docker command.
 
 ---

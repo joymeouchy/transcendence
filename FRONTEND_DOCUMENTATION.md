@@ -195,7 +195,7 @@ frontend/
 │   │   ├── game/                # GameCanvas, GameModals/*, PowerUps/*, playerInfo/
 │   │   ├── GameInvitePopup/     # Global incoming-invite dialog
 │   │   ├── Profile/ Friends/ chat/ leaderboard/ matchHistory/
-│   │   ├── LegalDocument/       # Document body for privacy/terms windows
+│   │   ├── LegalDocument/       # LegalDocument (document body) and LegalPageLayout (desktop or guest screen)
 │   │   └── marvinModal/ deepThoughtModal/  # Desktop easter-egg dialogs
 │   ├── data/                    # Static configuration (navigation items, form fields, default game theme)
 │   ├── styles/                  # _tokens.scss, _mixins.scss, xp-theme.scss
@@ -251,8 +251,8 @@ Routes come from the folders in `frontend/app/`. There is **no Next.js middlewar
 | `/chats` | `app/chats/page.tsx` | "MSN" direct messages with friends | `DesktopLayout` + `XPWindow` | Protected |
 | `/gameStats` | `app/gameStats/page.tsx` | Tabs: Match History and Leaderboard | `DesktopLayout` + `XPWindow` | Protected |
 | `/paint` | `app/paint/page.tsx` | Embeds `https://jspaint.app` in an iframe | `DesktopLayout` + `XPWindow` | Protected |
-| `/privacy-policy` | `app/privacy-policy/page.tsx` | Static legal text | `DesktopLayout` + `XPWindow` + `LegalDocument` | Protected |
-| `/terms-of-service` | `app/terms-of-service/page.tsx` | Static legal text | `DesktopLayout` + `XPWindow` + `LegalDocument` | Protected |
+| `/privacy-policy` | `app/privacy-policy/page.tsx` | Static legal text | `LegalPageLayout` (`DesktopLayout` when signed in, `AuthLayout` otherwise) + `XPWindow` + `LegalDocument` | Public |
+| `/terms-of-service` | `app/terms-of-service/page.tsx` | Static legal text | `LegalPageLayout` (`DesktopLayout` when signed in, `AuthLayout` otherwise) + `XPWindow` + `LegalDocument` | Public |
 | anything else | `app/not-found.tsx` | XP-style 404 dialog with a "Go Home" button | Standalone | Unguarded |
 
 Notes:
@@ -334,7 +334,7 @@ Templates receive callbacks (`onAccept`, `onRemoveFriend`, `onAddFriend`, `onClo
 | `XPSkeleton` | Shimmer placeholder for loading states (leaderboard). | `className`, `as` |
 | `XPStatusDot` | Green/grey online indicator. | `online` |
 
-Auth screens use their own small set in `app/components/auth/`: `AuthLayout` (blue XP login screen: "42Beirut / Pong XP" branding, an `.xp-divider` line and a fixed 360 px column for the page content, centred as one row on `md` and wider, stacked and scrollable between the top and bottom bars on phones), `AuthPanel`, `AuthField` (label + input, all input props pass through), `AuthButton` (green "go" button), `AuthLink`, and `AuthIcon` (a `next/image` wrapper). The form fields themselves are data: `app/data/auth/{fields,loginFields,registerFields}.ts`.
+Auth screens use their own small set in `app/components/auth/`: `AuthLayout` (blue XP login screen: "42Beirut / Pong XP" branding, an `.xp-divider` line and a fixed 360 px column for the page content, centred as one row on `md` and wider, stacked and scrollable between the top and bottom bars on phones; `fullWidth` drops the branding and centres the content instead; the bottom bar is a `<footer>` with a `<nav aria-label="Legal">` of Privacy Policy / Terms of Service links, with a focus ring and `aria-current` on the open page), `AuthPanel`, `AuthField` (label + input, all input props pass through), `AuthButton` (green "go" button), `AuthLink`, and `AuthIcon` (a `next/image` wrapper). The form fields themselves are data: `app/data/auth/{fields,loginFields,registerFields}.ts`.
 
 ### Game components
 
@@ -454,7 +454,7 @@ Feature-specific behaviour:
 `AuthRedirect` runs in a `useEffect` whenever the pathname changes:
 
 - Token valid and path is `/` or guest-only (`/login`, `/register`, `/forgot-password`, `/reset-password`): `router.replace("/home")`.
-- No valid token and path is protected (`/home`, `/profile`, `/friends`, `/game`, `/chats`, `/gameStats`, `/paint`, `/privacy-policy`, `/terms-of-service`): `router.replace("/")`.
+- No valid token and path is protected (`/home`, `/profile`, `/friends`, `/game`, `/chats`, `/gameStats`, `/paint`): `router.replace("/")`. `/privacy-policy` and `/terms-of-service` are in neither list, so everyone can open them.
 
 Because the check runs on the client after render, a protected page can render briefly before the redirect. The check also does not wait for `AuthContext`: it only looks at the token's expiry. Pages therefore defend against `user === null` themselves, usually with `if (!user) return;` in their loading effect.
 
@@ -859,7 +859,7 @@ After `game_over`, either player can press Rematch, which emits `request_rematch
 
 ### Other implemented features
 
-- **Legal pages:** `/privacy-policy` and `/terms-of-service` (static content inside `LegalDocument`), reachable from the Start menu and from `LegalModal` in the game's mode-selection window.
+- **Legal pages:** `/privacy-policy` and `/terms-of-service` (static content inside `LegalDocument`), reachable from the Start menu, from `LegalModal` in the game's mode-selection window, and from the footer links in `AuthLayout`'s bottom bar on every guest screen. They are public: `LegalPageLayout` shows them on the desktop when signed in and on the welcome screen otherwise (closing the window goes to `/home` or `/`).
 - **Paint:** embeds `https://jspaint.app`. A 2 s timeout or the iframe's `onLoad` hides the loader.
 - **Marvin / Deep Thought:** desktop easter eggs (see [§5](#desktop-extras)).
 - **404 page:** XP "System Error" dialog.
@@ -1090,23 +1090,22 @@ When an evaluator asks "what would you improve?" or finds one of these, the stro
 | 8 | Invite errors | Every `invite_error` is displayed as "Friend Unavailable / busy", ignoring the server's `message` (which may be, for example, "already have a pending invite"). | `UseGameSockets.tsx`, `MatchmakingModal.tsx` |
 | 9 | Route guard | Protection is client-side only, based on token presence and expiry. Protected pages can flash before redirecting. | `AuthRedirect.tsx`, `lib/auth.ts` |
 | 10 | Invalid token | If a non-expired token is rejected by `/users/me`, `AuthContext` sets `user = null` but **keeps the token**, so `AuthRedirect` still treats the user as logged in. Pages then render with no user (e.g. `/friends` stays on its loading overlay). There is no `401` handling in the Axios interceptor. | `AuthContext.tsx`, `lib/api.ts` |
-| 11 | Legal pages | `/privacy-policy` and `/terms-of-service` are protected, so logged-out visitors cannot read them. | `AuthRedirect.tsx` |
-| 12 | Reset link | `/reset-password` is guest-only: opening a reset link while logged in redirects to `/home`. | `AuthRedirect.tsx` |
-| 13 | Double alerts | Profile modals (`ChangeUsernameModal`, `ChangePasswordModal`, `ChangeProfilePictureModal`) show the global interceptor alert **and** their own inline error text for the same failure. (Forgot/reset password no longer do this.) | `lib/api.ts` + those modals |
-| 14 | Single alert slot | The global alert holds one message; a second error replaces the first. | `lib/alert.ts`, `AlertContext.tsx` |
-| 15 | Presence | Live status is merged only on `/friends`. Chats, `FriendSelectModal`, the profile friend list and the profile "Status" box use the REST snapshot from load time. | various |
-| 16 | Chat | Optimistic messages keep their temporary `Date.now()` id; they are never replaced with the server's message. Unread counts exist only while `/chats` is open; there is no notification on other pages. | `ChatsPageTemplate.tsx` |
-| 17 | Friend search | `AddFriendsPanel` sends a request on every keystroke (no debounce); each failure triggers the global alert. | `AddFriendsPanel.tsx` |
-| 18 | Add friend from profile | After a request is sent from `/profile/[id]`, the button returns to "Add Friend" (the page does not track outgoing pending requests). Clicking again sends a second request, which the backend rejects with an error alert. | `app/profile/[id]/page.tsx` |
-| 19 | Friends refresh | The friends page refreshes on both `visibilitychange` and window `focus`. Switching back to the tab usually fires both, so the two lists are fetched twice. | `app/friends/page.tsx` |
-| 20 | Wallpaper picker | `DesktopCustomizationModal` always pre-selects the first wallpaper, not the user's current one. The backend does not validate the wallpaper id. | `DesktopCustomizationModal.tsx`, `backend/routes/customization.ts` |
-| 21 | Modals | `XPModal` has no Escape-key handling, focus trap or portal (`closeOnOverlayClick` only controls backdrop clicks). `XPWindow` always renders the ✕ button, even when `onClose` is undefined (e.g. `OpponentDisconnectedModal`, the "found" matchmaking state), in which case it does nothing. | `XPModal.tsx`, `XPWindow.tsx` |
-| 22 | Profile loader | `ProfilePageTemplate` shows "Loading friends..." while the *profile* loads and "Loading user profile..." otherwise (messages swapped). | `ProfilePageTemplate.tsx` |
-| 23 | Design-system drift | `LegalModal` uses Tailwind default classes (`bg-gray-200`, `border-gray-400`, `text-black`, `rounded`, ...). The `@theme` reset removes these, so they generate no CSS. | `LegalModal.tsx` |
-| 24 | Minimum width | `XPWindow` keeps `min-w-75` (300 px), and on `compact` screens windows are at least 304 px wide (`max(90vw,304px)`), so screens narrower than about 320 px scroll sideways. Other fixed widths were changed to `w-N max-w-full`. | `XPWindow.tsx`, `DesktopLayout.tsx` |
-| 25 | External dependency | `/paint` loads `https://jspaint.app` in an iframe; it needs internet access and depends on that site. | `app/paint/page.tsx` |
-| 26 | Unhandled events | `connect_error`, `waiting`, `already_waiting` and `power_up_expired` have no listeners. A rejected socket connection fails silently. | `lib/socket.ts`, hooks |
-| 27 | Tests | No automated frontend tests exist. | `package.json` |
+| 11 | Reset link | `/reset-password` is guest-only: opening a reset link while logged in redirects to `/home`. | `AuthRedirect.tsx` |
+| 12 | Double alerts | Profile modals (`ChangeUsernameModal`, `ChangePasswordModal`, `ChangeProfilePictureModal`) show the global interceptor alert **and** their own inline error text for the same failure. (Forgot/reset password no longer do this.) | `lib/api.ts` + those modals |
+| 13 | Single alert slot | The global alert holds one message; a second error replaces the first. | `lib/alert.ts`, `AlertContext.tsx` |
+| 14 | Presence | Live status is merged only on `/friends`. Chats, `FriendSelectModal`, the profile friend list and the profile "Status" box use the REST snapshot from load time. | various |
+| 15 | Chat | Optimistic messages keep their temporary `Date.now()` id; they are never replaced with the server's message. Unread counts exist only while `/chats` is open; there is no notification on other pages. | `ChatsPageTemplate.tsx` |
+| 16 | Friend search | `AddFriendsPanel` sends a request on every keystroke (no debounce); each failure triggers the global alert. | `AddFriendsPanel.tsx` |
+| 17 | Add friend from profile | After a request is sent from `/profile/[id]`, the button returns to "Add Friend" (the page does not track outgoing pending requests). Clicking again sends a second request, which the backend rejects with an error alert. | `app/profile/[id]/page.tsx` |
+| 18 | Friends refresh | The friends page refreshes on both `visibilitychange` and window `focus`. Switching back to the tab usually fires both, so the two lists are fetched twice. | `app/friends/page.tsx` |
+| 19 | Wallpaper picker | `DesktopCustomizationModal` always pre-selects the first wallpaper, not the user's current one. The backend does not validate the wallpaper id. | `DesktopCustomizationModal.tsx`, `backend/routes/customization.ts` |
+| 20 | Modals | `XPModal` has no Escape-key handling, focus trap or portal (`closeOnOverlayClick` only controls backdrop clicks). `XPWindow` always renders the ✕ button, even when `onClose` is undefined (e.g. `OpponentDisconnectedModal`, the "found" matchmaking state), in which case it does nothing. | `XPModal.tsx`, `XPWindow.tsx` |
+| 21 | Profile loader | `ProfilePageTemplate` shows "Loading friends..." while the *profile* loads and "Loading user profile..." otherwise (messages swapped). | `ProfilePageTemplate.tsx` |
+| 22 | Design-system drift | `LegalModal` uses Tailwind default classes (`bg-gray-200`, `border-gray-400`, `text-black`, `rounded`, ...). The `@theme` reset removes these, so they generate no CSS. | `LegalModal.tsx` |
+| 23 | Minimum width | `XPWindow` keeps `min-w-75` (300 px), and on `compact` screens windows are at least 304 px wide (`max(90vw,304px)`), so screens narrower than about 320 px scroll sideways. Other fixed widths were changed to `w-N max-w-full`. | `XPWindow.tsx`, `DesktopLayout.tsx` |
+| 24 | External dependency | `/paint` loads `https://jspaint.app` in an iframe; it needs internet access and depends on that site. | `app/paint/page.tsx` |
+| 25 | Unhandled events | `connect_error`, `waiting`, `already_waiting` and `power_up_expired` have no listeners. A rejected socket connection fails silently. | `lib/socket.ts`, hooks |
+| 26 | Tests | No automated frontend tests exist. | `package.json` |
 
 ### Confirmed: dead or duplicated code
 

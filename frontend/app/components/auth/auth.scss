@@ -47,6 +47,20 @@
   border-top: 1px solid t.tint(0.7);
 }
 
+// Privacy Policy / Terms of Service links in the bottom bar
+.xp-footer-link {
+  text-decoration: none;
+
+  &:hover,
+  &[aria-current="page"] {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    @include m.xp-focus-ring(t.color(white), 2px);
+  }
+}
+
 .xp-login-panel {
   @include m.xp-glass(0.15, 0.3, 8px);
 }

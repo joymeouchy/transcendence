@@ -1,19 +1,33 @@
+"use client";
+
 import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import "./auth.scss";
 
 type AuthLayoutProps = {
   children: React.ReactNode;
+  // drop the branding column and center the children (legal pages)
+  fullWidth?: boolean;
 };
 
-export default function AuthLayout({ children }: AuthLayoutProps) {
+const legalLinks = [
+  { href: "/privacy-policy", label: "Privacy Policy" },
+  { href: "/terms-of-service", label: "Terms of Service" },
+];
+
+export default function AuthLayout({ children, fullWidth = false }: AuthLayoutProps) {
+  const pathname = usePathname();
+
   return (
     <div className="xp-screen relative h-dvh w-full overflow-hidden font-xp">
-      {/* the band between the top and bottom bars; scrolls when a form is
-          taller than the screen (phones, landscape) instead of hiding under the bars */}
-      <div className="absolute inset-x-0 top-15 bottom-15 overflow-y-auto">
-        {/* The branding stays put whatever the form's size: on phones it starts
+      <main className="absolute inset-x-0 top-15 bottom-15 overflow-y-auto">
+        {fullWidth ? (
+          <div className="flex min-h-full items-center justify-center p-xp-lg">{children}</div>
+        ) : (
+        /* The branding stays put whatever the form's size: on phones it starts
             at a fixed spot near the top with the form right below it; on wider
-            screens branding | divider | a fixed-width form column are centered as one row. */}
+            screens branding | divider | a fixed-width form column are centered as one row. */
         <div
           className="
             mx-auto flex min-h-full w-full max-w-5xl
@@ -33,9 +47,27 @@ md:flex-row md:justify-center md:gap-10 md:py-xp-xl
               both 360px), so the centered row never shifts */}
           <div className="flex w-full min-w-0 max-w-md justify-center md:w-90 md:max-w-none md:justify-start">{children}</div>
         </div>
-      </div>
+        )}
+      </main>
 
-      <div className="xp-bottom-bar absolute bottom-0 left-0 z-2 h-15 w-full" />
+      <footer className="xp-bottom-bar absolute bottom-0 left-0 z-2 flex h-15 w-full items-center justify-center px-6 md:justify-end">
+        <nav aria-label="Legal">
+          <ul className="m-0 flex list-none gap-xp-lg p-0">
+            {legalLinks.map(({ href, label }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  prefetch={false}
+                  aria-current={pathname === href ? "page" : undefined}
+                  className="xp-footer-link text-xp-md text-xp-white"
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </footer>
     </div>
   );
 }

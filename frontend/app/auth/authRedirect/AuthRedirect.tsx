@@ -19,9 +19,8 @@ const protectedRoutes = [
   "/chats",
   "/gameStats",
   "/paint",
-  "/privacy-policy",
-  "/terms-of-service",
 ];
+// /privacy-policy and /terms-of-service are in neither list: open to everyone.
 
 const matches = (pathname: string, routes: string[]) =>
   routes.some(
