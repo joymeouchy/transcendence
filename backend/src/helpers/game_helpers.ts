@@ -59,12 +59,6 @@ export function cancelInvitesFor(userId: number | undefined) {
   }
 }
 
-// reserveMatch and releaseMatch wrap every match creation in server.ts
-// (queue, rematch, friend invite):
-//   reserveMatch(a, b) → await the avatar lookups → startGame → releaseMatch(a, b)
-// while the server waits on the avatars, other socket events can run. the
-// reservation keeps both players busy during that gap
-
 // call as soon as a match is decided, before any await: marks both players
 // busy and drops their other invites right away. the ids can be undefined
 // (a socket with no known user), those are skipped

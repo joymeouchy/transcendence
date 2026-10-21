@@ -18,7 +18,10 @@ import {
   cancelGameCleanup,
   abandonPausedGame,
 } from "./game";
-import { pongConfig, isValidWinningScore } from "../../frontend/types/game_types";
+import {
+  pongConfig,
+  isValidWinningScore,
+} from "../../frontend/types/game_types";
 import passport from "./OAuth";
 import userRoutes from "../routes/users";
 import friendshipRoutes from "../routes/friendships";
@@ -51,8 +54,7 @@ const swaggerOptions = {
     // so "Try it out" calls go through Caddy's /api prefix instead of the site root
     servers: [{ url: BACKEND_URL }],
     // adds the "Authorize" button: paste a JWT once and every "Try it out"
-    // request sends it as "Authorization: Bearer <token>". (Header params named
-    // Authorization are ignored by OpenAPI 3, so they can't do this.)
+    // request sends it as "Authorization: Bearer <token>".
     components: {
       securitySchemes: {
         bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
@@ -81,9 +83,6 @@ const INVITE_TIMEOUT_MS = 30000;
 // a rematch is played to the same score. Only non-default scores are stored.
 const roomWinningScores = new Map<string, number>();
 
-// Express app: middleware first (runs on every request), then the route files,
-// each mounted under its own prefix (/auth, /users, ...). Caddy strips /api
-// before requests get here
 const app = express();
 // only the frontend's origin may call the API from a browser
 app.use(
@@ -110,9 +109,9 @@ const io = new Server(server, {
   cors: {
     origin: FRONTEND_URL,
   },
-  // if a connection drops briefly (wifi blip, laptop sleep), Socket.IO restores
-  // the same socket with the same id and rooms when it reconnects within this
-  // time, and replays the events it missed. that's what lets a match resume
+  // if a connection drops briefly, Socket.IO restores the same socket with
+  // the same id and rooms when it reconnects within this time,
+  // and replays the events it missed. that's what lets a match resume
   connectionStateRecovery: { maxDisconnectionDuration: RECOVERY_WINDOW_MS },
 });
 
@@ -145,10 +144,6 @@ async function cleanupOldMessages() {
 cleanupOldMessages();
 setInterval(cleanupOldMessages, MESSAGE_CLEANUP_INTERVAL_MS);
 
-// Authenticate the socket connection using the same JWT issued by /auth/login,
-// /auth/register or the Google callback, so we know the real userId behind a socket instead of
-// trusting whatever the client claims (this is what lets us tell two tabs of
-// the same account apart from two different accounts).
 // io.use is socket middleware: it runs once per new connection, before the
 // "connection" handler. next() accepts the connection, next(error) refuses it.
 // the client sends the token with io(url, { auth: { token } })
@@ -170,12 +165,10 @@ io.use(async (socket, next) => {
     return next(new Error("Invalid or expired token"));
   }
 
-  // socket.data is a per-socket object for our own values, readable in every
-  // handler below for as long as the socket is connected
   socket.data.userId = decoded.userId;
   socket.data.username = decoded.username;
 
-  // fetched before next() so match_found emissions can rely on it being
+  // fetched before next() so match_found can rely on it being
   // populated as soon as the connection is established
   const user = await prisma.user
     .findUnique({
@@ -248,8 +241,6 @@ io.on("connection", (socket) => {
   socket.on("join_queue", async () => {
     // console.log(socket.id, "wants to play");
 
-    // queueing from a match that's paused on a disconnected opponent counts
-    // as leaving it
     const currentRoom = findRoomBySocket(socket.id);
     if (currentRoom && abandonPausedGame(currentRoom)) {
       socket.leave(currentRoom);
@@ -288,8 +279,6 @@ io.on("connection", (socket) => {
       const matchedWaitingPlayer = waitingPlayer;
       const matchedSocket = socket;
 
-      // reset the queue before the avatar lookup below awaits, otherwise a
-      // join_queue firing in the meantime could match against this player again
       waitingPlayer = null;
       reserveMatch(waitingUserId, joiningUserId);
 
@@ -335,9 +324,8 @@ io.on("connection", (socket) => {
       // console.log("Game started in room:", room);
     }
   });
-  // handle paddle movement. the client sends one "up"/"down" per keydown (the
-  // browser repeats keydown while a key is held) or while the screen is touched.
-  // the server moves the paddle (game.ts checks the sender really plays in that room)
+
+  // handle paddle movement. the client sends one "up"/"down" per keydown
   socket.on(
     "paddle_move",
     ({ room, direction }: { room: string; direction: "up" | "down" }) => {
@@ -372,9 +360,9 @@ io.on("connection", (socket) => {
     // the opponent left the result screen (they leave the room then),
     // disconnected, or started another match: treat it as a decline.
     // io.sockets.adapter.rooms.get(room) is the Set of socket ids in that room
-    const opponentSocketId = [...(io.sockets.adapter.rooms.get(room) ?? [])].find(
-      (id) => id !== socket.id,
-    );
+    const opponentSocketId = [
+      ...(io.sockets.adapter.rooms.get(room) ?? []),
+    ].find((id) => id !== socket.id);
     const opponentId = opponentSocketId
       ? socketToUser.get(opponentSocketId)
       : undefined;
@@ -498,7 +486,13 @@ io.on("connection", (socket) => {
   // inviter chose. the invite is cancelled after INVITE_TIMEOUT_MS without an answer
   socket.on(
     "invite_friend",
-    ({ friendId, winningScore }: { friendId: number; winningScore?: number }) => {
+    ({
+      friendId,
+      winningScore,
+    }: {
+      friendId: number;
+      winningScore?: number;
+    }) => {
       const inviterId = socketToUser.get(socket.id);
       if (!inviterId) return;
 
@@ -767,10 +761,7 @@ io.on("connection", (socket) => {
       // remembered so that, if this socket is recovered after the match is
       // gone, the connection handler can send it game_abandoned
       droppedFromRoom.set(socket.id, room);
-      setTimeout(
-        () => droppedFromRoom.delete(socket.id),
-        RECOVERY_WINDOW_MS,
-      );
+      setTimeout(() => droppedFromRoom.delete(socket.id), RECOVERY_WINDOW_MS);
       pauseGame(room);
       io.to(room).emit("player_disconnected");
       scheduleGameCleanup(io, room, socket.id);
