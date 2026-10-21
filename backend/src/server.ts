@@ -88,7 +88,7 @@ const app = express();
 app.use(
   cors({
     origin: FRONTEND_URL,
-  }),
+  })
 );
 // parses JSON request bodies into req.body
 app.use(express.json());
@@ -318,7 +318,7 @@ io.on("connection", (socket) => {
         room,
         matchedWaitingPlayer.id,
         matchedSocket.id,
-        socketToUser,
+        socketToUser
       );
       releaseMatch(waitingUserId, joiningUserId);
       // console.log("Game started in room:", room);
@@ -330,7 +330,7 @@ io.on("connection", (socket) => {
     "paddle_move",
     ({ room, direction }: { room: string; direction: "up" | "down" }) => {
       handlePaddleMove(socket.id, room, direction);
-    },
+    }
   );
 
   // rematch: both players stay in the finished match's room on the result
@@ -381,8 +381,7 @@ io.on("connection", (socket) => {
       players.push(socket.id);
     }
 
-    // if both players want a rematch, let the other one know theirs got
-    // accepted; otherwise this is the first request, so ask the other player
+    // if both players want a rematch, let the other one know theirs got accepted
     if (players.length === 2) {
       socket.to(room).emit("rematch_accepted");
       rematches.delete(room);
@@ -451,17 +450,12 @@ io.on("connection", (socket) => {
     if (!socket.rooms.has(room)) return;
 
     // also sent when a player leaves the result screen without answering.
-    // only tell the opponent if a rematch was asked for: either they're
-    // waiting on us, or we asked and their request popup is still open
     const asked = (rematches.get(room) ?? []).length > 0;
     rematches.delete(room);
     roomWinningScores.delete(room);
     if (asked) {
       socket.to(room).emit("rematch_declined");
     }
-
-    // leave the finished match's room so later rematch requests for it
-    // don't pop up while we're on another screen or in another match
     socket.leave(room);
   });
 
@@ -496,7 +490,6 @@ io.on("connection", (socket) => {
       const inviterId = socketToUser.get(socket.id);
       if (!inviterId) return;
 
-      // optional: missing means the default, anything outside the allowed list is rejected
       const matchWinningScore = winningScore ?? pongConfig.winningScore;
       if (!isValidWinningScore(matchWinningScore)) {
         socket.emit("invite_error", { message: "Invalid max score." });
@@ -570,8 +563,6 @@ io.on("connection", (socket) => {
         winningScore: matchWinningScore,
       });
 
-      // sent to every tab of the friend. io.to(socketId) works because every
-      // socket is automatically in a room named after its own id
       for (const friendSocketId of friendSockets) {
         io.to(friendSocketId).emit("invite_received", {
           fromUserId: inviterId,
@@ -580,7 +571,7 @@ io.on("connection", (socket) => {
           winningScore: matchWinningScore,
         });
       }
-    },
+    }
   );
 
   // the inviter cancelled their invite before the friend answered
@@ -597,12 +588,11 @@ io.on("connection", (socket) => {
 
     const friendSockets = onlineUsers.get(friendId);
     friendSockets?.forEach((friendSocketId) =>
-      io.to(friendSocketId).emit("invite_cancelled", { fromUserId: inviterId }),
+      io.to(friendSocketId).emit("invite_cancelled", { fromUserId: inviterId })
     );
   });
 
-  // the invited friend accepted or declined. this socket is the friend,
-  // fromUserId is the inviter
+  // the invited friend accepted or declined. this socket is the friend, fromUserId is the inviter
   socket.on(
     "invite_response",
     async ({
@@ -618,9 +608,6 @@ io.on("connection", (socket) => {
       const key = `${fromUserId}:${responderId}`;
       const pending = pendingInvites.get(key);
       if (!pending) {
-        // the invite was cancelled just before this answer arrived (for
-        // example the inviter's match started). the popup already sent the
-        // accepter to the game page, so tell them, unless they're playing
         if (accepted && !isUserBusy(responderId)) {
           socket.emit("invite_error", {
             message: "This invite is no longer available.",
@@ -702,7 +689,7 @@ io.on("connection", (socket) => {
       });
       releaseMatch(fromUserId, responderId);
       // console.log("Friend match started in room:", room);
-    },
+    }
   );
 
   // a socket closed (tab closed, network lost, logout). clean up everything it
@@ -716,9 +703,6 @@ io.on("connection", (socket) => {
       userSockets?.delete(socket.id);
 
       // only mark offline once every socket/tab for this user has disconnected.
-      // No DB write and no await here - this stays fully synchronous so a
-      // reconnect can't interleave between the Set mutation and the emit
-      // (that gap is what let a stale disconnect race a newer connect before).
       if (!userSockets || userSockets.size === 0) {
         onlineUsers.delete(userId);
         io.emit("online_changed", { userId, isOnline: false });
@@ -731,16 +715,16 @@ io.on("connection", (socket) => {
         const [, inviteeIdStr] = key.split(":");
 
         if (pending.inviterSocketId === socket.id) {
-          // the tab that sent the invite is gone - cancel it
+          // the tab that sent the invite is gone, cancel it
           clearTimeout(pending.timeout);
           pendingInvites.delete(key);
           onlineUsers
             .get(Number(inviteeIdStr))
             ?.forEach((sId) =>
-              io.to(sId).emit("invite_cancelled", { fromUserId: userId }),
+              io.to(sId).emit("invite_cancelled", { fromUserId: userId })
             );
         } else if (Number(inviteeIdStr) === userId && !stillOnline) {
-          // the invitee has no sockets left connected - treat as a decline
+          // the invitee has no sockets left connected, treat as a decline
           clearTimeout(pending.timeout);
           pendingInvites.delete(key);
           io.sockets.sockets

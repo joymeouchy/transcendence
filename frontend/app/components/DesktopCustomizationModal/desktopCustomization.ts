@@ -67,4 +67,14 @@ export const desktopThemes: DesktopTheme[] = [
 		name: "Eepy",
 		background: images.windowsAnime2Wallpaper,
 	},
+	{
+		id: "maamoul",
+		name: "Maamoul",
+		background: images.windowsMaamoulWallpaper,
+	},
+	{
+		id: "Nour",
+		name: "Nour",
+		background: images.windowsNourWallpaper,
+	},
 ];

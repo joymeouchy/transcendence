@@ -46,5 +46,7 @@ export const images = {
 	windowsRevacholWallpaper: "/wallpapers/revachol.png",
 	windowsStoneHengeWallpaper: "/wallpapers/Stonehenge.jpg",
 	windowsTulipsWallpaper: "/wallpapers/Tulips.jpg",
+	windowsMaamoulWallpaper: "/wallpapers/maamoul.jpeg",
+	windowsNourWallpaper: "/wallpapers/nour.jpg",
 	windowsDefaultWallpaper: "/wallpapers/windows_wallpaper.jpg",
 };

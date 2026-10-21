@@ -20,5 +20,4 @@ export const BACKEND_URL = trim(process.env.BACKEND_URL || "https://localhost:84
 if (!process.env.JWT_SECRET) {
   throw new Error("JWT_SECRET is not set. Add it to .env before starting the server.");
 }
-// read after the check above, so TypeScript knows it's a string and not undefined
 export const JWT_SECRET: string = process.env.JWT_SECRET;
