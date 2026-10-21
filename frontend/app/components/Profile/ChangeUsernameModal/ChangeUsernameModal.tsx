@@ -7,6 +7,7 @@ import XPAlert from "../../ui/XPAlert/XPAlert";
 
 import { UserService } from "@/services/user.services";
 import { useAuth } from "@/context/AuthContext";
+import { validateUsername } from "@/lib/validation";
 
 type ChangeUsernameModalProps = {
 	isOpen: boolean;
@@ -45,8 +46,9 @@ export default function ChangeUsernameModal({
 	const handleSubmit = async () => {
 		setError("");
 
-		if (!username.trim()) {
-			setError("Username is required.");
+		const usernameError = validateUsername(username.trim());
+		if (usernameError) {
+			setError(usernameError);
 			return;
 		}
 

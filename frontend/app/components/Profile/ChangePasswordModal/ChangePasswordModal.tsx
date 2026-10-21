@@ -6,6 +6,7 @@ import XPModal from "../../ui/XPModal/XPModal";
 import XPAlert from "../../ui/XPAlert/XPAlert";
 
 import { authService } from "@/services/auth.services";
+import { validatePassword } from "@/lib/validation";
 
 type ChangePasswordModalProps = {
 	isOpen: boolean;
@@ -53,6 +54,12 @@ export default function ChangePasswordModal({
 			!confirmPassword
 		) {
 			setError("Please fill in all fields.");
+			return;
+		}
+
+		const passwordError = validatePassword(newPassword);
+		if (passwordError) {
+			setError(passwordError);
 			return;
 		}
 

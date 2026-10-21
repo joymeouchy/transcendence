@@ -54,7 +54,7 @@ export default function ActivePowerUp({ effect, className, textClassName }: Prop
       </div>
 
       <div className="flex min-w-0 items-start justify-between gap-2">
-        <span className={clsx(textClassName, "min-w-0 flex-1 leading-[1.3] [overflow-wrap:anywhere]")}>
+        <span className={clsx(textClassName, "min-w-0 flex-1 leading-[1.3] whitespace-normal! [overflow-wrap:anywhere]")}>
           {formatPowerUpName(effect.type)}
         </span>
 

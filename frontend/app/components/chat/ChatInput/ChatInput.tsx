@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import clsx from "clsx";
 import styles from "./ChatInput.module.scss";
+import { MESSAGE_MAX_LENGTH } from "@/lib/validation";
 
 interface Props {
 	onSend: (message: string) => void;
@@ -32,6 +33,7 @@ export default function ChatInput({
 					"max-h-25 min-h-5.5 min-w-0 flex-1 resize-none overflow-y-auto rounded-xp-2xs px-1.5 py-1 font-xp text-xp-sm leading-[15px] outline-none",
 				)}
 				name="message"
+				maxLength={MESSAGE_MAX_LENGTH}
 				value={value}
 				onChange={(e) =>
 					setValue(e.target.value)
