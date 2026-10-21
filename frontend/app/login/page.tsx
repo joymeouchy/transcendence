@@ -30,12 +30,6 @@ export default function LoginPage() {
 
   const { login } = useAuth();
 
-  // useEffect(() => {
-  //   if (isAuthenticated()) {
-  //     router.replace("/home");
-  //   }
-  // }, []);
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 

@@ -16,6 +16,8 @@ import { UserService } from "../services/user.services";
 import { UserProfile } from "@/types/types.dto";
 import { playSound, playSoundWhenAllowed, sounds } from "@/lib/sounds";
 import { socket } from "@/lib/socket";
+import { setUnauthorizedHandler } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 type AuthContextType = {
   user: UserProfile | null;
@@ -54,6 +56,7 @@ export function AuthProvider({
   const [loading, setLoading] =
     useState(true);
   const { onlineUsers } = useOnlineSocket();
+  const router = useRouter();
 
   /**
    * Load current authenticated user
@@ -132,6 +135,31 @@ useEffect(() => {
   }
 }, [user]);
 
+/**
+ * Force a sign-out when the backend rejects the token (invalid or
+ * expired), from a REST call or the socket handshake
+ */
+useEffect(() => {
+  const forceLogout = () => {
+    if (!authService.getToken()) return;
+    authService.logout();
+    setUser(null);
+    router.replace("/login");
+  };
+
+  const onConnectError = (err: Error) => {
+    if (err.message === "Invalid or expired token") forceLogout();
+  };
+
+  setUnauthorizedHandler(forceLogout);
+  socket.on("connect_error", onConnectError);
+
+  return () => {
+    setUnauthorizedHandler(null);
+    socket.off("connect_error", onConnectError);
+  };
+}, [router]);
+
 useEffect(() => {
   if (user) {
     socket.connect();
@@ -188,8 +216,10 @@ const register = async (
     email,
     password,
   });
-
-  await refreshUser();
+  const currentUser = await UserService.getMe();
+  sessionStorage.removeItem("pendingLoginSound");
+  setUser(currentUser);
+  playSound(sounds.startup);
 };
 
 /**

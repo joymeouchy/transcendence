@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { tokenStorage } from "@/lib/token";
 
 export default function AuthCallbackContent() {
 	const router = useRouter();
@@ -9,18 +10,13 @@ export default function AuthCallbackContent() {
 
 	useEffect(() => {
 		const token = searchParams.get("token");
-		const userId = searchParams.get("userId");
 
 		if (!token) {
 			router.replace("/login");
 			return;
 		}
 
-		localStorage.setItem("token", token);
-
-		if (userId) {
-			localStorage.setItem("userId", userId);
-		}
+		tokenStorage.set(token);
 
 		// Picked up by AuthContext after the reload to play the login sound
 		sessionStorage.setItem("pendingLoginSound", "1");

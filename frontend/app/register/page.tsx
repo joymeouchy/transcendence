@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { authService } from "@/services/auth.services";
 // import { isAuthenticated } from "@/lib/auth";
 import { registerFields } from "../data/auth/registerFields";
 import { useAuth } from "@/context/AuthContext";
@@ -21,7 +20,7 @@ import XPAlert from "../components/ui/XPAlert/XPAlert";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { refreshUser } = useAuth();
+  const { register } = useAuth();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -58,14 +57,11 @@ export default function RegisterPage() {
     try {
       setLoading(true);
 
-      await authService.register({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-      });
-
-      // Fetch the newly authenticated user's information
-      await refreshUser();
+      await register(
+        formData.username,
+        formData.email,
+        formData.password
+      );
 
       setSuccessMessage("Registration successful");
       setShowSuccess(true);

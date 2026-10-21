@@ -436,7 +436,7 @@ Feature-specific behaviour:
 | [`services/auth.services.ts`](frontend/services/auth.services.ts) | `register`, `login` (both store `res.data.token`), `loginWithGoogle` (full-page redirect to `${API_URL}/auth/google`), `logout` (removes the token), `getToken`, `forgotPassword`, `resetPassword`, `changePassword`. |
 | [`context/AuthContext.tsx`](frontend/context/AuthContext.tsx) | Holds `user: UserProfile \| null`, `loading`, `onlineUsers`; exposes `login`, `register`, `logout`, `refreshUser`; connects and disconnects the socket. |
 | [`app/auth/authRedirect/AuthRedirect.tsx`](frontend/app/auth/authRedirect/AuthRedirect.tsx) | Redirects on every pathname change, based on `isAuthenticated()` only. |
-| [`app/auth/callback/AuthCallbackContent.tsx`](frontend/app/auth/callback/AuthCallbackContent.tsx) | Google OAuth landing: stores `token` (and `userId`) in `localStorage`, sets `sessionStorage.pendingLoginSound`, then calls `window.location.replace("/home")`. |
+| [`app/auth/callback/AuthCallbackContent.tsx`](frontend/app/auth/callback/AuthCallbackContent.tsx) | Google OAuth landing: stores `token` with `tokenStorage.set`, sets `sessionStorage.pendingLoginSound`, then calls `window.location.replace("/home")`. |
 | [`app/GoogleAuthError/GoogleAuthError.tsx`](frontend/app/GoogleAuthError/GoogleAuthError.tsx) | Shown on `/login?error=...`. Known codes are `google_email_exists` and `google_failed`; any other code shows the generic failure text. |
 
 ### AuthContext lifecycle
@@ -875,7 +875,7 @@ There is no external state library. State lives in three layers:
 | **Contexts** (`context/`) | `AuthContext`: `user`, `loading`, `onlineUsers`. `GameInviteContext`: `incomingInvite`. `AlertContext`: current alert message. | Whole session (root layout) |
 | **Hooks** | `useGameSocket`: all game UI state. `useMessageSocket`: last received message. `useOnlineSocket`: presence map (used inside `AuthContext`). | While the consuming page is mounted |
 | **Page/component state** | Data loaded through services (friends, requests, messages, matches, leaderboard, themes), form fields, modal open flags, loading flags | While the component is mounted; refetched on mount |
-| **Browser storage** | `localStorage.token` (JWT), `localStorage.userId` (written by the OAuth callback, not read anywhere), `sessionStorage.pendingLoginSound` | Persistent / tab |
+| **Browser storage** | `localStorage.token` (JWT, only accessed through `lib/token.ts` `tokenStorage`), `sessionStorage.pendingLoginSound` | Persistent / tab |
 
 Typical flows:
 
@@ -1116,7 +1116,6 @@ When an evaluator asks "what would you improve?" or finds one of these, the stro
 | `GameModals/MatchMakingModal/FriendInviteModal.tsx` | Username-entry invite modal; not imported (`FriendSelectModal` replaced it). |
 | `useGameSocket` `inviteResult` / `closeInviteResult` | `inviteResult` is never set; `closeInviteResult` is never used. |
 | `sounds.notif` | Path fixed to `/sounds/...`, but still not played anywhere. |
-| `localStorage.userId` | Written by the OAuth callback, never read. |
 | `login/page.tsx` | Commented-out `isAuthenticated` import and redirect (the same code was removed from `register/page.tsx`; `AuthRedirect` does this job). |
 | `types/types.dto.ts` `Friend`/`FriendRequest` vs `services/friendships.service.ts` `Friend`/`PendingRequest` | Two equivalent type definitions used interchangeably. |
 | Label-based wiring | `StartMenuColumn` and `FloatingIcons` decide actions by comparing `item.label` strings ("Customize", "Marvin", "Deep Thought"). `StartMenuColumn` also renders its own `DesktopCustomizationModal` per column (two instances in the Start menu). |

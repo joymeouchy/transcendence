@@ -21,9 +21,26 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Set by AuthContext: signs the user out when the token is rejected
+let unauthorizedHandler: (() => void) | null = null;
+
+export const setUnauthorizedHandler = (handler: (() => void) | null) => {
+  unauthorizedHandler = handler;
+};
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Only the JWT middleware answers 401, so a 401 on a request that
+    // carried a token means it is invalid or expired
+    if (
+      error.response?.status === 401 &&
+      error.config?.headers?.Authorization
+    ) {
+      unauthorizedHandler?.();
+    }
+
+
     const message =
       error.response?.data?.error ||
       error.response?.data?.message ||

@@ -1,8 +1,9 @@
+import { tokenStorage } from "./token";
 
 export const isAuthenticated = () => {
   if (typeof window === "undefined") return false;
 
-  const token = localStorage.getItem("token");
+  const token = tokenStorage.get();
 
   if (!token) return false;
 
@@ -16,13 +17,13 @@ export const isAuthenticated = () => {
     const isExpired = payload.exp * 1000 <= Date.now();
 
     if (isExpired) {
-      localStorage.removeItem("token");
+      tokenStorage.remove();
       return false;
     }
 
     return true;
   } catch {
-    localStorage.removeItem("token");
+    tokenStorage.remove();
     return false;
   }
 };
